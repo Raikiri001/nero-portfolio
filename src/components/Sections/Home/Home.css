@@ -55,7 +55,8 @@
   box-shadow: 0 0 15px rgba(0, 144, 217, 0.3);
 }
 
-.subtitle-bracket-left, .subtitle-bracket-right {
+.subtitle-bracket-left,
+.subtitle-bracket-right {
   font-family: var(--font-mono);
   font-size: 1.5rem;
   font-weight: bold;
@@ -95,7 +96,7 @@
   text-decoration: none;
   pointer-events: auto;
   cursor: none;
-  overflow: hidden;
+  overflow: visible;
   transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -122,34 +123,90 @@
   border-color: var(--nerd-primary);
   border-style: solid;
   border-width: 0;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, transform 0.3s ease;
 }
 
-.cv-box-corner.top-left { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; }
-.cv-box-corner.top-right { top: -1px; right: -1px; border-top-width: 2px; border-right-width: 2px; }
-.cv-box-corner.bottom-left { bottom: -1px; left: -1px; border-bottom-width: 2px; border-left-width: 2px; }
-.cv-box-corner.bottom-right { bottom: -1px; right: -1px; border-bottom-width: 2px; border-right-width: 2px; }
+.cv-box-corner.top-left { top: -8px; left: -8px; border-top-width: 3px; border-left-width: 3px; }
+.cv-box-corner.top-right { top: -8px; right: -8px; border-top-width: 3px; border-right-width: 3px; }
+.cv-box-corner.bottom-left { bottom: -8px; left: -8px; border-bottom-width: 3px; border-left-width: 3px; }
+.cv-box-corner.bottom-right { bottom: -8px; right: -8px; border-bottom-width: 3px; border-right-width: 3px; }
+
+.cv-bounding-box:hover .cv-box-corner.top-left { animation: corner-tl-high 0.8s infinite ease-in-out; }
+.cv-bounding-box:hover .cv-box-corner.top-right { animation: corner-tr-high 0.8s infinite ease-in-out; }
+.cv-bounding-box:hover .cv-box-corner.bottom-left { animation: corner-bl-high 0.8s infinite ease-in-out; }
+.cv-bounding-box:hover .cv-box-corner.bottom-right { animation: corner-br-high 0.8s infinite ease-in-out; }
+
+@keyframes corner-tl-high { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-10px, -10px) scale(1.3); } }
+@keyframes corner-tr-high { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(10px, -10px) scale(1.3); } }
+@keyframes corner-bl-high { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-10px, 10px) scale(1.3); } }
+@keyframes corner-br-high { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(10px, 10px) scale(1.3); } }
 
 .cv-label-container {
   display: flex;
   flex-direction: column;
-  background: rgba(0, 0, 0, 0.8);
+  background: transparent;
   padding: 6px 10px;
-  border-bottom: 1px solid var(--nerd-primary);
-  border-right: 1px solid var(--nerd-primary);
   font-family: var(--font-mono);
   font-size: 0.65rem;
   color: var(--color-text-primary);
   transition: border-color 0.3s ease;
+  border: none;
 }
 
 .cv-bounding-box:hover .cv-label-container {
   border-color: var(--nerd-accent-red);
 }
 
-.cv-label { color: var(--nerd-primary); font-weight: bold; transition: color 0.3s ease; }
-.cv-bounding-box:hover .cv-label { color: var(--nerd-accent-red); }
-.cv-confidence { color: var(--nerd-accent-green); }
+.cv-box-tgt {
+  position: absolute;
+  top: -35px;
+  left: -4px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: bold;
+  background: var(--nerd-primary);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 2px;
+  letter-spacing: 0.1em;
+  pointer-events: none;
+  z-index: 100;
+  box-shadow: 0 0 10px rgba(0, 144, 217, 0.4);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cv-bounding-box:hover .cv-box-tgt {
+  background: var(--nerd-accent-red);
+  box-shadow: 0 0 15px rgba(255, 0, 60, 0.6);
+}
+
+.cv-box-coords {
+  position: absolute;
+  bottom: -35px;
+  right: -4px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: bold;
+  background: var(--nerd-primary);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 2px;
+  letter-spacing: 0.1em;
+  pointer-events: none;
+  z-index: 100;
+  white-space: nowrap;
+  box-shadow: 0 0 10px rgba(0, 144, 217, 0.4);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cv-bounding-box:hover .cv-box-coords {
+  background: var(--nerd-accent-red);
+  box-shadow: 0 0 15px rgba(255, 0, 60, 0.6);
+}
+
+.cv-confidence {
+  color: var(--nerd-accent-yellow);
+}
 
 .cv-expanded-details {
   opacity: 0;

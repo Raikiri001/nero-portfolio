@@ -85,10 +85,16 @@ body {
   font-family: var(--font-ui);
   background-color: var(--color-void);
   color: var(--color-text-primary);
-  overflow-x: hidden;
+  overflow: hidden; /* Global vertical scroll removal */
   cursor: none;
   min-height: 100vh;
   text-shadow: 0 0 3px rgba(255,255,255,0.2);
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+  display: none;
 }
 
 #root {

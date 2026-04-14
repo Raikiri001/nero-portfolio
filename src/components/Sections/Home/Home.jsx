@@ -1,9 +1,10 @@
 import { useRef, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'motion/react';
 import { PROJECTS_ARRAY, TERMINAL_MESSAGES } from '../../../data/siteData';
 import { ScrambleText } from '../../HUD/ScrambleText';
 import './Home.css';
 
+// ... existing Home component ...
 export function Home({ onNavigate }) {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [scrollingMessages, setScrollingMessages] = useState([{ id: 0, text: TERMINAL_MESSAGES[0], time: new Date().toLocaleTimeString('en-US', { hour12: false }) }]);
@@ -21,34 +22,31 @@ export function Home({ onNavigate }) {
   }, []);
 
   // Scrolling Terminal Logic
-// 1. Updated useEffect (Simplified)
-useEffect(() => {
-  let currentIdx = TERMINAL_MESSAGES.length; // Start after initial messages
-  
-  const interval = setInterval(() => {
-    const nextMsg = TERMINAL_MESSAGES[currentIdx % TERMINAL_MESSAGES.length];
-    
-    setScrollingMessages(prev => {
-      const newMessage = { 
-        id: Date.now(), // Use a unique timestamp for the key
-        text: nextMsg, 
-        time: new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }) 
-      };
+  useEffect(() => {
+    let currentIdx = TERMINAL_MESSAGES.length; 
 
-      const newArr = [...prev, newMessage];
-      // Keep a bit more buffer (e.g., 8 items) to ensure the screen stays full during transition
-      return newArr.slice(-8); 
-    });
-    
-    currentIdx++;
-  }, 2500); // Slightly slower interval feels more readable
+    const interval = setInterval(() => {
+      const nextMsg = TERMINAL_MESSAGES[currentIdx % TERMINAL_MESSAGES.length];
 
-  return () => clearInterval(interval);
-}, []);
+      setScrollingMessages(prev => {
+        const newMessage = {
+          id: Date.now(),
+          text: nextMsg,
+          time: new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        };
+
+        const newArr = [...prev, newMessage];
+        return newArr.slice(-8);
+      });
+
+      currentIdx++;
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section className="home-section" id="home">
-      {/* 3D Parallax Container */}
       <div
         className="home-parallax"
         ref={containerRef}
@@ -63,20 +61,18 @@ useEffect(() => {
           position: 'relative'
         }}
       >
-        {/* Dynamic CV Analysis Overlay - Orbiting Further Out */}
         <div className="cv-overlay" style={{ zIndex: 1 }}>
           {PROJECTS_ARRAY.map((project, index) => (
-            <CVBoundingBox 
-              key={project.id} 
-              project={project} 
-              index={index} 
-              total={PROJECTS_ARRAY.length} 
-              onNavigate={onNavigate} 
+            <CVBoundingBox
+              key={project.id}
+              project={project}
+              index={index}
+              total={PROJECTS_ARRAY.length}
+              onNavigate={onNavigate}
             />
           ))}
         </div>
 
-        {/* Centerpiece Text */}
         <motion.div
           className="nero-centerpiece"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -87,10 +83,8 @@ useEffect(() => {
           <div className="nero-title" style={{ fontSize: '8rem', margin: 0, lineHeight: 1 }}>
             <ScrambleText text="Nero G" duration={600} />
           </div>
-          
         </motion.div>
 
-        {/* Mission Log / Scrolling Terminal */}
         <motion.div
           className="mission-log hud-panel"
           initial={{ opacity: 0, y: 50 }}
@@ -126,38 +120,48 @@ useEffect(() => {
 
 // Bounding Box Component for CV Overlay
 function CVBoundingBox({ project, index, total, onNavigate }) {
-  const [dim, setDim] = useState({ w: 180, h: 100, x: 0, y: 0 });
-  const [confidence, setConfidence] = useState(0.99);
+  const [dim, setDim] = useState({ w: 240, h: 140 });
   const [isHovered, setIsHovered] = useState(false);
+  
+  // Motion Values for real-time tracking
+  const motionX = useMotionValue(0);
+  const motionY = useMotionValue(0);
+  
+  // Real-time Coordinate Transform
+  const coordsText = useTransform(
+    [motionX, motionY],
+    ([latestX, latestY]) => `${(latestY / 10).toFixed(4)}°N, ${(latestX / 5).toFixed(4)}°E`
+  );
 
   useEffect(() => {
     const scramble = () => {
-      // Create an orbit that specifically avoids the center using elliptical projection
       const angle = (index / total) * Math.PI * 2 + (Math.random() - 0.5);
-      
-      // Much wider X radius, shorter Y radius to avoid center block, closer to border
-      const radiusX = 650 + Math.random() * 250; 
+      const radiusX = 650 + Math.random() * 250;
       const radiusY = 400 + Math.random() * 200;
-      
+
+      const targetX = Math.cos(angle) * radiusX;
+      const targetY = Math.sin(angle) * radiusY;
+
       setDim({
         w: 240 + Math.random() * 60,
         h: 140 + Math.random() * 40,
-        x: Math.cos(angle) * radiusX,
-        y: Math.sin(angle) * radiusY,
       });
-      setConfidence((0.85 + Math.random() * 0.14).toFixed(2));
+
+      // Animate the motion values directly for smooth real-time interpolation
+      animate(motionX, targetX, { duration: 2.5, ease: "easeInOut" });
+      animate(motionY, targetY, { duration: 2.5, ease: "easeInOut" });
     };
-    
+
     scramble();
     const interval = setInterval(scramble, 5000 + Math.random() * 2000);
     return () => clearInterval(interval);
-  }, [index, total]);
+  }, [index, total, motionX, motionY]);
 
   const handleClick = (e) => {
     e.preventDefault();
     if (onNavigate) {
-       window.sessionStorage.setItem('openProject', project.id);
-       onNavigate('sorties');
+      window.sessionStorage.setItem('openProject', project.id);
+      onNavigate('sorties');
     }
   };
 
@@ -170,14 +174,14 @@ function CVBoundingBox({ project, index, total, onNavigate }) {
       animate={{
         width: dim.w,
         height: dim.h,
-        x: dim.x,
-        y: dim.y,
         borderColor: isHovered ? 'var(--nerd-accent-red)' : 'var(--nerd-primary)',
         backgroundColor: isHovered ? 'rgba(255, 0, 60, 0.05)' : 'transparent'
       }}
-      transition={{ duration: 2.5, ease: "easeInOut" }}
       style={{
         position: 'absolute',
+        // Bind position to motion values
+        x: motionX,
+        y: motionY,
         border: '1px solid var(--nerd-primary)',
         cursor: 'pointer',
         display: 'flex',
@@ -189,19 +193,19 @@ function CVBoundingBox({ project, index, total, onNavigate }) {
       }}
       data-clickable
     >
+      <span className="cv-box-tgt">TGT #{project.id.replace('proj_', '')}</span>
+      <motion.span className="cv-box-coords">
+        {coordsText}
+      </motion.span>
+
       <div className="cv-box-corner top-left" style={{ borderColor: isHovered ? 'var(--nerd-accent-red)' : 'var(--nerd-primary)' }}></div>
       <div className="cv-box-corner top-right" style={{ borderColor: isHovered ? 'var(--nerd-accent-red)' : 'var(--nerd-primary)' }}></div>
       <div className="cv-box-corner bottom-left" style={{ borderColor: isHovered ? 'var(--nerd-accent-red)' : 'var(--nerd-primary)' }}></div>
       <div className="cv-box-corner bottom-right" style={{ borderColor: isHovered ? 'var(--nerd-accent-red)' : 'var(--nerd-primary)' }}></div>
-      
-      <div className="cv-label-container" style={{ background: 'var(--panel-bg-dark)', padding: '2px 8px', fontSize: '0.8rem', zIndex: 2 }}>
-        <span className="cv-label" style={{ color: isHovered ? 'var(--nerd-accent-red)' : 'var(--nerd-primary)' }}>[{project.id}]</span>
-        <span className="cv-confidence" style={{ marginLeft: '5px', color: 'var(--nerd-accent-yellow)' }}>CONF: {confidence}</span>
-      </div>
-      
+
       <div className="cv-expanded-details" style={{ opacity: isHovered ? 1 : 0, transition: 'opacity 0.2s', textAlign: 'center', marginTop: '10px', pointerEvents: 'none' }}>
         <div className="cv-proj-title" style={{ fontSize: '0.9rem', color: '#fff', textShadow: '0 0 5px red' }}>{project.title}</div>
-        <div className="cv-proj-action" style={{ color: 'var(--nerd-accent-red)', fontSize: '0.8rem', marginTop: '5px' }}>CLICK TO INTERCEPT &gt;&gt;</div>
+        <div className="cv-proj-action" style={{ color: 'var(--nerd-accent-red)', fontSize: '0.8rem', marginTop: '5px' }}>CLICK TO INTERCEPT</div>
       </div>
     </motion.button>
   );

@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useSoundEngine } from '../../../hooks/useSoundEngine';
+import { ScrambleText } from '../../HUD/ScrambleText';
 import './Contact.css';
 
 const commLinks = [
@@ -58,8 +59,8 @@ export function Contact() {
         transition={{ duration: 0.6 }}
         style={{ marginLeft: '120px' }}
       >
-        <span className="section-header__code">SEC_004</span>
-        <h2 className="section-header__title">COMMUNICATION // DATA NODES</h2>
+        <span className="section-header__code"><ScrambleText text="SEC_004" /></span>
+        <h2 className="section-header__title"><ScrambleText text="COMMUNICATION // DATA NODES" /></h2>
         <div className="section-header__line" />
       </motion.div>
 

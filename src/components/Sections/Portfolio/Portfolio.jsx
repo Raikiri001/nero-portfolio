@@ -20,8 +20,8 @@ export function Portfolio() {
       if (proj) {
         // slight delay to let user see the page before expanding
         setTimeout(() => {
-           sound.ping();
-           setSelectedMission(proj);
+          sound.ping();
+          setSelectedMission(proj);
         }, 800);
       }
       window.sessionStorage.removeItem('openProject');
@@ -65,7 +65,7 @@ export function Portfolio() {
         transition={{ duration: 0.6 }}
         style={{ marginLeft: '120px' }}
       >
-        <span className="section-header__code">SEC_003</span>
+        <span className="section-header__code"><ScrambleText text="SEC_003" /></span>
         <h2 className="section-header__title"><ScrambleText text="TACTICAL SORTIES // OPERATIONAL LOGS" delay={200} /></h2>
         <div className="section-header__line" />
       </motion.div>
@@ -85,7 +85,7 @@ export function Portfolio() {
           >
             <div className="mission-folder__id">[{project.id}]</div>
             <h3 className="mission-folder__title">{project.title}</h3>
-            
+
             {/* Tactical Graphics Inside Card */}
             <div className="mission-folder__tactical-data" style={{ margin: '15px 0', borderTop: '1px solid rgba(0, 144, 217, 0.3)', borderBottom: '1px solid rgba(0, 144, 217, 0.3)', padding: '10px 0', fontSize: '0.8rem', fontFamily: 'var(--font-mono)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
@@ -107,7 +107,7 @@ export function Portfolio() {
             </div>
 
             <div className="mission-folder__status">STATUS: {project.status}</div>
-            
+
             <div className="mission-folder__footer">
               <div className="mission-folder__date">{project.date}</div>
               <div className="mission-folder__classification">CLASS: OMEGA</div>
@@ -137,23 +137,16 @@ export function Portfolio() {
               <div className="mission-detail__header">
                 <div className="mission-detail__id">[{selectedMission.id}]</div>
                 <h3 className="mission-detail__title">
-                  <ScrambleText text={selectedMission.title} duration={500} />
+                  {selectedMission.title}
                 </h3>
                 <div className="mission-detail__status">STATUS: {selectedMission.status} | {selectedMission.date}</div>
                 <button className="mission-detail__close" onClick={handleClose} data-clickable>
-                  ✕ ABORT VISUALIZATION
+                  ABORT
                 </button>
               </div>
 
               <div className="mission-detail__body" style={{ overflowY: 'auto' }}>
-                
-                {/* Tactical Schematic Large */}
-                <div className="mission-detail__schematic" style={{ height: '150px' }}>
-                  <div className="schematic-grid" style={{ height: '100%', background: 'rgba(0, 144, 217, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 1fr) 3fr', gap: '40px', marginTop: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 1fr) 3fr', gap: '40px', marginTop: '10px' }}>
                   {/* Left Col */}
                   <div>
                     <div className="mission-detail__section">
@@ -180,7 +173,7 @@ export function Portfolio() {
                 <div className="mission-detail__meta">
                   <span style={{ color: 'var(--nerd-accent-red)', fontSize: '0.8rem', fontFamily: 'var(--font-mono)' }}>[TARGET_LOCK_ACQUIRED] // ENHANCING ARCHIVAL DATA</span>
                   <a href={selectedMission.repoUrl} target="_blank" rel="noopener noreferrer" className="mission-detail__access" data-clickable>
-                    <ScrambleText text="ACCESS_REPOSITORY" duration={400} />
+                    ACCESS_REPOSITORY
                   </a>
                 </div>
               </div>

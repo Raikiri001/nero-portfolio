@@ -65,10 +65,11 @@ function App() {
       
       wheelAccumulator += e.deltaY;
       
-      if (wheelAccumulator > 100) {
+      // Increased threshold to 800 for more deliberate scrolling
+      if (wheelAccumulator > 800) {
         changeSection('next');
         wheelAccumulator = 0;
-      } else if (wheelAccumulator < -100) {
+      } else if (wheelAccumulator < -800) {
         changeSection('prev');
         wheelAccumulator = 0;
       }

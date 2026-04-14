@@ -14,27 +14,19 @@
   grid-auto-flow: column;
   grid-auto-columns: 450px;
   gap: 30px;
-  margin: 20px 120px 40px;
+  margin: 30px 120px 40px;
   width: auto;
   overflow-x: auto;
   padding-bottom: 30px;
   scroll-snap-type: x mandatory;
-  scrollbar-width: thin;
-  scrollbar-color: var(--nerd-primary) transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .mission-grid::-webkit-scrollbar {
-  height: 6px;
+  display: none;
 }
 
-.mission-grid::-webkit-scrollbar-track {
-  background: rgba(0, 144, 217, 0.05);
-}
-
-.mission-grid::-webkit-scrollbar-thumb {
-  background: var(--nerd-primary);
-  border-radius: 10px;
-}
 
 /* --- Mission Folder Card --- */
 .mission-folder {
@@ -242,9 +234,9 @@
   flex-direction: column;
   gap: 12px;
   margin-bottom: 25px;
-  border-bottom: 2px solid rgba(0, 144, 217, 0.4);
   position: relative;
   flex-shrink: 0;
+  padding-right: 120px; /* Buffer for ABORT button */
 }
 
 .mission-detail__id {
@@ -274,8 +266,8 @@
 
 .mission-detail__close {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 40px;
+  right: 45px;
   background: rgba(255, 23, 68, 0.1);
   border: 1px solid var(--nerd-accent-red);
   color: var(--nerd-accent-red);
@@ -398,8 +390,8 @@
 
 .mission-debrief {
   font-family: var(--font-mono);
-  font-size: 1.1rem;
-  line-height: 1.9;
+  font-size: 0.85rem;
+  line-height: 1.6;
   color: var(--color-text-primary);
   background: rgba(0, 0, 0, 0.4);
   padding: 25px;
@@ -411,9 +403,10 @@
   gap: 20px;
   justify-content: space-between;
   align-items: center;
-  padding-top: 25px;
+  padding: 25px 5px 15px; /* Added side and bottom padding for glow */
   border-top: 1px solid rgba(0, 144, 217, 0.3);
-  margin-top: 40px;
+  margin-top: 20px;
+  flex-shrink: 0;
 }
 
 /* Removed large repo-link styles, we will use hud-nav__link styling in JSX */

@@ -134,5 +134,50 @@ export const PROJECTS_ARRAY = [
       DATASET_SIZE: "PENDING",
       KEY_METRIC: "0.83 PLCC"
     }
+  },
+  {
+    id: "proj_07",
+    title: "Neural Synapse Visualizer v1.0",
+    date: "October 2025 - December 2025",
+    status: "MISSION_STANDBY",
+    details: "Developing a 3D brain activity visualization tool using Three.js and Python backend. Maps real-time EEG data to interactive neural nodes. Implements dynamic heat-maps for cognitive load analysis.",
+    repoUrl: "#github-link-here",
+    tags: ["Three.js", "Python", "Bio-Informatics"],
+    tacticalData: {
+      THREAT_STATUS: "STANDBY",
+      MODEL_USED: "Custom_Visualizer",
+      DATASET_SIZE: "N/A",
+      KEY_METRIC: "99.2% Sync"
+    }
+  },
+  {
+    id: "proj_08",
+    title: "Autonomous Drone Swarm Pathfinding",
+    date: "January 2026 - Present",
+    status: "MISSION_ACTIVE",
+    details: "Implementing Multi-Agent Reinforcement Learning (MARL) for collaborative navigation in complex urban environments. Utilizing PPO-based agents with shared attention mechanisms.",
+    repoUrl: "#github-link-here",
+    tags: ["MARL", "PPO", "Drones"],
+    tacticalData: {
+      THREAT_STATUS: "DEPLOYED",
+      MODEL_USED: "MAPPO",
+      DATASET_SIZE: "Sim_Environment",
+      KEY_METRIC: "Zero Collision"
+    }
+  },
+  {
+    id: "proj_09",
+    title: "Encrypted Data Stream Decryptor",
+    date: "May 2026 - August 2026",
+    status: "IN_QUEUE",
+    details: "Research project focusing on Transformer-based architectures for identifying patterns in high-entropy encrypted streams. Evaluating vulnerability to pattern-based frequency analysis.",
+    repoUrl: "#github-link-here",
+    tags: ["Transformers", "CyberSec", "BERT"],
+    tacticalData: {
+      THREAT_STATUS: "ENCRYPTED",
+      MODEL_USED: "BERT-T100",
+      DATASET_SIZE: "TBD",
+      KEY_METRIC: "TBD"
+    }
   }
 ];

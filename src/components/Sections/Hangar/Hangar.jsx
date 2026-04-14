@@ -25,7 +25,7 @@ export function Hangar() {
         transition={{ duration: 0.6 }}
         style={{ marginLeft: '120px' }}
       >
-        <span className="section-header__code">SEC_002</span>
+        <span className="section-header__code"><ScrambleText text="SEC_002" /></span>
         <h2 className="section-header__title"><ScrambleText text="PILOT DOSSIER // E.D.A DASHBOARD" delay={200} /></h2>
         <div className="section-header__line" />
       </motion.div>
