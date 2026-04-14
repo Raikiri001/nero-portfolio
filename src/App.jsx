@@ -118,18 +118,6 @@ function App() {
             {/* Background Base */}
             <div className="hex-grid-bg" />
             
-            {/* Dynamic Grid Overlay Follows Mouse */}
-            <div 
-              className="tactical-grid-overlay" 
-              style={{
-                background: `radial-gradient(circle 400px at ${mousePos.x}px ${mousePos.y}px, rgba(0, 144, 217, 0.15) 0%, transparent 100%),
-                             linear-gradient(rgba(0, 144, 217, 0.1) 1px, transparent 1px),
-                             linear-gradient(90deg, rgba(0, 144, 217, 0.1) 1px, transparent 1px)`,
-                backgroundSize: '100% 100%, 50px 50px, 50px 50px',
-                position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none'
-              }}
-            />
-
             {/* HUD Elements */}
             <Navigation activeSection={activeSection} onNavigate={handleNavigate} />
             <ScanlineOverlay />

@@ -62,7 +62,7 @@ export function ScrambleText({ text, duration = 600, delay = 0, className = '' }
             <ScrambleChar 
               key={charIndex} 
               targetChar={char} 
-              delay={delay + (wordIndex * 5 + charIndex) * 20} 
+              delay={delay + (wordIndex * 200 + charIndex * 80)} 
             />
           ))}
           {wordIndex < array.length - 1 && <span className="scramble-space">&nbsp;</span>}

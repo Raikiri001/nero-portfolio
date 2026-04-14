@@ -13,6 +13,22 @@
   overflow: hidden;
 }
 
+.boot-sequence::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(0, 144, 217, 0.05) 50%);
+  background-size: 100% 4px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+@keyframes scanline-flicker {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
 /* --- Gate Screen --- */
 .boot-gate {
   position: absolute;
@@ -148,7 +164,9 @@
 .neural-text {
   font-family: var(--font-mono);
   font-size: 1rem;
-  color: var(--color-gold);
+  color: var(--nerd-primary);
+  text-shadow: 0 0 10px rgba(0, 144, 217, 0.5);
+  z-index: 10;
 }
 
 .neural-text__ok {
@@ -158,8 +176,12 @@
 
 .neural-cursor {
   animation: blink 0.6s step-end infinite;
-  color: var(--color-gold);
+  color: var(--nerd-primary);
   margin-left: 2px;
+}
+
+.neural-text__content--blink {
+  animation: blink 0.8s step-end infinite;
 }
 
 /* --- ASCII Render --- */
@@ -272,10 +294,3 @@
   100% { opacity: 0.95; }
 }
 
-/* --- Burst Canvas --- */
-.beam-canvas {
-  position: fixed;
-  inset: 0;
-  z-index: 10001;
-  pointer-events: none;
-}

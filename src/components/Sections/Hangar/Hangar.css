@@ -11,11 +11,12 @@
 }
 
 .eda-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-  margin: 60px 120px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin: 40px 120px 0;
   width: auto;
+  align-items: start;
 }
 
 .eda-panel {
@@ -41,8 +42,8 @@
 
 .pilot-stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
 }
 
 .pilot-stat-box {
@@ -52,7 +53,7 @@
   justify-content: center;
   background: rgba(0, 0, 0, 0.6);
   border: 1px solid rgba(0, 144, 217, 0.15);
-  padding: 30px 10px;
+  padding: 15px 10px;
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
   transition: all 0.3s ease;
 }
@@ -80,7 +81,7 @@
 }
 
 .pilot-bio-container {
-  margin-top: 40px;
+  margin-top: 25px;
 }
 
 .pilot-bio {
@@ -109,8 +110,8 @@
 .skills-static-container {
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  margin-top: 20px;
+  gap: 15px;
+  margin-top: 10px;
 }
 
 .skill-static-category {
@@ -134,8 +135,8 @@
 
 .skill-static-item {
   font-family: var(--font-mono);
-  font-size: 1rem;
-  padding: 8px 20px;
+  font-size: 0.85rem;
+  padding: 6px 15px;
   background: rgba(0, 0, 0, 0.6);
   border: 1px solid rgba(0, 144, 217, 0.2);
   color: var(--nerd-primary);

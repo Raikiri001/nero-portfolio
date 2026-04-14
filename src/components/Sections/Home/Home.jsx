@@ -84,15 +84,10 @@ useEffect(() => {
           transition={{ duration: 0.8, delay: 0.2 }}
           style={{ zIndex: 2, pointerEvents: 'none' }}
         >
-          <div className="nero-title" style={{ fontSize: '6rem', margin: 0, lineHeight: 1 }}>
+          <div className="nero-title" style={{ fontSize: '8rem', margin: 0, lineHeight: 1 }}>
             <ScrambleText text="Nero G" duration={600} />
           </div>
           
-          <div className="nero-subtitle-container" style={{ marginTop: '30px', background: 'var(--panel-bg-dark)', padding: '10px 20px', border: '1px solid var(--nerd-primary)' }}>
-            <div className="nero-subtitle" style={{ fontSize: '1.2rem', maxWidth: '600px', textAlign: 'center' }}>
-              <ScrambleText text="AN ASPIRING MACHINE LEARNING ENGINEER AND DATA ANALYST WITH AN INTEREST IN GUNDAM AND MACROSS." duration={800} delay={300} />
-            </div>
-          </div>
         </motion.div>
 
         {/* Mission Log / Scrolling Terminal */}
@@ -101,12 +96,12 @@ useEffect(() => {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          style={{ width: '800px', height: '350px', marginTop: '40px', zIndex: 2 }}
+          style={{ width: '1000px', height: '420px', marginTop: '40px', zIndex: 2 }}
         >
           <div className="mission-log__header" style={{ borderBottom: '1px solid var(--nerd-accent-red)' }}>
             <span className="blink-dot" style={{ backgroundColor: 'var(--nerd-accent-red)' }}></span> <ScrambleText text="MISSION_LOG :: ACTIVE" />
           </div>
-          <div className="mission-log__content" style={{ maxHeight: '280px', overflow: 'hidden' }}>
+          <div className="mission-log__content" style={{ maxHeight: '320px', overflow: 'hidden' }}>
             <AnimatePresence>
               {scrollingMessages.map((msgItem) => (
                 <motion.div

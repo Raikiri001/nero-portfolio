@@ -10,10 +10,30 @@
 
 .mission-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-rows: repeat(2, 1fr);
+  grid-auto-flow: column;
+  grid-auto-columns: 450px;
   gap: 30px;
-  margin: 20px 120px 0;
+  margin: 20px 120px 40px;
   width: auto;
+  overflow-x: auto;
+  padding-bottom: 30px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: var(--nerd-primary) transparent;
+}
+
+.mission-grid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.mission-grid::-webkit-scrollbar-track {
+  background: rgba(0, 144, 217, 0.05);
+}
+
+.mission-grid::-webkit-scrollbar-thumb {
+  background: var(--nerd-primary);
+  border-radius: 10px;
 }
 
 /* --- Mission Folder Card --- */
@@ -30,6 +50,8 @@
   transition: all 0.3s ease;
   clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
   min-height: 280px;
+  width: 100%;
+  scroll-snap-align: start;
   box-shadow: inset 0 0 15px rgba(0, 144, 217, 0.1);
 }
 
