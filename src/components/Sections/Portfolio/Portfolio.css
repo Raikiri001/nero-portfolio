@@ -267,7 +267,7 @@
 .mission-detail__close {
   position: absolute;
   top: 40px;
-  right: 45px;
+  right: 20px; /* Aligned with nested content (40px base + 15px body + 5px meta padding) */
   background: rgba(255, 23, 68, 0.1);
   border: 1px solid var(--nerd-accent-red);
   color: var(--nerd-accent-red);

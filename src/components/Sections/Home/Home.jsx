@@ -81,7 +81,7 @@ export function Home({ onNavigate }) {
           style={{ zIndex: 2, pointerEvents: 'none' }}
         >
           <div className="nero-title" style={{ fontSize: '8rem', margin: 0, lineHeight: 1 }}>
-            <ScrambleText text="Nero G" duration={600} />
+            <ScrambleText text="NERO GARCIA" duration={600} />
           </div>
         </motion.div>
 
@@ -106,7 +106,7 @@ export function Home({ onNavigate }) {
                   transition={{ duration: 0.3 }}
                   className="mission-log__message"
                 >
-                  <span className="log-timestamp" style={{ color: 'var(--nerd-accent-yellow)' }}>{msgItem.time}</span>
+                  <span className="log-timestamp" style={{ color: 'var(--nerd-accent-red)' }}>{msgItem.time}</span>
                   <span className="log-text">{msgItem.text}</span>
                 </motion.div>
               ))}

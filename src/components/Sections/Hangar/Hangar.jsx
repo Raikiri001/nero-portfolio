@@ -27,7 +27,6 @@ export function Hangar() {
       >
         <span className="section-header__code"><ScrambleText text="SEC_002" /></span>
         <h2 className="section-header__title"><ScrambleText text="PILOT DOSSIER // E.D.A DASHBOARD" delay={200} /></h2>
-        <div className="section-header__line" />
       </motion.div>
 
       <div className="eda-layout">
@@ -47,7 +46,7 @@ export function Hangar() {
                 <div key={i} className="pilot-stat-box">
                   <span className="pilot-stat-label">{stat.label}</span>
                   <span className="pilot-stat-value" style={{ color: stat.color }}>
-                    {stat.value}<span className="blink-cursor">_</span>
+                    {stat.value}
                   </span>
                 </div>
               ))}

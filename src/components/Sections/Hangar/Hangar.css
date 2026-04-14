@@ -59,9 +59,9 @@
 }
 
 .pilot-stat-box:hover {
-  background: rgba(255, 0, 60, 0.1);
-  border-color: var(--nerd-accent-red);
-  box-shadow: 0 0 20px rgba(255, 0, 60, 0.3);
+  background: rgba(0, 144, 217, 0.1);
+  border-color: var(--nerd-primary);
+  box-shadow: 0 0 20px rgba(0, 144, 217, 0.3);
 }
 
 .pilot-stat-label {
@@ -144,13 +144,13 @@
   letter-spacing: 0.1em;
   transition: all 0.3s ease;
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-  cursor: crosshair;
+  cursor: none;
 }
 
 .skill-static-item:hover {
-  background: rgba(255, 0, 60, 0.1);
-  border-color: var(--nerd-accent-red);
-  box-shadow: 0 0 20px rgba(255, 0, 60, 0.3);
+  background: rgba(0, 144, 217, 0.1);
+  border-color: var(--nerd-primary);
+  box-shadow: 0 0 20px rgba(0, 144, 217, 0.3);
   color: #fff;
 }
 
