@@ -1,0 +1,76 @@
+/* Power Gauge */
+.power-gauge {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.power-gauge__label {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  color: var(--color-cyan);
+  letter-spacing: 0.15em;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  margin-bottom: 8px;
+}
+
+.power-gauge__track {
+  width: 8px;
+  height: 200px;
+  background: rgba(0, 242, 255, 0.08);
+  border: 1px solid rgba(0, 242, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+  clip-path: polygon(0 4px, 4px 0, calc(100% - 0px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0px 100%, 0 calc(100% - 4px));
+}
+
+.power-gauge__fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(0deg, var(--color-cyan), rgba(0, 242, 255, 0.6));
+  transition: height 0.3s ease, background 0.5s ease;
+  box-shadow: 0 0 8px rgba(0, 242, 255, 0.3);
+}
+
+.power-gauge__fill--gold {
+  background: linear-gradient(0deg, var(--color-gold), rgba(212, 175, 55, 0.6));
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+.power-gauge__fill--crimson {
+  background: linear-gradient(0deg, var(--color-crimson), rgba(255, 23, 68, 0.6));
+  box-shadow: 0 0 12px rgba(255, 23, 68, 0.5);
+  animation: pulse-glow 0.5s ease-in-out infinite;
+}
+
+.power-gauge__tick {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(0, 242, 255, 0.15);
+}
+
+.power-gauge__value {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--color-cyan);
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.power-gauge__sublabel {
+  font-family: var(--font-mono);
+  font-size: 0.4rem;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.1em;
+}

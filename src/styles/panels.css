@@ -1,0 +1,246 @@
+/* ============================================================
+   Armor-Plated Panel System
+   ============================================================ */
+
+/* --- Base Panel --- */
+.panel {
+  position: relative;
+  background: var(--color-panel-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  clip-path: polygon(
+    12px 0,
+    calc(100% - 4px) 0,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    4px 100%,
+    0 calc(100% - 4px),
+    0 12px
+  );
+  padding: 20px 24px;
+}
+
+/* Dual-border glow system using layered pseudo-elements */
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  clip-path: polygon(
+    12px 0,
+    calc(100% - 4px) 0,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    4px 100%,
+    0 calc(100% - 4px),
+    0 12px
+  );
+  border: 1.5px solid rgba(0, 242, 255, 0.6); /* --border-cyan */
+  pointer-events: none;
+  z-index: 1;
+}
+
+.panel::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  clip-path: polygon(
+    12px 0,
+    calc(100% - 4px) 0,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    4px 100%,
+    0 calc(100% - 4px),
+    0 12px
+  );
+  border: 1.5px solid rgba(242, 255, 0, 0.6); /* --border-gold */
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* --- Panel Variants --- */
+
+/* Left-slanted (Persona style) */
+.panel--left-slant {
+  clip-path: polygon(
+    0 0,
+    100% 4%,
+    100% 96%,
+    0 100%
+  );
+}
+.panel--left-slant::before,
+.panel--left-slant::after {
+  clip-path: polygon(
+    0 0,
+    100% 4%,
+    100% 96%,
+    0 100%
+  );
+}
+
+/* Right-slanted */
+.panel--right-slant {
+  clip-path: polygon(
+    0 4%,
+    100% 0,
+    100% 100%,
+    0 96%
+  );
+}
+.panel--right-slant::before,
+.panel--right-slant::after {
+  clip-path: polygon(
+    0 4%,
+    100% 0,
+    100% 100%,
+    0 96%
+  );
+}
+
+/* Hexagonal */
+.panel--hex {
+  clip-path: polygon(
+    25% 0%, 75% 0%,
+    100% 25%, 100% 75%,
+    75% 100%, 25% 100%,
+    0% 75%, 0% 25%
+  );
+}
+.panel--hex::before,
+.panel--hex::after {
+  clip-path: polygon(
+    25% 0%, 75% 0%,
+    100% 25%, 100% 75%,
+    75% 100%, 25% 100%,
+    0% 75%, 0% 25%
+  );
+}
+
+/* Aggressive angular */
+.panel--aggressive {
+  clip-path: polygon(
+    20px 0,
+    calc(100% - 8px) 0,
+    100% 20px,
+    100% calc(100% - 20px),
+    calc(100% - 20px) 100%,
+    8px 100%,
+    0 calc(100% - 8px),
+    0 20px
+  );
+}
+.panel--aggressive::before,
+.panel--aggressive::after {
+  clip-path: polygon(
+    20px 0,
+    calc(100% - 8px) 0,
+    100% 20px,
+    100% calc(100% - 20px),
+    calc(100% - 20px) 100%,
+    8px 100%,
+    0 calc(100% - 8px),
+    0 20px
+  );
+}
+
+/* --- Panel Header --- */
+.panel__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid rgba(0, 242, 255, 0.4);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  text-shadow: var(--text-glow-cyan);
+}
+
+.panel__header::before {
+  content: '◆';
+  font-size: 0.5rem;
+  color: var(--color-cyan);
+}
+
+/* --- Panel States --- */
+.panel:hover {
+  box-shadow: var(--glow-intense-cyan);
+}
+
+.panel--active {
+  box-shadow: var(--glow-intense-cyan);
+}
+.panel--active::before {
+  border-color: rgba(255, 0, 127, 0.8);
+}
+.panel--active::after {
+  border-color: rgba(0, 242, 255, 0.8);
+}
+
+/* --- Panel Data Row --- */
+.panel__data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid rgba(0, 242, 255, 0.05);
+}
+
+.panel__data-row .label {
+  color: var(--color-cyan);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.panel__data-row .value {
+  color: var(--color-text-primary);
+}
+
+/* --- Progress Bars --- */
+.power-bar {
+  position: relative;
+  height: 8px;
+  background: rgba(0, 242, 255, 0.1);
+  border: 1px solid rgba(0, 242, 255, 0.2);
+  padding: 1px;
+}
+
+.power-bar__fill {
+  height: 100%;
+  background-image: linear-gradient(90deg, var(--hud-cyan), var(--color-gold));
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0, #000 4px, transparent 4px, transparent 6px);
+  mask-image: repeating-linear-gradient(90deg, #000 0, #000 4px, transparent 4px, transparent 6px);
+  mask: repeating-linear-gradient(90deg, #000 0, #000 4px, transparent 4px, transparent 6px);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+}
+
+.power-bar--crimson .power-bar__fill {
+  background-image: linear-gradient(90deg, var(--color-gold), var(--color-crimson));
+  box-shadow: 0 0 6px rgba(255, 23, 68, 0.4);
+}
+
+.power-bar--yellow-green .power-bar__fill {
+  background-image: linear-gradient(90deg, var(--hud-yellow), var(--hud-lime));
+  box-shadow: 0 0 6px var(--hud-lime);
+}
+
+.power-bar--cyan-blue .power-bar__fill {
+  background-image: linear-gradient(90deg, var(--hud-cyan), #0066ff);
+  box-shadow: 0 0 6px var(--hud-cyan);
+}
+
+.power-bar--magenta-white .power-bar__fill {
+  background-image: linear-gradient(90deg, var(--hud-magenta), #ffffff);
+  box-shadow: 0 0 6px var(--hud-magenta);
+}

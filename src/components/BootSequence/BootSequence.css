@@ -1,0 +1,281 @@
+/* ============================================================
+   Boot Sequence Styles
+   ============================================================ */
+
+.boot-sequence {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* --- Gate Screen --- */
+.boot-gate {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: #000;
+}
+
+.gate-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  transition: opacity 0.5s ease;
+}
+
+.gate-content--fading {
+  opacity: 0;
+}
+
+.gate-reticle {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.gate-reticle__ring {
+  position: absolute;
+  border: 2px solid;
+  border-radius: 50%;
+}
+
+.gate-reticle__ring--outer {
+  inset: 0;
+  border-color: var(--color-gold);
+  animation: spin-slow 8s linear infinite;
+  border-style: dashed;
+}
+
+.gate-reticle__ring--inner {
+  inset: 15px;
+  border-color: var(--color-cyan);
+  animation: spin-reverse 5s linear infinite;
+}
+
+.gate-reticle__cross {
+  position: absolute;
+  inset: 35px;
+}
+
+.gate-reticle__cross::before,
+.gate-reticle__cross::after {
+  content: '';
+  position: absolute;
+  background: var(--color-gold);
+}
+
+.gate-reticle__cross::before {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+.gate-reticle__cross::after {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.gate-label {
+  font-family: var(--font-ui);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  color: var(--color-gold);
+  animation: pulse-glow 2s ease-in-out infinite;
+  padding: 12px 24px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+}
+
+.gate-label__bracket {
+  color: var(--color-cyan);
+  font-weight: 300;
+}
+
+.gate-sublabel {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.15em;
+}
+
+.gate-pulse-ring {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 50%;
+  animation: gate-pulse 3s ease-out infinite;
+}
+
+@keyframes gate-pulse {
+  0% { transform: scale(0.5); opacity: 0.6; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+/* --- Boot Stages --- */
+.boot-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+/* --- Neural Link --- */
+.boot-neural {
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 60px 80px;
+}
+
+.neural-text {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--color-gold);
+}
+
+.neural-text__ok {
+  color: #00ff88;
+  font-weight: 700;
+}
+
+.neural-cursor {
+  animation: blink 0.6s step-end infinite;
+  color: var(--color-gold);
+  margin-left: 2px;
+}
+
+/* --- ASCII Render --- */
+.boot-ascii {
+  gap: 10px;
+  align-items: center;
+  overflow-y: auto;
+}
+
+.ascii-header {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-cyan);
+  letter-spacing: 0.15em;
+  margin-bottom: 8px;
+}
+
+.ascii-header--sms {
+  margin-top: 20px;
+}
+
+.ascii-render {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  line-height: 1.2;
+  color: var(--color-gold);
+  white-space: pre;
+  text-align: center;
+}
+
+.ascii-render--pilot {
+  font-size: 0.55rem;
+  color: var(--color-cyan);
+}
+
+.ascii-line {
+  opacity: 0;
+  animation: fade-in-line 0.1s ease forwards;
+}
+
+@keyframes fade-in-line {
+  to { opacity: 1; }
+}
+
+/* --- G.U.N.D.A.M. Letters --- */
+.gundam-letters {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: absolute;
+  right: 15%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-ui);
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+.gundam-letter {
+  color: rgba(255, 0, 0, 0.4);
+  animation: gundam-slam 0.15s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+  line-height: 0.8;
+}
+
+.gundam-letter--active {
+  animation: gundam-slam 0.1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards,
+             gundam-settle 0.3s 0.1s ease forwards,
+             gundam-glitch 0.2s 0.2s infinite;
+}
+
+.gundam-letter--dot {
+  font-size: 1.5rem;
+  margin: -10px 0;
+}
+
+@keyframes gundam-slam {
+  0% { transform: scale(3) translateX(40px); opacity: 0; }
+  60% { transform: scale(0.9) translateX(-5px); opacity: 1; }
+  100% { transform: scale(1) translateX(0); opacity: 1; }
+}
+
+@keyframes gundam-settle {
+  to {
+    color: var(--hud-cyan);
+    text-shadow: 0 0 20px var(--hud-cyan), 0 0 40px rgba(0, 242, 255, 0.5);
+  }
+}
+
+@keyframes gundam-glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, 2px); }
+  80% { transform: translate(1px, -2px); }
+  100% { transform: translate(0); }
+}
+
+/* Glitch Filters for boot stage */
+.boot-ascii {
+  filter: contrast(1.2) brightness(1.1) drop-shadow(0 0 5px rgba(0,242,255,0.4));
+  animation: crt-flicker 0.15s infinite;
+}
+
+@keyframes crt-flicker {
+  0% { opacity: 0.95; }
+  50% { opacity: 1; filter: contrast(1.4) brightness(1.2) drop-shadow(0 0 5px rgba(255,0,127,0.4)) hue-rotate(-10deg); }
+  100% { opacity: 0.95; }
+}
+
+/* --- Burst Canvas --- */
+.beam-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  pointer-events: none;
+}

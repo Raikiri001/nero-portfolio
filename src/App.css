@@ -1,0 +1,41 @@
+/* ============================================================
+   App Layout
+   ============================================================ */
+
+.main-app {
+  position: relative;
+  min-height: 100vh;
+}
+
+.sections-container {
+  position: relative;
+  z-index: 5;
+}
+
+/* Footer */
+.site-footer {
+  position: relative;
+  z-index: 5;
+  padding: 30px 0;
+  border-top: 1px solid rgba(0, 242, 255, 0.08);
+  margin: 0 40px 0 180px;
+}
+
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.footer-label {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.1em;
+}
+
+.footer-separator {
+  font-size: 0.35rem;
+  color: rgba(242, 255, 0, 0.5); /* old --color-gold-dim */
+}

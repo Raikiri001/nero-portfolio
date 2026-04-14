@@ -1,0 +1,10 @@
+.scramble-wrapper {
+  display: inline-flex;
+  flex-wrap: wrap;
+}
+
+.scramble-char {
+  display: inline-block;
+  min-width: 0.6em; /* Prevent jitter for variable width fonts */
+  text-align: center;
+}

@@ -1,0 +1,248 @@
+/* ============================================================
+   Home Section — NERO TACTICAL OS
+   ============================================================ */
+
+.home-section {
+  position: relative;
+  min-height: 100vh;
+  padding: 60px var(--hud-padding) 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-parallax {
+  position: relative;
+  z-index: 5;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* --- Centerpiece NERO Text --- */
+.nero-centerpiece {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+  text-align: center;
+}
+
+.nero-title {
+  font-family: var(--font-ui);
+  font-size: 8rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.25em;
+  text-shadow: var(--text-glow-primary);
+  margin-bottom: 20px;
+  line-height: 1;
+}
+
+.nero-subtitle-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: var(--panel-bg-dark);
+  padding: 10px 25px;
+  border-top: 1px solid var(--nerd-primary);
+  border-bottom: 1px solid var(--nerd-primary);
+  box-shadow: 0 0 15px rgba(0, 144, 217, 0.3);
+}
+
+.subtitle-bracket-left, .subtitle-bracket-right {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--nerd-primary);
+}
+
+.nero-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: #fff;
+  max-width: 700px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+}
+
+/* --- Dynamic CV Analysis Overlay --- */
+.cv-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cv-bounding-box {
+  position: absolute;
+  border: 1px solid rgba(0, 144, 217, 0.2);
+  background: rgba(0, 144, 217, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  box-shadow: inset 0 0 10px rgba(0, 144, 217, 0.1);
+  text-decoration: none;
+  pointer-events: auto;
+  cursor: none;
+  overflow: hidden;
+  transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cv-bounding-box:hover {
+  border-color: var(--nerd-accent-red);
+  background: rgba(255, 23, 68, 0.1);
+  box-shadow: inset 0 0 20px rgba(255, 23, 68, 0.2);
+  z-index: 100;
+}
+
+.cv-bounding-box:hover .cv-box-corner {
+  border-color: var(--nerd-accent-red);
+}
+
+.cv-bounding-box:hover .cv-expanded-details {
+  opacity: 1;
+  max-height: 200px;
+}
+
+.cv-box-corner {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-color: var(--nerd-primary);
+  border-style: solid;
+  border-width: 0;
+  transition: border-color 0.3s ease;
+}
+
+.cv-box-corner.top-left { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; }
+.cv-box-corner.top-right { top: -1px; right: -1px; border-top-width: 2px; border-right-width: 2px; }
+.cv-box-corner.bottom-left { bottom: -1px; left: -1px; border-bottom-width: 2px; border-left-width: 2px; }
+.cv-box-corner.bottom-right { bottom: -1px; right: -1px; border-bottom-width: 2px; border-right-width: 2px; }
+
+.cv-label-container {
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--nerd-primary);
+  border-right: 1px solid var(--nerd-primary);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-text-primary);
+  transition: border-color 0.3s ease;
+}
+
+.cv-bounding-box:hover .cv-label-container {
+  border-color: var(--nerd-accent-red);
+}
+
+.cv-label { color: var(--nerd-primary); font-weight: bold; transition: color 0.3s ease; }
+.cv-bounding-box:hover .cv-label { color: var(--nerd-accent-red); }
+.cv-confidence { color: var(--nerd-accent-green); }
+
+.cv-expanded-details {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  font-family: var(--font-mono);
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.cv-proj-title {
+  color: #fff;
+  font-family: var(--font-ui);
+  font-weight: bold;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  white-space: normal;
+  text-wrap: balance;
+}
+
+.cv-proj-status {
+  color: var(--nerd-primary);
+  font-size: 0.65rem;
+}
+
+.cv-proj-action {
+  color: var(--nerd-accent-red);
+  font-size: 0.65rem;
+  font-weight: bold;
+  animation: blink 1s infinite alternate;
+  margin-top: 5px;
+}
+
+/* --- Mission Log / Scrolling Terminal --- */
+.mission-log {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 500px;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  z-index: 20;
+}
+
+.mission-log__header {
+  color: var(--nerd-primary);
+  border-bottom: 2px solid rgba(0, 144, 217, 0.4);
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+}
+
+.blink-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--nerd-accent-red);
+  border-radius: 50%;
+  animation: blink 1s infinite alternate;
+}
+
+.mission-log__content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.mission-log__message {
+  display: flex;
+  gap: 12px;
+  color: var(--color-text-secondary);
+  animation: chromatic-flicker 0.15s ease-out;
+}
+
+.log-timestamp {
+  color: var(--nerd-primary);
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+.log-text {
+  color: var(--color-text-primary);
+  text-shadow: 0 0 4px rgba(0, 144, 217, 0.4);
+}
