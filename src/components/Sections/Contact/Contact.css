@@ -120,9 +120,8 @@
 }
 
 .contact-content {
-  margin-left: 120px;
-  max-width: 1200px;
-  margin-top: 20px;
+  margin: 20px 120px 0;
+  width: auto;
 }
 
 .data-nodes-grid {
