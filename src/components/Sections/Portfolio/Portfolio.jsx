@@ -127,7 +127,7 @@ export function Portfolio() {
             onClick={handleClose}
           >
             <motion.div
-              className="mission-detail panel hud-panel"
+              className="mission-detail"
               initial={{ scale: 0.8, opacity: 0, rotateX: 10 }}
               animate={{ scale: 1, opacity: 1, rotateX: 0 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -145,7 +145,7 @@ export function Portfolio() {
                 </button>
               </div>
 
-              <div className="mission-detail__body" style={{ marginTop: '20px' }}>
+              <div className="mission-detail__body" style={{ overflowY: 'auto' }}>
                 
                 {/* Tactical Schematic Large */}
                 <div className="mission-detail__schematic" style={{ height: '150px' }}>
@@ -177,7 +177,7 @@ export function Portfolio() {
                   </div>
                 </div>
 
-                <div className="mission-detail__meta" style={{ marginTop: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="mission-detail__meta">
                   <span style={{ color: 'var(--nerd-accent-red)', fontSize: '0.8rem', fontFamily: 'var(--font-mono)' }}>[TARGET_LOCK_ACQUIRED] // ENHANCING ARCHIVAL DATA</span>
                   <a href={selectedMission.repoUrl} target="_blank" rel="noopener noreferrer" className="mission-detail__access" data-clickable>
                     <ScrambleText text="ACCESS_REPOSITORY" duration={400} />
