@@ -23,7 +23,7 @@ export function Home({ onNavigate }) {
 
   // Scrolling Terminal Logic
   useEffect(() => {
-    let currentIdx = TERMINAL_MESSAGES.length; 
+    let currentIdx = TERMINAL_MESSAGES.length;
 
     const interval = setInterval(() => {
       const nextMsg = TERMINAL_MESSAGES[currentIdx % TERMINAL_MESSAGES.length];
@@ -122,11 +122,11 @@ export function Home({ onNavigate }) {
 function CVBoundingBox({ project, index, total, onNavigate }) {
   const [dim, setDim] = useState({ w: 240, h: 140 });
   const [isHovered, setIsHovered] = useState(false);
-  
+
   // Motion Values for real-time tracking
   const motionX = useMotionValue(0);
   const motionY = useMotionValue(0);
-  
+
   // Real-time Coordinate Transform
   const coordsText = useTransform(
     [motionX, motionY],

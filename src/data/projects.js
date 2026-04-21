@@ -41,7 +41,7 @@ export const projects = [
       'for traffic management systems.',
     ],
     armament: ['Python', 'YOLOv8', 'OpenCV', 'TensorFlow', 'Scikit-learn'],
-    visualType: 'tactical-map',
+    visualType: 'tactical-map ',
     threat_level: 'CRITICAL',
     sortie_date: '2024.11.22',
   },
