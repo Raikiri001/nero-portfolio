@@ -111,11 +111,6 @@
   border-color: var(--nerd-accent-red);
 }
 
-.cv-bounding-box:hover .cv-expanded-details {
-  opacity: 1;
-  max-height: 200px;
-}
-
 .cv-box-corner {
   position: absolute;
   width: 15px;
@@ -211,15 +206,11 @@
 }
 
 .cv-expanded-details {
-  opacity: 0;
-  max-height: 0;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 10px;
+  padding: 0 10px 10px;
   font-family: var(--font-mono);
-  transition: max-height 0.3s ease, opacity 0.3s ease;
   width: 100%;
   box-sizing: border-box;
 }

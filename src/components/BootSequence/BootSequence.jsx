@@ -90,8 +90,8 @@ export function BootSequence({ onComplete }) {
             className="boot-stage boot-neural"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, scale: 0.8, filter: 'blur(10px)' }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
           >
             <div className="neural-text" style={{ flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left', lineHeight: '1.6' }}>
               {terminalLines.map((line, idx) => (

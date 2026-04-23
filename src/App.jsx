@@ -120,6 +120,20 @@ function App() {
     exit: { scale: 0.85, opacity: 0, filter: 'brightness(0.3) blur(8px)', transition: { duration: 0.8, ease: "easeInOut" } }
   };
 
+  // Specific variants for boot sequence to prevent background shrinking
+  const bootVariants = {
+    enter: { 
+      opacity: 1, 
+      filter: 'brightness(1) blur(0px)',
+      transition: { duration: 0.8, ease: "easeOut" } 
+    },
+    exit: { 
+      opacity: 0, 
+      filter: 'brightness(0.3) blur(8px)',
+      transition: { duration: 0.8, ease: "easeInOut" } 
+    }
+  };
+
   return (
     <>
       <CustomCursor />
@@ -131,7 +145,7 @@ function App() {
         {!bootComplete ? (
           <motion.div
             key="boot"
-            variants={containerVariants}
+            variants={bootVariants}
             initial="enter"
             animate="enter"
             exit="exit"

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'motion/react';
 import { PROJECTS_ARRAY, TERMINAL_MESSAGES } from '../../../data/siteData';
 import { ScrambleText } from '../../HUD/ScrambleText';
@@ -9,9 +9,20 @@ export function Home({ onNavigate }) {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  // Initialize with a random starting message to avoid "first message twice" and start random immediately
+  // Message Pool for non-duplicating sequence
+  const messagePoolRef = useRef([]);
+  
+  const getNextMessage = useCallback(() => {
+    if (messagePoolRef.current.length === 0) {
+      // Refill and shuffle the pool
+      messagePoolRef.current = [...TERMINAL_MESSAGES].sort(() => Math.random() - 0.5);
+    }
+    return messagePoolRef.current.pop();
+  }, []);
+
+  // Initialize with a random starting message
   const [scrollingMessages, setScrollingMessages] = useState(() => {
-    const startMsg = TERMINAL_MESSAGES[Math.floor(Math.random() * TERMINAL_MESSAGES.length)];
+    const startMsg = [...TERMINAL_MESSAGES].sort(() => Math.random() - 0.5)[0];
     return [{ 
       id: Date.now(), 
       text: startMsg, 
@@ -29,20 +40,11 @@ export function Home({ onNavigate }) {
     return () => window.removeEventListener('mousemove', handleMouse);
   }, [mouseX, mouseY]);
 
-  // Scrolling Terminal Logic - Random Order
+  // Scrolling Terminal Logic - Shuffled Deck Order
   useEffect(() => {
     const interval = setInterval(() => {
       setScrollingMessages(prev => {
-        // Pick a random message that isn't the same as the last one if possible
-        let randomIndex = Math.floor(Math.random() * TERMINAL_MESSAGES.length);
-        const lastMsgText = prev[prev.length - 1]?.text;
-        
-        // Simple retry once to get a different one if list > 1
-        if (TERMINAL_MESSAGES.length > 1 && TERMINAL_MESSAGES[randomIndex] === lastMsgText) {
-          randomIndex = (randomIndex + 1) % TERMINAL_MESSAGES.length;
-        }
-
-        const nextMsg = TERMINAL_MESSAGES[randomIndex];
+        const nextMsg = getNextMessage();
 
         const newMessage = {
           id: Date.now(),
@@ -51,12 +53,12 @@ export function Home({ onNavigate }) {
         };
 
         const newArr = [...prev, newMessage];
-        return newArr.slice(-8);
+        return newArr.slice(-20);
       });
-    }, 3000); // Slightly slower for better readability
+    }, 3500); // 3.5s for a better data-stream feel
 
     return () => clearInterval(interval);
-  }, []);
+  }, [getNextMessage]);
 
   return (
     <section className="home-section" id="home">
@@ -107,7 +109,7 @@ export function Home({ onNavigate }) {
           style={{ width: 'min(95%, 1000px)', height: 'clamp(200px, 45vh, 420px)', marginTop: 'clamp(15px, 3vh, 40px)', zIndex: 2 }}
         >
           <div className="mission-log__header" style={{ borderBottom: '1px solid var(--nerd-accent-red)' }}>
-            <span className="blink-dot" style={{ backgroundColor: 'var(--nerd-accent-red)' }}></span> <ScrambleText text="MISSION_LOG :: ACTIVE" />
+            <ScrambleText text="TERMINAL: ACTIVE" />
           </div>
           <div className="mission-log__content" style={{ maxHeight: '320px', overflow: 'hidden' }}>
             <AnimatePresence>
@@ -245,10 +247,21 @@ function CVBoundingBox({ project, index, total, onNavigate }) {
 
       <Robot dir={robotDir} gundamId={index} />
 
-      <div className="cv-expanded-details" style={{ opacity: isHovered ? 1 : 0, transition: 'opacity 0.2s', textAlign: 'center', marginTop: '10px', pointerEvents: 'none', zIndex: 10, position: 'relative' }}>
-        <div className="cv-proj-title" style={{ fontSize: '0.9rem', color: '#fff', textShadow: '0 0 5px red' }}>{project.title}</div>
-        <div className="cv-proj-action" style={{ color: 'var(--nerd-accent-red)', fontSize: '0.8rem', marginTop: '5px' }}>CLICK TO INTERCEPT</div>
-      </div>
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div 
+            className="cv-expanded-details"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            style={{ textAlign: 'center', marginTop: '10px', pointerEvents: 'none', zIndex: 10, position: 'relative', overflow: 'hidden' }}
+          >
+            <div className="cv-proj-title" style={{ fontSize: '0.9rem', color: '#fff', textShadow: '0 0 5px red' }}>{project.title}</div>
+            <div className="cv-proj-action" style={{ color: 'var(--nerd-accent-red)', fontSize: '0.8rem', marginTop: '5px' }}>CLICK TO INTERCEPT</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.button>
   );
 }
