@@ -17,3 +17,17 @@
 .scroll-up {
   top: 30px;
 }
+
+.scroll-left {
+  left: 30px;
+  right: auto;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.scroll-right {
+  right: 30px;
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%);
+}

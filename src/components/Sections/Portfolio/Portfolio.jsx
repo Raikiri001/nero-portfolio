@@ -4,13 +4,31 @@ import { useSoundEngine } from '../../../hooks/useSoundEngine';
 import { PROJECTS_ARRAY } from '../../../data/siteData';
 import { MultiLockCanvas } from './MultiLockCanvas';
 import { ScrambleText } from '../../HUD/ScrambleText';
+import { ScrollIndicator } from '../../HUD/ScrollIndicator';
 import './Portfolio.css';
 
 export function Portfolio() {
   const sound = useSoundEngine();
   const [selectedMission, setSelectedMission] = useState(null);
   const [lockTarget, setLockTarget] = useState(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
   const containerRef = useRef(null);
+  const gridRef = useRef(null);
+
+  const checkScroll = () => {
+    if (gridRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = gridRef.current;
+      setCanScrollLeft(scrollLeft > 10);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener('resize', checkScroll);
+    return () => window.removeEventListener('resize', checkScroll);
+  }, []);
 
   // Check for deep-linking from Home bounding box
   useEffect(() => {
@@ -71,7 +89,15 @@ export function Portfolio() {
       </motion.div>
 
       {/* Mission Grid */}
-      <div className="mission-grid">
+      <div style={{ position: 'relative' }}>
+        <ScrollIndicator direction="left" show={canScrollLeft} />
+        <ScrollIndicator direction="right" show={canScrollRight} />
+        
+        <div 
+          className="mission-grid" 
+          ref={gridRef}
+          onScroll={checkScroll}
+        >
         {PROJECTS_ARRAY.map((project, idx) => (
           <motion.div
             key={project.id}
@@ -114,6 +140,7 @@ export function Portfolio() {
             </div>
           </motion.div>
         ))}
+      </div>
       </div>
 
       {/* Expanded Mission Detail */}
@@ -171,10 +198,14 @@ export function Portfolio() {
                 </div>
 
                 <div className="mission-detail__meta">
-                  <span style={{ color: 'var(--nerd-accent-red)', fontSize: '0.8rem', fontFamily: 'var(--font-mono)' }}>[TARGET_LOCK_ACQUIRED] // ENHANCING ARCHIVAL DATA</span>
-                  <a href={selectedMission.repoUrl} target="_blank" rel="noopener noreferrer" className="mission-detail__access" data-clickable>
-                    ACCESS_REPOSITORY
-                  </a>
+                  <span style={{ color: 'var(--nerd-accent-red)', fontSize: '0.8rem', fontFamily: 'var(--font-mono)' }}>
+                    {selectedMission.repoUrl ? '[TARGET_LOCK_ACQUIRED] // ENHANCING ARCHIVAL DATA' : '[DATA_NOT_FOUND] // NO_EXTERNAL_LINK_AVAILABLE'}
+                  </span>
+                  {selectedMission.repoUrl && (
+                    <a href={selectedMission.repoUrl} target="_blank" rel="noopener noreferrer" className="mission-detail__access" data-clickable>
+                      ACCESS_REPOSITORY
+                    </a>
+                  )}
                 </div>
               </div>
             </motion.div>
