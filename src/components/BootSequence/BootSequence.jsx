@@ -11,7 +11,7 @@ export function BootSequence({ onComplete }) {
   const [terminalLines, setTerminalLines] = useState([]);
   const [activeLineIdx, setActiveLineIdx] = useState(0);
   const [activeCharIdx, setActiveCharIdx] = useState(0);
-  
+
   const [showBurst, setShowBurst] = useState(false);
   const [gateVisible, setGateVisible] = useState(true);
 
@@ -55,7 +55,7 @@ export function BootSequence({ onComplete }) {
             return newLines;
           });
           setActiveCharIdx(prev => prev + 1);
-          
+
           if (activeCharIdx % 3 === 0) sound.ping(); // subtle typing sound
         }, 15); // typing speed
         return () => clearTimeout(timeout);
@@ -75,8 +75,8 @@ export function BootSequence({ onComplete }) {
   // Burst logic removed
 
   return (
-    <div 
-      className="boot-sequence" 
+    <div
+      className="boot-sequence"
       onClick={stage === 'awaiting_input' ? handleComplete : undefined}
       style={{ cursor: stage === 'awaiting_input' ? 'pointer' : 'default' }}
     >

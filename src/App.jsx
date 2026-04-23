@@ -111,14 +111,23 @@ function App() {
     <>
       <CustomCursor />
 
+      {/* Background Base */}
+      <div className="hex-grid-bg" />
+
       <AnimatePresence mode="wait">
         {!bootComplete ? (
-          <BootSequence key="boot" onComplete={handleBootComplete} />
+          <motion.div
+            key="boot"
+            variants={containerVariants}
+            initial="enter"
+            animate="enter"
+            exit="exit"
+            style={{ position: 'absolute', inset: 0, zIndex: 10000, transformOrigin: 'center center', width: '100%', height: '100vh' }}
+          >
+            <BootSequence onComplete={handleBootComplete} />
+          </motion.div>
         ) : (
           <div key="main" className="main-app">
-            
-            {/* Background Base */}
-            <div className="hex-grid-bg" />
             
             {/* HUD Elements */}
             <Navigation activeSection={activeSection} onNavigate={handleNavigate} />

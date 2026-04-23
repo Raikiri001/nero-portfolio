@@ -9,7 +9,15 @@ export function Home({ onNavigate }) {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  const [scrollingMessages, setScrollingMessages] = useState([{ id: 0, text: TERMINAL_MESSAGES[0], time: new Date().toLocaleTimeString('en-US', { hour12: false }) }]);
+  // Initialize with a random starting message to avoid "first message twice" and start random immediately
+  const [scrollingMessages, setScrollingMessages] = useState(() => {
+    const startMsg = TERMINAL_MESSAGES[Math.floor(Math.random() * TERMINAL_MESSAGES.length)];
+    return [{ 
+      id: Date.now(), 
+      text: startMsg, 
+      time: new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }) 
+    }];
+  });
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -21,14 +29,21 @@ export function Home({ onNavigate }) {
     return () => window.removeEventListener('mousemove', handleMouse);
   }, [mouseX, mouseY]);
 
-  // Scrolling Terminal Logic
+  // Scrolling Terminal Logic - Random Order
   useEffect(() => {
-    let currentIdx = TERMINAL_MESSAGES.length;
-
     const interval = setInterval(() => {
-      const nextMsg = TERMINAL_MESSAGES[currentIdx % TERMINAL_MESSAGES.length];
-
       setScrollingMessages(prev => {
+        // Pick a random message that isn't the same as the last one if possible
+        let randomIndex = Math.floor(Math.random() * TERMINAL_MESSAGES.length);
+        const lastMsgText = prev[prev.length - 1]?.text;
+        
+        // Simple retry once to get a different one if list > 1
+        if (TERMINAL_MESSAGES.length > 1 && TERMINAL_MESSAGES[randomIndex] === lastMsgText) {
+          randomIndex = (randomIndex + 1) % TERMINAL_MESSAGES.length;
+        }
+
+        const nextMsg = TERMINAL_MESSAGES[randomIndex];
+
         const newMessage = {
           id: Date.now(),
           text: nextMsg,
@@ -38,9 +53,7 @@ export function Home({ onNavigate }) {
         const newArr = [...prev, newMessage];
         return newArr.slice(-8);
       });
-
-      currentIdx++;
-    }, 2500);
+    }, 3000); // Slightly slower for better readability
 
     return () => clearInterval(interval);
   }, []);

@@ -9,10 +9,10 @@ export function Hangar() {
 
   // New informative pilot stats
   const pilotStats = [
-    { label: "PROJECTS_COMPLETED", value: "15", color: "var(--nerd-primary)" },
-    { label: "YEARS_EXPERIENCE", value: "3", color: "var(--nerd-accent-green)" },
-    { label: "MODELS_TRAINED", value: "42", color: "var(--nerd-accent-red)" },
-    { label: "PAPERS_READ", value: "120+", color: "var(--nerd-primary)" }
+    { label: "PROJECTS_COMPLETED", value: "6", color: "var(--nerd-primary)" },
+    { label: "SPECIALISATION", value: "AI | Data Analytics", color: "var(--nerd-accent-green)" },
+    { label: "MODELS_TRAINED", value: "20", color: "var(--nerd-accent-red)" },
+    { label: "PAPERS_READ", value: "100+", color: "var(--nerd-primary)" }
   ];
 
   return (
@@ -56,7 +56,7 @@ export function Hangar() {
               <div className="eda-panel__header"><ScrambleText text="ABOUT_ME" /></div>
               <div className="pilot-bio">
                 <span className="blink-dot" style={{ backgroundColor: 'var(--nerd-accent-red)' }}></span>
-                <span> An aspiring Machine Learning Engineer and Data Analyst. Highly interested in mecha systems (Gundam, Macross) and merging tactical designs with advanced backend AI infrastructures. [PLACEHOLDER EXCERPT]: I am constantly pushing the boundaries of algorithmic performance, dissecting core neural pathways to enhance tactical OS integrations. My experience spans across rigorous data analysis and designing high-fidelity dashboards suitable for an Ace Pilot execution sequence. I maintain a strict adherence to elegant, scalable code structures, while actively integrating machine learning models into real-world simulations.</span>
+                <span>I’m currently a third-year Computer Science student specializing in AI and Data Analytics, but my fascination with complex systems goes way beyond the code I write on my screen. I’ve always been drawn to the intersection where clean aesthetics and high-end engineering meet, which is a passion rooted in my long-standing love for mecha. I’ve spent a lot of time exploring the intricate worlds of Gundam SEED and Macross Frontier, and I’ve always viewed the ZGMF-X20A Strike Freedom as the absolute gold standard for design. That appreciation eventually translated into a hands-on hobby of building Gunpla and other plastic models, where I’ve found that my academic and creative worlds overlap more than I ever expected. I’ve realized that the level of patience and precision needed to meticulously detail a Master Grade kit is almost identical to the mindset I need when I’m refining a neural network or debugging a difficult project. Both tasks require a deep curiosity for the under-the-hood mechanics that make a system work, and I truly enjoy the process of taking dozens of complex components and perfecting them into a functional whole, whether that’s inside a terminal or at my workbench.</span>
               </div>
             </div>
           </motion.div>

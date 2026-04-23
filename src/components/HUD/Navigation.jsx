@@ -1,5 +1,5 @@
 import { useSoundEngine } from '../../hooks/useSoundEngine';
-import { ScrambleText } from './ScrambleText';
+
 import './Navigation.css';
 
 const NAV_ITEMS = [
@@ -21,7 +21,7 @@ export function Navigation({ activeSection, onNavigate }) {
     <nav className="hud-nav" id="main-navigation">
       <div className="hud-nav__header">
         <span className="hud-nav__bracket">[</span>
-        <span className="hud-nav__title"><ScrambleText text="TACTICAL_NAV" /></span>
+        <span className="hud-nav__title">NERO GARCIA - PORTFOLIO</span>
         <span className="hud-nav__bracket">]</span>
       </div>
       <ul className="hud-nav__list">
@@ -32,7 +32,8 @@ export function Navigation({ activeSection, onNavigate }) {
               onClick={() => handleClick(item.id)}
               data-clickable
             >
-              <span className="hud-nav__text"><ScrambleText text={item.label} delay={index * 100} duration={400} /></span>
+              <span className="hud-nav__index" style={{ opacity: 0.5, fontSize: '0.65rem', marginRight: '5px' }}>0{index + 1}</span>
+              <span className="hud-nav__text">{item.label}</span>
             </button>
           </li>
         ))}

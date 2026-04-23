@@ -114,22 +114,16 @@ export function Portfolio() {
 
             {/* Tactical Graphics Inside Card */}
             <div className="mission-folder__tactical-data" style={{ margin: '15px 0', borderTop: '1px solid rgba(0, 144, 217, 0.3)', borderBottom: '1px solid rgba(0, 144, 217, 0.3)', padding: '10px 0', fontSize: '0.8rem', fontFamily: 'var(--font-mono)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span className="tac-label" style={{ color: 'var(--color-text-secondary)' }}>THREAT_STATUS:</span>
-                <span className="tac-val" style={{ color: 'var(--nerd-accent-yellow)' }}>{project.tacticalData?.THREAT_STATUS}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span className="tac-label" style={{ color: 'var(--color-text-secondary)' }}>MODEL_USED:</span>
-                <span className="tac-val" style={{ color: 'var(--nerd-primary)' }}>{project.tacticalData?.MODEL_USED}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span className="tac-label" style={{ color: 'var(--color-text-secondary)' }}>DATASET_SIZE:</span>
-                <span className="tac-val" style={{ color: 'var(--nerd-primary)' }}>{project.tacticalData?.DATASET_SIZE}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span className="tac-label" style={{ color: 'var(--color-text-secondary)' }}>KEY_METRIC:</span>
-                <span className="tac-val" style={{ color: 'var(--nerd-accent-green)' }}>{project.tacticalData?.KEY_METRIC}</span>
-              </div>
+              {project.tacticalData && Object.entries(project.tacticalData).map(([key, value], i, arr) => {
+                const colors = ['var(--nerd-accent-yellow)', 'var(--nerd-primary)', 'var(--nerd-primary)', 'var(--nerd-accent-green)'];
+                const color = colors[i % colors.length];
+                return (
+                  <div key={key} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: i === arr.length - 1 ? '0' : '4px' }}>
+                    <span className="tac-label" style={{ color: 'var(--color-text-secondary)' }}>{key}:</span>
+                    <span className="tac-val" style={{ color }}>{value}</span>
+                  </div>
+                );
+              })}
             </div>
 
             <div className="mission-folder__status">STATUS: {project.status}</div>

@@ -9,24 +9,32 @@ export const SCANNER_LABELS = [
 
 export const TERMINAL_MESSAGES = [
   "Hello, Welcome!",
-  "An Aspiring Machine Learning Engineer and Data Analyst.",
-  "Great interest in Gundam and Macross.",
-  "LINK ESTABLISHED to SDB-01_YOLOv11s",
-  "ANALYZING TRAFFIC PATTERNS... | THREAT_LEVEL: NOMINAL",
-  "NEURAL SYNC... | UNIT_STABILITY: 99.4%",
-  "WELCOME, PILOT. [UNIT: GUNDAM_COMPLEX O.S.]",
-  "ミッション進行中... (Japanese - Mission in progress...)",
-  "システム同期完了。 (Japanese - System synchronization complete.)",
-  "ターゲット・ロック！ (Japanese - Target Lock!)"
+  "I am an aspiring Machine Learning Engineer and Data Analyst.",
+  "Major: AI and Data Analytics. Status: Specialized in Computer Vision.",
+  "Hot take: Gundam SEED is the absolute best series in the franchise.",
+  "In my opinion, the ZGMF-X20A Strike Freedom is the pinnacle of design.",
+  "Macross Frontier is comfortably the best Macross series—no contest.",
+  "Current focus: Building Gunpla by day and training AI models by night.",
+  "Special thanks to Aidan R!",
+  "Special thanks to Roshan K!",
+  "Special thanks to Seni B!",
+  "Special thanks to Ethan S!",
+  "Asian Kung-fu generation makes the best rock music ever!!!",
+  "I find Object detection and Instance segmentation verty interesting!"
 ];
 
 export const SYSTEM_BOOT_SEQUENCE = [
-  "INIT_KERNEL(N_E_R_O_OS) // OK",
-  "MOUNTING_NEURAL_LINK // OK",
-  "LOADING_COMBAT_DATA_PROFILES // OK",
-  "CHECKING_OPTICAL_SENSORS // OK",
-  "BYPASSING_INHIBITORS // OVERRIDE",
-  "ALL_SYSTEMS_NOMINAL"
+  "INIT_KERNEL(G.U.N.D.A.M_OS) N.E.R.O. VER",
+  "INIT_KERNEL(SMS_MESSIAH_CORE)_OK",
+  "MOUNTING_NEURO_LINK_GEN_UNILATERAL",
+  "PHASE_SHIFT_ARMOR_ENERGIZED",
+  "N_JAMMER_CANCELLER_ACTIVE",
+  "SEED_FACTOR_TRIGGERED_OVERRIDE",
+  "SYNCING_FOLD_WAVE_RECEPTORS_ENERGIZED",
+  "FOLD_QUARTZ_STABILIZATION_ACTIVE",
+  "CHECKING_EX-GEAR_INTERFACE_ACTIVE",
+  "BYPASSING_SMS_INHIBITORS_DECULTURE",
+  "ALL SYSTEMS NOMINAL"
 ];
 
 export const SKILLS_ARRAY = [
