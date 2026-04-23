@@ -167,7 +167,7 @@ export const COMM_LINKS = {
       label: 'GITHUB.COM',
       type: 'REPOSITORY',
       value: 'Nero_G',
-      url: 'https://github.com/Nero-G',
+      url: 'https://github.com/Raikiri001',
       active: 'TRUE'
     },
     {
