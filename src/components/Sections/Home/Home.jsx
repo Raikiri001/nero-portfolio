@@ -19,7 +19,7 @@ export function Home({ onNavigate }) {
     };
     window.addEventListener('mousemove', handleMouse);
     return () => window.removeEventListener('mousemove', handleMouse);
-  }, []);
+  }, []); 
 
   // Scrolling Terminal Logic
   useEffect(() => {
