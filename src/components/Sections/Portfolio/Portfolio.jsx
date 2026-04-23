@@ -81,7 +81,7 @@ export function Portfolio() {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        style={{ marginLeft: '120px' }}
+        style={{ marginLeft: 'var(--section-margin-x)' }}
       >
         <span className="section-header__code"><ScrambleText text="SEC_003" /></span>
         <h2 className="section-header__title"><ScrambleText text="TACTICAL SORTIES // OPERATIONAL LOGS" delay={200} /></h2>
@@ -167,7 +167,7 @@ export function Portfolio() {
               </div>
 
               <div className="mission-detail__body" style={{ overflowY: 'auto' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 1fr) 3fr', gap: '40px', marginTop: '10px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(250px, 100%), 1fr))', gap: 'clamp(20px, 3vw, 40px)', marginTop: '10px' }}>
                   {/* Left Col */}
                   <div>
                     <div className="mission-detail__section">

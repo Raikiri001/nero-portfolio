@@ -57,7 +57,7 @@ export function Contact() {
         initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
-        style={{ marginLeft: '120px' }}
+        style={{ marginLeft: 'var(--section-margin-x)' }}
       >
         <span className="section-header__code"><ScrambleText text="SEC_004" /></span>
         <h2 className="section-header__title"><ScrambleText text="COMMUNICATION // DATA NODES" /></h2>

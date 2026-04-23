@@ -2,7 +2,7 @@
 .contact-section {
   position: relative;
   min-height: 100vh;
-  padding: 80px var(--hud-padding) 60px;
+  padding: var(--section-pad-top) var(--hud-padding) 60px;
 }
 
 .contact-content {
@@ -114,13 +114,13 @@
 .comms-section {
   position: relative;
   min-height: 100vh;
-  padding: 80px calc(var(--hud-padding) * 2) 40px;
+  padding: var(--section-pad-top) var(--hud-padding) 40px;
   display: flex;
   flex-direction: column;
 }
 
 .contact-content {
-  margin: 30px 120px 0;
+  margin: 30px var(--section-margin-x) 0;
   width: auto;
 }
 
@@ -133,10 +133,10 @@
 /* --- Data Node Card --- */
 .data-node {
   flex: 1;
-  min-width: 300px;
+  min-width: min(280px, 100%);
   background: rgba(0, 5, 13, 0.6);
   border: 1px solid rgba(0, 144, 217, 0.4);
-  padding: 25px;
+  padding: clamp(16px, 2.5vw, 25px);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -233,7 +233,7 @@
 
 .data-secured-text {
   font-family: var(--font-ui);
-  font-size: 3rem;
+  font-size: clamp(1.5rem, 5vw, 3rem);
   font-weight: bold;
   color: var(--nerd-primary);
   text-shadow: var(--text-glow-primary);

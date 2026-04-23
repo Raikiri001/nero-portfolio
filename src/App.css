@@ -18,7 +18,7 @@
   z-index: 5;
   padding: 30px 0;
   border-top: 1px solid rgba(0, 242, 255, 0.08);
-  margin: 0 40px 0 180px;
+  margin: 0 var(--hud-padding) 0 var(--section-margin-x);
 }
 
 .footer-content {

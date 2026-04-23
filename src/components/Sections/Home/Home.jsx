@@ -94,7 +94,7 @@ export function Home({ onNavigate }) {
           transition={{ duration: 0.8, delay: 0.2 }}
           style={{ zIndex: 2, pointerEvents: 'none' }}
         >
-          <div className="nero-title" style={{ fontSize: '8rem', margin: 0, lineHeight: 1 }}>
+          <div className="nero-title" style={{ margin: 0, lineHeight: 1 }}>
             <ScrambleText text="NERO GARCIA" duration={600} />
           </div>
         </motion.div>
@@ -104,7 +104,7 @@ export function Home({ onNavigate }) {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          style={{ width: '1000px', height: '420px', marginTop: '40px', zIndex: 2 }}
+          style={{ width: 'min(95%, 1000px)', height: 'clamp(200px, 45vh, 420px)', marginTop: 'clamp(15px, 3vh, 40px)', zIndex: 2 }}
         >
           <div className="mission-log__header" style={{ borderBottom: '1px solid var(--nerd-accent-red)' }}>
             <span className="blink-dot" style={{ backgroundColor: 'var(--nerd-accent-red)' }}></span> <ScrambleText text="MISSION_LOG :: ACTIVE" />

@@ -64,6 +64,19 @@ function App() {
       // Don't trigger if user is scrolling inside a scrollable container (like the mission detail overlay)
       if (e.target.closest('.mission-detail') || e.target.closest('.mission-detail-overlay')) return;
       
+      // Allow natural scrolling if the section content overflows
+      const scrollContainer = e.target.closest('.eda-dashboard-section, .sorties-section, .home-section, .comms-section');
+      if (scrollContainer) {
+        const isScrollingUp = e.deltaY < 0;
+        const isScrollingDown = e.deltaY > 0;
+        const atTop = scrollContainer.scrollTop <= 0;
+        const atBottom = scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 1;
+        
+        // If it can scroll in the requested direction, don't change sections
+        if (isScrollingDown && !atBottom) return;
+        if (isScrollingUp && !atTop) return;
+      }
+      
       wheelAccumulator += e.deltaY;
       
       // Increased threshold to 800 for more deliberate scrolling
@@ -142,7 +155,7 @@ function App() {
                   initial="initial"
                   animate="enter"
                   exit="exit"
-                  style={{ position: 'absolute', inset: 0, transformOrigin: 'center center', width: '100%', height: '100vh', overflow: 'hidden' }}
+                  style={{ position: 'absolute', inset: 0, transformOrigin: 'center center', width: '100%', height: '100vh', overflowY: 'auto', overflowX: 'hidden' }}
                 >
                   {/* Home and Sorties now take extra props to handle deep-linking. We will add them later. */}
                   {activeSection === 'home' && <Home onNavigate={handleNavigate} />}

@@ -32,7 +32,7 @@ export function Navigation({ activeSection, onNavigate }) {
               onClick={() => handleClick(item.id)}
               data-clickable
             >
-              <span className="hud-nav__index" style={{ opacity: 0.5, fontSize: '0.65rem', marginRight: '5px' }}>0{index + 1}</span>
+              <span className="hud-nav__index">0{index + 1}</span>
               <span className="hud-nav__text">{item.label}</span>
             </button>
           </li>

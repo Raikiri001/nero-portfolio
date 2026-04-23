@@ -5,7 +5,7 @@
 .eda-dashboard-section {
   position: relative;
   min-height: 100vh;
-  padding: 80px calc(var(--hud-padding) * 2) 40px;
+  padding: var(--section-pad-top) var(--hud-padding) 40px;
   display: flex;
   flex-direction: column;
 }
@@ -13,8 +13,8 @@
 .eda-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 30px;
-  margin: 30px 120px 0;
+  gap: clamp(15px, 3vw, 30px);
+  margin: 30px var(--section-margin-x) 0;
   width: auto;
   align-items: start;
 }
@@ -75,7 +75,7 @@
 
 .pilot-stat-value {
   font-family: var(--font-ui);
-  font-size: 2.5rem;
+  font-size: clamp(1.4rem, 3vw, 2.5rem);
   font-weight: bold;
   text-shadow: 0 0 10px currentColor;
 }
@@ -165,4 +165,27 @@
   display: inline-block;
   color: var(--nerd-accent-red);
   margin-left: 2px;
+}
+
+/* ---- Responsive Breakpoints ---- */
+@media (max-width: 900px) {
+  .eda-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .pilot-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pilot-bio {
+    font-size: 0.8rem;
+    padding: 14px;
+  }
+
+  .skill-static-item {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
 }

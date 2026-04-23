@@ -23,7 +23,7 @@ export function Hangar() {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        style={{ marginLeft: '120px' }}
+        style={{ marginLeft: 'var(--section-margin-x)' }}
       >
         <span className="section-header__code"><ScrambleText text="SEC_002" /></span>
         <h2 className="section-header__title"><ScrambleText text="PILOT DOSSIER // E.D.A DASHBOARD" delay={200} /></h2>

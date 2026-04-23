@@ -5,7 +5,7 @@
 .home-section {
   position: relative;
   min-height: 100vh;
-  padding: 60px var(--hud-padding) 40px;
+  padding: var(--section-pad-top) var(--hud-padding) 40px;
   display: flex;
   flex-direction: column;
 }
@@ -35,12 +35,12 @@
 
 .nero-title {
   font-family: var(--font-ui);
-  font-size: 8rem;
+  font-size: clamp(2.5rem, 8vw, 8rem);
   font-weight: 700;
   color: #fff;
   letter-spacing: 0.25em;
   text-shadow: var(--text-glow-primary);
-  margin-bottom: 20px;
+  margin-bottom: clamp(10px, 2vh, 20px);
   line-height: 1;
 }
 
@@ -65,7 +65,7 @@
 
 .nero-subtitle {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: clamp(0.55rem, 1.2vw, 0.9rem);
   color: #fff;
   max-width: 700px;
   text-transform: uppercase;
@@ -253,12 +253,12 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 500px;
-  height: 250px;
+  width: clamp(280px, 45vw, 500px);
+  height: clamp(150px, 30vh, 250px);
   display: flex;
   flex-direction: column;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: clamp(0.6rem, 1vw, 0.8rem);
   z-index: 20;
 }
 
