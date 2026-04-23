@@ -1,4 +1,5 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from 'motion/react';
 import { BootSequence } from './components/BootSequence/BootSequence';
 import { CustomCursor } from './components/HUD/CustomCursor';
@@ -18,9 +19,6 @@ function App() {
   const [bootComplete, setBootComplete] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [isTransitioning, setIsTransitioning] = useState(false);
-  
-  // Mouse tracking for background
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   const handleBootComplete = useCallback(() => {
     setBootComplete(true);
@@ -100,14 +98,7 @@ function App() {
     };
   }, [bootComplete, isTransitioning, changeSection]);
 
-  // Mouse tracking for tactical grid reveal
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+
 
   const handleNavigate = useCallback((sectionId) => {
     changeSection(null, sectionId);

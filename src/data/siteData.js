@@ -24,8 +24,6 @@ export const TERMINAL_MESSAGES = [
 ];
 
 export const SYSTEM_BOOT_SEQUENCE = [
-  "INIT_KERNEL(G.U.N.D.A.M_OS) N.E.R.O. VER",
-  "INIT_KERNEL(SMS_MESSIAH_CORE)_OK",
   "MOUNTING_NEURO_LINK_GEN_UNILATERAL",
   "PHASE_SHIFT_ARMOR_ENERGIZED",
   "N_JAMMER_CANCELLER_ACTIVE",
@@ -55,14 +53,14 @@ export const SKILLS_ARRAY = [
 export const PROJECTS_ARRAY = [
   {
     id: "proj_01",
-    title: "Detection of dangerous objects in airport security",
+    title: "Dangerous Object Detection In Airport Security X-Rays",
     date: "July 2024 - November 2024",
     status: "MISSION_COMPLETE",
     details: "Developed YOLOv11s object detection model in Python. Automates identification of prohibited items in X-ray baggage. Employed scaling/rotation augmentation. Achieved 0.918 mAP50 on test dataset.",
-    repoUrl: "#github-link-here",
+    repoUrl: "",
     tags: ["YOLOv11s", "Python", "Computer Vision"],
     tacticalData: {
-      THREAT_STATUS: "NOMINAL",
+      OBJECTIVE: "OBJECT_DETECTION",
       MODEL_USED: "YOLOv11s",
       DATASET_SIZE: "3,500",
       KEY_METRIC: "0.918 mAP50"
@@ -70,29 +68,29 @@ export const PROJECTS_ARRAY = [
   },
   {
     id: "proj_02",
-    title: "Binary classifier of whether it will rain the day after",
+    title: "Will It Rain Tomorrow Binary Classifier",
     date: "July 2024 - November 2024",
     status: "MISSION_COMPLETE",
     details: "Analyzed >50k weather samples using KNIME/Python. Imputed, normalized, and one-hot encoded features. Evaluated Decision Trees, RF, KNN, XGBoost. Achieved 0.89 precision, 0.81 recall, 0.87 accuracy with a fine-tuned MLP.",
-    repoUrl: "#github-link-here",
+    repoUrl: "",
     tags: ["KNIME", "Python", "MLP", "XGBoost"],
     tacticalData: {
-      THREAT_STATUS: "EVALUATING",
-      MODEL_USED: "MLP / XGBoost",
-      DATASET_SIZE: ">50,000",
+      OBJECTIVE: "CLASSIFICATION",
+      MODEL_USED: "MLP, Random Forest, KNN, XGBoost",
+      DATASET_SIZE: "50,000",
       KEY_METRIC: "0.89 Precision"
     }
   },
   {
     id: "proj_03",
-    title: "Binary image classifier of artificially generated images",
+    title: "Artificially Generated Images Binary Image Classifier",
     date: "July 2024 - November 2024",
     status: "MISSION_COMPLETE",
-    details: "Developed real-time YOLOv11l classification model to distinguish authentic from synthetic images. Improved generalization via targeted augmentation. Achieved unified 0.73 Precision, Recall, and Accuracy.",
-    repoUrl: "#github-link-here",
-    tags: ["YOLOv11l", "Classification", "Deep Learning"],
+    details: "Developed real-time YOLOv11l Classification model to distinguish authentic from synthetic images. Improved generalization via targeted augmentation. Achieved unified 0.73 Precision, Recall, and Accuracy.",
+    repoUrl: "",
+    tags: ["YOLOv11l-cls", "Classification", "Deep Learning", "Image Processing"],
     tacticalData: {
-      THREAT_STATUS: "WARNING",
+      OBJECTIVE: "CLASSIFICATION",
       MODEL_USED: "YOLOv11l",
       DATASET_SIZE: "15,000",
       KEY_METRIC: "0.73 Accuracy"
@@ -100,14 +98,14 @@ export const PROJECTS_ARRAY = [
   },
   {
     id: "proj_04",
-    title: "Anti-social driving behaviour detection",
+    title: "Anti-Social Driving Behaviour Detector",
     date: "February 2025 - June 2025",
-    status: "MISSION_ACTIVE",
+    status: "MISSION_COMPLETE",
     details: "CNN/YOLOv12s deep learning system classifying illegal U-turns/swerving. Applied Gaussian/Savitzky-Golay filtering for noisy tracking data. Trained on 20,000 images. YOLOv12s achieved mAP50-95 of 0.893. Behavioural classifier achieved 0.86 precision.",
-    repoUrl: "#github-link-here",
-    tags: ["YOLOv12s", "CNN", "Tracking"],
+    repoUrl: "https://github.com/Raikiri001/Anti-social-driving-Behaviour-Detector",
+    tags: ["YOLOv12s", "Computer Vision", "Object Tracking", "Object Detection", "Behaviour Classification"],
     tacticalData: {
-      THREAT_STATUS: "ACTIVE_TRACKING",
+      OBJECTIVE: "OBJECT_DETECTION, OBJECT_TRACKING, CLASSIFICATION",
       MODEL_USED: "YOLOv12s",
       DATASET_SIZE: "20,000",
       KEY_METRIC: "0.893 mAP50-95"
@@ -115,77 +113,79 @@ export const PROJECTS_ARRAY = [
   },
   {
     id: "proj_05",
-    title: "Illegal Parking Detection",
+    title: "Illegal Parking Detector",
     date: "February 2025 - June 2025",
-    status: "MISSION_ACTIVE",
+    status: "MISSION_COMPLETE",
     details: "Two-stage CV system integrating road instance segmentation (YOLOv8l-seg) with vehicle detection (YOLOv11s). Analyzes spatial relationships for complex violations (double parking, kerb alignment). Applied convex hull post-processing to refine masks.",
-    repoUrl: "#github-link-here",
-    tags: ["YOLOv8l-seg", "YOLOv11s", "Segmentation"],
+    repoUrl: "https://github.com/Raikiri001/Illegal-Parking-Detector",
+    tags: ["YOLOv8l-seg", "YOLOv11s", "Instance Segmentation", "Object Tracking", "Object Detection", "Behaviour Classification"],
     tacticalData: {
-      THREAT_STATUS: "ACTIVE_TRACKING",
-      MODEL_USED: "YOLOv8l-seg",
+      OBJECTIVE: "OBJECT_DETECTION, OBJECT_TRACKING, INSTANCE_SEGMENTATION, CLASSIFICATION",
+      MODEL_USED: "YOLOv8l-seg, YOLOv11s",
       DATASET_SIZE: "12,000",
-      KEY_METRIC: "In Progress"
+      KEY_METRIC: "YOLOv8l-seg: 0.831 mAP50-95, YOLOv11s 0.893 mAP50"
     }
   },
   {
     id: "proj_06",
     title: "Image Mean Opinion Score Regressor",
     date: "July 2025 - October 2025",
-    status: "IN_QUEUE",
-    details: "Developed EfficientNetB2 CNN for Image Quality Assessment (IQA). Custom regression head for MOS. Achieved PLCC of 0.83 and SROCC of 0.79.",
-    repoUrl: "#github-link-here",
-    tags: ["EfficientNetB2", "IQA", "Regression"],
+    status: "MISSION_COMPLETE",
+    details: "Developed EfficientNetB2 CNN for Image Quality Assessment (IQA). Custom regression head for MOS. Achieved PLCC of 0.83 and SROCC of 0.79. Designed and implemented a custom regression head optimized for this IQA task.",
+    repoUrl: "https://github.com/Raikiri001/Image-Mean-Opinion-Score-Regressor",
+    tags: ["EfficientNetB2", "Image Quality Assessment", "Regression"],
     tacticalData: {
-      THREAT_STATUS: "STANDBY",
-      MODEL_USED: "EfficientNetB2",
-      DATASET_SIZE: "PENDING",
-      KEY_METRIC: "0.83 PLCC"
+      OBJECTIVE: "REGRESSION",
+      MODEL_USED: "Custom EfficientNetB2",
+      DATASET_SIZE: "11,000",
+      KEY_METRIC: "0.83 PLCC, SROCC 0.79"
     }
   },
   {
     id: "proj_07",
-    title: "Neural Synapse Visualizer v1.0",
-    date: "October 2025 - December 2025",
-    status: "MISSION_STANDBY",
-    details: "Developing a 3D brain activity visualization tool using Three.js and Python backend. Maps real-time EEG data to interactive neural nodes. Implements dynamic heat-maps for cognitive load analysis.",
+    title: "Personal Portfolio Website v2.0",
+    date: "March 2026 - April 2026",
+    status: "MISSION_COMPLETE",
+    details: "Developed an interactive, high-performance portfolio website designed to mirror a mobile suit cockpit interface. This project bridges the gap between web development and the mechanical aesthetics of the Gundam SEED and Macross Frontier universes. Developed to display projects.",
     repoUrl: "#github-link-here",
-    tags: ["Three.js", "Python", "Bio-Informatics"],
+    tags: ["Three.js", "JavaScript", "Website Development"],
     tacticalData: {
-      THREAT_STATUS: "STANDBY",
-      MODEL_USED: "Custom_Visualizer",
-      DATASET_SIZE: "N/A",
-      KEY_METRIC: "99.2% Sync"
-    }
-  },
-  {
-    id: "proj_08",
-    title: "Autonomous Drone Swarm Pathfinding",
-    date: "January 2026 - Present",
-    status: "MISSION_ACTIVE",
-    details: "Implementing Multi-Agent Reinforcement Learning (MARL) for collaborative navigation in complex urban environments. Utilizing PPO-based agents with shared attention mechanisms.",
-    repoUrl: "#github-link-here",
-    tags: ["MARL", "PPO", "Drones"],
-    tacticalData: {
-      THREAT_STATUS: "DEPLOYED",
-      MODEL_USED: "MAPPO",
-      DATASET_SIZE: "Sim_Environment",
-      KEY_METRIC: "Zero Collision"
-    }
-  },
-  {
-    id: "proj_09",
-    title: "Encrypted Data Stream Decryptor",
-    date: "May 2026 - August 2026",
-    status: "IN_QUEUE",
-    details: "Research project focusing on Transformer-based architectures for identifying patterns in high-entropy encrypted streams. Evaluating vulnerability to pattern-based frequency analysis.",
-    repoUrl: "#github-link-here",
-    tags: ["Transformers", "CyberSec", "BERT"],
-    tacticalData: {
-      THREAT_STATUS: "ENCRYPTED",
-      MODEL_USED: "BERT-T100",
-      DATASET_SIZE: "TBD",
-      KEY_METRIC: "TBD"
+      OBJECTIVE: "WEB_DEV",
+      FRAMEWORK: "REACT",
     }
   }
 ];
+
+export const COMM_LINKS = {
+  headers: {
+    status: "ACTIVE_STATUS",
+    type: "PROTOCOL"
+  },
+  nodes: [
+    {
+      id: 'github',
+      label: 'GITHUB.COM',
+      type: 'REPOSITORY',
+      value: 'Nero_G',
+      url: 'https://github.com/Nero-G',
+      active: 'TRUE'
+    },
+    {
+      id: 'linkedin',
+      label: 'LINKEDIN',
+      type: 'PROFESSIONAL_NET',
+      value: 'Nero_G',
+      url: 'https://linkedin.com/in/nero-g',
+      active: 'TRUE'
+    },
+    {
+      id: 'email',
+      label: 'SECURE_EMAIL',
+      type: 'DIRECT_COMM',
+      value: 'nero@example.com',
+      url: 'mailto:nero@example.com',
+      active: 'TRUE'
+    }
+  ]
+};
+

@@ -7,10 +7,11 @@ export function useScrollSpeed() {
   const [speed, setSpeed] = useState(0);
   const [rawSpeed, setRawSpeed] = useState(0);
   const lastScrollRef = useRef(0);
-  const lastTimeRef = useRef(Date.now());
+  const lastTimeRef = useRef(0);
   const decayRef = useRef(null);
 
   useEffect(() => {
+    lastTimeRef.current = Date.now();
     const handleScroll = () => {
       const now = Date.now();
       const dt = now - lastTimeRef.current;

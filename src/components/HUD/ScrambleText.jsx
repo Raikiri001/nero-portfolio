@@ -51,7 +51,7 @@ function ScrambleChar({ targetChar, delay }) {
   );
 }
 
-export function ScrambleText({ text, duration = 600, delay = 0, className = '' }) {
+export function ScrambleText({ text, delay = 0, className = '' }) {
   // Safe parsing just in case text is undefined or a number
   const safeText = String(text || '');
   return (

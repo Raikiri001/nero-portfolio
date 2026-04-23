@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useSoundEngine } from '../../hooks/useSoundEngine';
+import { useState, useEffect, useRef } from 'react';
 import './CustomCursor.css';
 
 export function CustomCursor() {
@@ -9,7 +8,6 @@ export function CustomCursor() {
   const targetPosRef = useRef({ x: -100, y: -100 });
   const currentPosRef = useRef({ x: -100, y: -100 });
   const animRef = useRef(null);
-  const sound = useSoundEngine();
   const wasLockedRef = useRef(false);
 
   useEffect(() => {
@@ -24,7 +22,6 @@ export function CustomCursor() {
       if (clickableElement && !wasLockedRef.current) {
         setIsLocked(true);
         wasLockedRef.current = true;
-        sound.chirp();
       } else if (!clickableElement) {
         setIsLocked(false);
         wasLockedRef.current = false;

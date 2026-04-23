@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'motion/react';
 import { PROJECTS_ARRAY, TERMINAL_MESSAGES } from '../../../data/siteData';
 import { ScrambleText } from '../../HUD/ScrambleText';
@@ -172,7 +173,7 @@ function CVBoundingBox({ project, index, total, onNavigate }) {
           break;
         }
         attempts++;
-      } while (true);
+      } while (attempts <= 15);
 
       setDim({
         w: 240 + Math.random() * 60,
@@ -267,7 +268,7 @@ function CVBoundingBox({ project, index, total, onNavigate }) {
 }
 
 function MSBody({ 
-  primary="#f0f0f0", chest="#0055ff", waist="#f0f0f0", 
+  chest="#0055ff", waist="#f0f0f0", 
   shoulder="#f0f0f0", shoulderAccent="#0055ff",
   arm="#f0f0f0", joint="#a0a0a0", leg="#f0f0f0", knee="#ff0000", foot="#ff0000",
   vfin="#fff", visor="#00ffcc", chin="#ff0000",

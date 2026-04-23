@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 export function MultiLockCanvas({ target }) {
   const canvasRef = useRef(null);
@@ -79,10 +80,11 @@ export function MultiLockCanvas({ target }) {
     requestAnimationFrame(animate);
   }, [target]);
 
-  return (
+  return createPortal(
     <canvas
       ref={canvasRef}
       style={{ position: 'fixed', inset: 0, zIndex: 5001, pointerEvents: 'none' }}
-    />
+    />,
+    document.body
   );
 }

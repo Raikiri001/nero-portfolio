@@ -1,18 +1,11 @@
 import { useState, useRef } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'motion/react';
-import { useLanguage } from '../../../hooks/useLanguage';
-import { useSoundEngine } from '../../../hooks/useSoundEngine';
 import { ScrambleText } from '../../HUD/ScrambleText';
+import { COMM_LINKS } from '../../../data/siteData';
 import './Contact.css';
 
-const commLinks = [
-  { id: 'github', label: 'GITHUB.COM', type: 'REPOSITORY', value: 'Nero_G', url: 'https://github.com/', frequency: '144.75' },
-  { id: 'linkedin', label: 'LINKEDIN', type: 'PROFESSIONAL_NET', value: 'Nero_G', url: 'https://linkedin.com/', frequency: '108.20' },
-  { id: 'email', label: 'SECURE_EMAIL', type: 'DIRECT_COMM', value: 'nero@example.com', url: 'mailto:nero@example.com', frequency: '256.00' }
-];
-
 export function Contact() {
-  const sound = useSoundEngine();
   const [dataSecured, setDataSecured] = useState(null);
   const sectionRef = useRef(null);
 
@@ -20,11 +13,9 @@ export function Contact() {
     e.preventDefault();
     if (dataSecured) return;
 
-    sound.ping();
     setDataSecured(link.id);
 
     setTimeout(() => {
-      sound.beam();
       window.open(link.url, '_blank', 'noopener,noreferrer');
       setDataSecured(null);
     }, 1500);
@@ -66,7 +57,7 @@ export function Contact() {
 
       <div className="contact-content">
         <div className="data-nodes-grid">
-          {commLinks.map((link, idx) => (
+          {COMM_LINKS.nodes.map((link, idx) => (
             <motion.a
               key={link.id}
               href={link.url}
@@ -79,17 +70,16 @@ export function Contact() {
               data-clickable
             >
               <div className="data-node__header">
-                <span className="data-node__freq">FREQ: {link.frequency}</span>
-                <span className="data-node__status blink-dot"></span>
+                <span className="data-node__freq">
+                  {COMM_LINKS.headers.status}: <span className="status-value">{link.active}</span>
+                </span>
               </div>
 
               <div className="data-node__body">
                 <div className="data-node__label">{link.label}</div>
-                <div className="data-node__type">[{link.type}]</div>
-              </div>
-
-              <div className="data-node__footer">
-                ESTABLISH_LINK
+                <div className="data-node__type">
+                  <span className="data-node__type-header">{COMM_LINKS.headers.type}:</span> {link.type}
+                </div>
               </div>
             </motion.a>
           ))}

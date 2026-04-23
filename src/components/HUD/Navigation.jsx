@@ -1,5 +1,3 @@
-import { useSoundEngine } from '../../hooks/useSoundEngine';
-
 import './Navigation.css';
 
 const NAV_ITEMS = [
@@ -10,10 +8,7 @@ const NAV_ITEMS = [
 ];
 
 export function Navigation({ activeSection, onNavigate }) {
-  const sound = useSoundEngine();
-
   const handleClick = (id) => {
-    sound.pip();
     onNavigate(id);
   };
 

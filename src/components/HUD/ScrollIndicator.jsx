@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'motion/react';
 import './ScrollIndicator.css';
 
@@ -41,7 +42,6 @@ export function ScrollIndicator({ direction, show }) {
 
   useEffect(() => {
     if (!isVertical) {
-      setIsTimerVisible(true);
       return;
     }
 

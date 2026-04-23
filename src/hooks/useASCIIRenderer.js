@@ -42,7 +42,13 @@ export function useASCIIRenderer(asciiLines, options = {}) {
   }, [asciiLines, speed, reset]);
 
   useEffect(() => {
-    if (autoStart) start();
+    if (autoStart) {
+      const t = setTimeout(() => start(), 0);
+      return () => {
+        clearTimeout(t);
+        clearTimeout(timerRef.current);
+      }
+    }
     return () => clearTimeout(timerRef.current);
   }, [autoStart, start]);
 

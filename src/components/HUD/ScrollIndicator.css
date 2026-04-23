@@ -11,10 +11,12 @@
 }
 
 .scroll-down {
+  position: fixed;
   bottom: 30px;
 }
 
 .scroll-up {
+  position: fixed;
   top: 30px;
 }
 

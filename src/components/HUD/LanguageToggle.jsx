@@ -1,13 +1,10 @@
 import { useLanguage } from '../../hooks/useLanguage';
-import { useSoundEngine } from '../../hooks/useSoundEngine';
 import './LanguageToggle.css';
 
 export function LanguageToggle() {
   const { language, toggleLanguage, isSeedMode } = useLanguage();
-  const sound = useSoundEngine();
 
   const handleToggle = () => {
-    sound.beam();
     toggleLanguage();
   };
 

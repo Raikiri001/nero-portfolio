@@ -1,8 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'motion/react';
-import { useASCIIRenderer } from '../../hooks/useASCIIRenderer';
-import { useSoundEngine } from '../../hooks/useSoundEngine';
-import { PILOT_HELMET_EMBLEM } from '../../data/ascii-art';
 import { SYSTEM_BOOT_SEQUENCE } from '../../data/siteData';
 import './BootSequence.css';
 
@@ -12,20 +10,10 @@ export function BootSequence({ onComplete }) {
   const [activeLineIdx, setActiveLineIdx] = useState(0);
   const [activeCharIdx, setActiveCharIdx] = useState(0);
 
-  const [showBurst, setShowBurst] = useState(false);
-  const [gateVisible, setGateVisible] = useState(true);
-
-  const sound = useSoundEngine();
-  const gateClickedRef = useRef(false);
-
-  const helmetRenderer = useASCIIRenderer(PILOT_HELMET_EMBLEM, { speed: 40 }); // slightly faster
-
   // Input stage completion
   const handleComplete = useCallback(() => {
-    sound.enable();
-    sound.ping();
     onComplete();
-  }, [sound, onComplete]);
+  }, [onComplete]);
 
   useEffect(() => {
     if (stage === 'awaiting_input') {
@@ -55,8 +43,6 @@ export function BootSequence({ onComplete }) {
             return newLines;
           });
           setActiveCharIdx(prev => prev + 1);
-
-          if (activeCharIdx % 3 === 0) sound.ping(); // subtle typing sound
         }, 15); // typing speed
         return () => clearTimeout(timeout);
       } else {
@@ -68,7 +54,7 @@ export function BootSequence({ onComplete }) {
         return () => clearTimeout(timeout);
       }
     }
-  }, [stage, activeLineIdx, activeCharIdx, sound]);
+  }, [stage, activeLineIdx, activeCharIdx]);
 
   // ASCII Helmet logic removed
 
