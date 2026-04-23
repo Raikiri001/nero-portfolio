@@ -1,0 +1,19 @@
+.scroll-indicator-container {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+}
+
+.scroll-down {
+  bottom: 30px;
+}
+
+.scroll-up {
+  top: 30px;
+}

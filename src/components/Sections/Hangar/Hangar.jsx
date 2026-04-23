@@ -30,10 +30,10 @@ export function Hangar() {
       </motion.div>
 
       <div className="eda-layout">
-        
+
         <div className="eda-left-col">
           {/* PILOT_STATS Module */}
-          <motion.div 
+          <motion.div
             className="eda-panel pilot-stats-panel hud-panel"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -51,11 +51,11 @@ export function Hangar() {
                 </div>
               ))}
             </div>
-            
+
             <div className="pilot-bio-container mt-4">
               <div className="eda-panel__header"><ScrambleText text="ABOUT_ME" /></div>
               <div className="pilot-bio">
-                <span className="blink-dot" style={{ backgroundColor: 'var(--nerd-accent-red)' }}></span> 
+                <span className="blink-dot" style={{ backgroundColor: 'var(--nerd-accent-red)' }}></span>
                 <span> An aspiring Machine Learning Engineer and Data Analyst. Highly interested in mecha systems (Gundam, Macross) and merging tactical designs with advanced backend AI infrastructures. [PLACEHOLDER EXCERPT]: I am constantly pushing the boundaries of algorithmic performance, dissecting core neural pathways to enhance tactical OS integrations. My experience spans across rigorous data analysis and designing high-fidelity dashboards suitable for an Ace Pilot execution sequence. I maintain a strict adherence to elegant, scalable code structures, while actively integrating machine learning models into real-world simulations.</span>
               </div>
             </div>
@@ -64,7 +64,7 @@ export function Hangar() {
 
         {/* SKILLS STATIC */}
         <div className="eda-right-col">
-          <motion.div 
+          <motion.div
             className="eda-panel skill-ribbon-panel hud-panel"
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -72,7 +72,7 @@ export function Hangar() {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <div className="eda-panel__header"><ScrambleText text="SYSTEM_SKILLS_ACTIVE" /></div>
-            
+
             <div className="skills-static-container">
               {SKILLS_ARRAY.map((category) => (
                 <div key={category.category} className="skill-static-category">

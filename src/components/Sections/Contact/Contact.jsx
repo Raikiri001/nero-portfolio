@@ -19,7 +19,7 @@ export function Contact() {
   const handleContactClick = (e, link) => {
     e.preventDefault();
     if (dataSecured) return;
-    
+
     sound.ping();
     setDataSecured(link.id);
 
@@ -32,7 +32,7 @@ export function Contact() {
 
   return (
     <section className="comms-section" id="comms" ref={sectionRef}>
-      
+
       {/* DATA SECURED Overlay */}
       <AnimatePresence>
         {dataSecured && (
@@ -82,7 +82,7 @@ export function Contact() {
                 <span className="data-node__freq">FREQ: {link.frequency}</span>
                 <span className="data-node__status blink-dot"></span>
               </div>
-              
+
               <div className="data-node__body">
                 <div className="data-node__label">{link.label}</div>
                 <div className="data-node__type">[{link.type}]</div>

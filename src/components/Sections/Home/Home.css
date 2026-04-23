@@ -126,10 +126,15 @@
   transition: border-color 0.3s ease, transform 0.3s ease;
 }
 
-.cv-box-corner.top-left { top: -8px; left: -8px; border-top-width: 3px; border-left-width: 3px; }
-.cv-box-corner.top-right { top: -8px; right: -8px; border-top-width: 3px; border-right-width: 3px; }
-.cv-box-corner.bottom-left { bottom: -8px; left: -8px; border-bottom-width: 3px; border-left-width: 3px; }
-.cv-box-corner.bottom-right { bottom: -8px; right: -8px; border-bottom-width: 3px; border-right-width: 3px; }
+.cv-box-corner.top-left { top: -8px; left: -8px; border-top-width: 3px; border-left-width: 3px; animation: corner-tl-idle 4s infinite ease-in-out; }
+.cv-box-corner.top-right { top: -8px; right: -8px; border-top-width: 3px; border-right-width: 3px; animation: corner-tr-idle 4s infinite ease-in-out; }
+.cv-box-corner.bottom-left { bottom: -8px; left: -8px; border-bottom-width: 3px; border-left-width: 3px; animation: corner-bl-idle 4s infinite ease-in-out; }
+.cv-box-corner.bottom-right { bottom: -8px; right: -8px; border-bottom-width: 3px; border-right-width: 3px; animation: corner-br-idle 4s infinite ease-in-out; }
+
+@keyframes corner-tl-idle { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-4px, -4px); } }
+@keyframes corner-tr-idle { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(4px, -4px); } }
+@keyframes corner-bl-idle { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-4px, 4px); } }
+@keyframes corner-br-idle { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(4px, 4px); } }
 
 .cv-bounding-box:hover .cv-box-corner.top-left { animation: corner-tl-high 0.8s infinite ease-in-out; }
 .cv-bounding-box:hover .cv-box-corner.top-right { animation: corner-tr-high 0.8s infinite ease-in-out; }
@@ -218,6 +223,8 @@
   padding: 10px;
   font-family: var(--font-mono);
   transition: max-height 0.3s ease, opacity 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .cv-proj-title {
@@ -227,7 +234,8 @@
   font-size: 0.9rem;
   letter-spacing: 0.05em;
   white-space: normal;
-  text-wrap: balance;
+  word-wrap: break-word;
+  text-align: center;
 }
 
 .cv-proj-status {

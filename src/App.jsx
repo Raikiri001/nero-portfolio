@@ -5,6 +5,7 @@ import { CustomCursor } from './components/HUD/CustomCursor';
 import { ScanlineOverlay } from './components/HUD/ScanlineOverlay';
 import { Navigation } from './components/HUD/Navigation';
 import { TransitionOverlay } from './components/HUD/TransitionOverlay';
+import { ScrollIndicator } from './components/HUD/ScrollIndicator';
 import { Home } from './components/Sections/Home/Home';
 import { Portfolio } from './components/Sections/Portfolio/Portfolio';
 import { Hangar } from './components/Sections/Hangar/Hangar';
@@ -139,6 +140,10 @@ function App() {
                   {activeSection === 'about' && <Hangar />}
                   {activeSection === 'sorties' && <Portfolio />}
                   {activeSection === 'comms' && <Contact />}
+                  
+                  {/* Scroll Indicators inside the push-back container so they transition out together */}
+                  <ScrollIndicator direction="up" show={SECTIONS.indexOf(activeSection) > 0} />
+                  <ScrollIndicator direction="down" show={SECTIONS.indexOf(activeSection) < SECTIONS.length - 1} />
                 </motion.div>
               </AnimatePresence>
             </div>
