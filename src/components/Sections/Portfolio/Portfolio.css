@@ -173,6 +173,19 @@
   width: max-content;
   border-left: 3px solid var(--nerd-primary);
   font-weight: bold;
+  transition: var(--transition-fast);
+}
+
+.mission-folder__status[data-status="MISSION_COMPLETE"] {
+  color: var(--nerd-accent-green);
+  border-left-color: var(--nerd-accent-green);
+  background: rgba(0, 255, 102, 0.1);
+}
+
+.mission-folder__status[data-status="MISSION_ONGOING"] {
+  color: var(--nerd-accent-yellow);
+  border-left-color: var(--nerd-accent-yellow);
+  background: rgba(255, 230, 0, 0.1);
 }
 
 .mission-folder__footer {
@@ -298,8 +311,15 @@
 .mission-detail__status {
   font-family: var(--font-mono);
   font-size: 1rem;
-  color: var(--nerd-accent-green);
   font-weight: bold;
+}
+
+.mission-detail__status[data-status="MISSION_COMPLETE"] {
+  color: var(--nerd-accent-green);
+}
+
+.mission-detail__status[data-status="MISSION_ONGOING"] {
+  color: var(--nerd-accent-yellow);
 }
 
 .mission-detail__close {

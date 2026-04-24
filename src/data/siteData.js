@@ -156,8 +156,8 @@ export const PROJECTS_ARRAY = [
   {
     id: "proj_07",
     title: "Personal Portfolio Website v2.0",
-    date: "March 2026 - April 2026",
-    status: "MISSION_COMPLETE",
+    date: "March 2026 - Present",
+    status: "MISSION_ONGOING",
     details: "Developed an interactive, high-performance portfolio website designed to mirror a mobile suit cockpit interface. This project bridges the gap between web development and the mechanical aesthetics of the Gundam SEED and Macross Frontier universes. Developed to display projects.",
     repoUrl: "#github-link-here",
     tags: ["Three.js", "JavaScript", "Website Development"],

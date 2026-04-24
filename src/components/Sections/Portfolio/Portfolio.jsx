@@ -119,7 +119,9 @@ export function Portfolio() {
                 })}
               </div>
 
-              <div className="mission-folder__status">STATUS: {project.status}</div>
+              <div className="mission-folder__status" data-status={project.status}>
+                STATUS: {project.status.replace(/_/g, ' ')}
+              </div>
 
               <div className="mission-folder__footer">
                 <div className="mission-folder__date">{project.date}</div>
@@ -154,7 +156,9 @@ export function Portfolio() {
                   <h3 className="mission-detail__title">
                     {selectedMission.title}
                   </h3>
-                  <div className="mission-detail__status">STATUS: {selectedMission.status} | {selectedMission.date}</div>
+                  <div className="mission-detail__status" data-status={selectedMission.status}>
+                    STATUS: {selectedMission.status.replace(/_/g, ' ')} | {selectedMission.date}
+                  </div>
                   <button className="mission-detail__close" onClick={handleClose} data-clickable>
                     ABORT
                   </button>
