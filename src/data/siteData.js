@@ -159,7 +159,7 @@ export const PROJECTS_ARRAY = [
     date: "March 2026 - Present",
     status: "MISSION_ONGOING",
     details: "Developed an interactive, high-performance portfolio website designed to mirror a mobile suit cockpit interface. This project bridges the gap between web development and the mechanical aesthetics of the Gundam SEED and Macross Frontier universes. Developed to display projects.",
-    repoUrl: "#github-link-here",
+    repoUrl: "https://github.com/Raikiri001/nero-portfolio",
     tags: ["Three.js", "JavaScript", "Website Development"],
     tacticalData: {
       OBJECTIVE: "WEB_DEV",
@@ -187,7 +187,7 @@ export const COMM_LINKS = {
       label: 'LINKEDIN',
       type: 'PROFESSIONAL_NET',
       value: 'Nero_G',
-      url: 'https://linkedin.com/in/nero-g',
+      url: 'https://www.linkedin.com/in/nero-garcia-935a8b283/',
       active: 'TRUE'
     },
     {
