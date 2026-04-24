@@ -6,8 +6,6 @@ import './styles/panels.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <LanguageProvider>
-      <App />
-    </LanguageProvider>
+    <App />
   </StrictMode>,
 );
