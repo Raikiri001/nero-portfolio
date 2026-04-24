@@ -76,7 +76,7 @@ export function Portfolio() {
         transition={{ duration: 0.6 }}
         style={{ marginLeft: 'var(--section-margin-x)' }}
       >
-        <span className="section-header__code"><ScrambleText text="SEC_003" /></span>
+        <span className="section-header__code"><ScrambleText text="SEC_03" /></span>
         <h2 className="section-header__title"><ScrambleText text="SORTIES // PROJECTS" delay={200} /></h2>
         <div className="section-header__line" />
       </motion.div>

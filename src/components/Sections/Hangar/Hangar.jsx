@@ -26,7 +26,7 @@ export function Hangar() {
         transition={{ duration: 0.6 }}
         style={{ marginLeft: 'var(--section-margin-x)' }}
       >
-        <span className="section-header__code"><ScrambleText text="SEC_002" /></span>
+        <span className="section-header__code"><ScrambleText text="SEC_02" /></span>
         <h2 className="section-header__title"><ScrambleText text="PILOT DOSSIER // DASHBOARD" delay={200} /></h2>
       </motion.div>
 
@@ -56,7 +56,7 @@ export function Hangar() {
             <div className="pilot-bio-container mt-4">
               <div className="eda-panel__header"><ScrambleText text="ABOUT_ME" /></div>
               <div className="pilot-bio">
-                <span>I’m currently a fourth-year Computer Science student specializing in AI and Data Analytics, but my fascination with complex systems goes way beyond the code I write on my screen. I’ve always been drawn to the intersection where clean aesthetics and high-end engineering meet, which is a passion rooted in my long-standing love for mecha. I’ve spent a lot of time exploring the intricate worlds of Gundam SEED and Macross Frontier, and I’ve always viewed the ZGMF-X20A Strike Freedom as the absolute gold standard for design. That appreciation eventually translated into a hands-on hobby of building Gunpla and other plastic models, where I’ve found that my academic and creative worlds overlap more than I ever expected. I’ve realized that the level of patience and precision needed to meticulously detail a Master Grade kit is almost identical to the mindset I need when I’m refining a neural network or debugging a difficult project. Both tasks require a deep curiosity for the under-the-hood mechanics that make a system work, and I truly enjoy the process of taking dozens of complex components and perfecting them into a functional whole, whether that’s inside a terminal or at my workbench.</span>
+                <span>I’m currently a fourth-year Computer Science student specializing in AI and Data Analytics, but my fascination with complex systems goes way beyond the code I write on my screen. I’ve always been drawn to the intersection where clean aesthetics and high-end engineering meet, which is a passion rooted in my long-standing love for aviation, mecha and piloting. I’ve spent a lot of time exploring the intricate worlds of Gundam SEED and Macross Frontier, and I’ve always viewed the ZGMF-X20A Strike Freedom as the absolute gold standard for mecha design. That appreciation eventually translated into a hands-on hobby of building Gunpla and other plastic models, where I’ve found that my academic and creative worlds overlap more than I ever expected. I’ve realized that the level of patience and precision needed to meticulously detail a Master Grade kit is almost identical to the mindset I need when I’m refining a neural network or debugging a difficult project. Both tasks require a deep curiosity for the under-the-hood mechanics that make a system work, and I truly enjoy the process of taking dozens of complex components and perfecting them into a functional whole, whether that’s inside a terminal or at my workbench.</span>
               </div>
             </div>
           </motion.div>

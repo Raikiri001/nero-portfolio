@@ -10,7 +10,7 @@ export const SCANNER_LABELS = [
 export const TERMINAL_MESSAGES = [
   "Hello, Welcome!",
   "I am an aspiring Machine Learning Engineer and Data Analyst.",
-  "Major: AI and Data Analytics. Status: Specialized in Computer Vision.",
+  "I major in AI and Data Analytics. I am specialised in Computer Vision.",
   "Hot take: Gundam SEED is the absolute best series in the franchise.",
   "In my opinion, the ZGMF-X20A Strike Freedom is the pinnacle of design.",
   "Macross Frontier is comfortably the best Macross series—no contest.",
@@ -20,7 +20,19 @@ export const TERMINAL_MESSAGES = [
   "Special thanks to Seni B!",
   "Special thanks to Ethan S!",
   "Asian Kung-fu generation makes the best rock music ever!!!",
-  "I find Object detection and Instance segmentation verty interesting!"
+  "I find Object detection and Instance segmentation verty interesting!",
+  "Developing and building Neural Networks is fun!",
+  "I like to develop projects that have great social impact!",
+  "I aim to use my experience and skills to help society!",
+  "I am always open to new ideas and collaborations.",
+  "Feel free to reach out to me if you have any questions or suggestions.",
+  "The best Gunpla I have built so far is the MGEX Strike Freedom!",
+  "I am always looking for new challenges and opportunities to learn.",
+  "I am excited to see what the future holds!",
+  "I hope you enjoy visiting my portfolio!",
+  "Thank you for visiting my portfolio!",
+  "I hope you have a great day!",
+  "I have an interest in plastic modelling!"
 ];
 
 export const SYSTEM_BOOT_SEQUENCE = [
@@ -101,7 +113,7 @@ export const PROJECTS_ARRAY = [
     title: "Anti-Social Driving Behaviour Detector",
     date: "February 2025 - June 2025",
     status: "MISSION_COMPLETE",
-    details: "CNN/YOLOv12s deep learning system classifying illegal U-turns/swerving. Applied Gaussian/Savitzky-Golay filtering for noisy tracking data. Trained on 20,000 images. YOLOv12s achieved mAP50-95 of 0.893. Behavioural classifier achieved 0.86 precision.",
+    details: "Developed a YOLOv12s deep learning system classifying illegal U-turns/swerving. Applied Gaussian/Savitzky-Golay filtering for noisy tracking data. Trained on 20,000 images. YOLOv12s achieved mAP50-95 of 0.893. Behavioural classifier achieved 0.86 precision.",
     repoUrl: "https://github.com/Raikiri001/Anti-social-driving-Behaviour-Detector",
     tags: ["YOLOv12s", "Computer Vision", "Object Tracking", "Object Detection", "Behaviour Classification"],
     tacticalData: {
@@ -164,7 +176,7 @@ export const COMM_LINKS = {
   nodes: [
     {
       id: 'github',
-      label: 'GITHUB.COM',
+      label: 'GITHUB',
       type: 'REPOSITORY',
       value: 'Nero_G',
       url: 'https://github.com/Raikiri001',
@@ -180,10 +192,10 @@ export const COMM_LINKS = {
     },
     {
       id: 'email',
-      label: 'SECURE_EMAIL',
+      label: 'EMAIL',
       type: 'DIRECT_COMM',
       value: 'nero@example.com',
-      url: 'mailto:nero@example.com',
+      url: 'mailto:n_garcia_20a@outlook.com',
       active: 'TRUE'
     }
   ]
