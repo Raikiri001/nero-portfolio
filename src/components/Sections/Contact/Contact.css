@@ -5,12 +5,7 @@
   padding: var(--section-pad-top) var(--hud-padding) 60px;
 }
 
-.contact-content {
-  margin-left: 180px;
-  margin-right: 40px;
-  margin-top: 30px;
-  max-width: 600px;
-}
+
 
 /* All-Out Attack Cut-In */
 .all-out-attack {
@@ -164,19 +159,20 @@
 
 .contact-content {
   margin: 30px var(--section-margin-x) 0;
+  max-width: 1200px;
   width: auto;
 }
 
 .data-nodes-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 30px;
-  flex-wrap: wrap;
 }
 
 /* --- Data Node Card --- */
 .data-node {
-  flex: 1;
-  min-width: min(280px, 100%);
+  min-width: 0;
+  width: 100%;
   background: rgba(0, 5, 13, 0.6);
   border: 1px solid rgba(0, 144, 217, 0.4);
   padding: clamp(16px, 2.5vw, 25px);
