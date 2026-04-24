@@ -19,6 +19,7 @@ export const TERMINAL_MESSAGES = [
   "Special thanks to Roshan K!",
   "Special thanks to Seni B!",
   "Special thanks to Ethan S!",
+  "Special thanks to Alex W!",
   "Asian Kung-fu generation makes the best rock music ever!!!",
   "I find Object detection and Instance segmentation verty interesting!",
   "Developing and building Neural Networks is fun!",
