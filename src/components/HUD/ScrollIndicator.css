@@ -33,3 +33,9 @@
   top: 50%;
   transform: translateY(-50%);
 }
+
+@media (max-width: 768px) {
+  .scroll-indicator-container {
+    display: none;
+  }
+}

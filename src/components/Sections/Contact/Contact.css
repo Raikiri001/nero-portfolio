@@ -239,3 +239,35 @@
   text-transform: uppercase;
 }
 
+/* --- Comms Footer --- */
+.comms-footer {
+  margin-top: auto;
+  padding: 60px var(--section-margin-x) 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  opacity: 0.7;
+}
+
+.comms-footer__line {
+  height: 1px;
+  width: 100%;
+  background: var(--nerd-primary);
+  opacity: 0.4;
+}
+
+.comms-footer__content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.comms-footer__timestamp {
+  color: var(--nerd-primary);
+}
+

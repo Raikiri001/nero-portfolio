@@ -54,6 +54,14 @@ export function Contact() {
           ))}
         </div>
       </div>
+
+      <footer className="comms-footer">
+        <div className="comms-footer__line" />
+        <div className="comms-footer__content">
+          <span>&copy; Nero Garcia</span>
+          <span className="comms-footer__timestamp">EST_DATE: 2026.04.24</span>
+        </div>
+      </footer>
     </section>
   );
 }
