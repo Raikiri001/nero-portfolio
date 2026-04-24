@@ -94,7 +94,7 @@ export function Portfolio() {
           {PROJECTS_ARRAY.map((project, idx) => (
             <motion.div
               key={project.id}
-              className="mission-folder"
+              className="mission-folder hud-panel"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
