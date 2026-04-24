@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'motion/react';
 import { PROJECTS_ARRAY } from '../../../data/siteData';
-import { MultiLockCanvas } from './MultiLockCanvas';
+import { MultiLockCanvas } from '../../HUD/MultiLockCanvas';
 import { ScrambleText } from '../../HUD/ScrambleText';
 import { ScrollIndicator } from '../../HUD/ScrollIndicator';
 import './Portfolio.css';
@@ -146,7 +146,7 @@ export function Portfolio() {
                 initial={{ scale: 0.8, opacity: 0, rotateX: 10 }}
                 animate={{ scale: 1, opacity: 1, rotateX: 0 }}
                 exit={{ scale: 0.9, opacity: 0 }}
-                transition={{ duration: 0.4, type: 'spring', stiffness: 200 }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }} // Smooth "glide" cubic-bezier
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="mission-detail__header">
