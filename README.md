@@ -1,6 +1,5 @@
 # NERO Tactical OS // Portfolio v2.0
 
-![NERO OS Banner](https://img.shields.io/badge/INTERFACE-TACTICAL_HUD-0090d9?style=for-the-badge)
 ![React](https://img.shields.io/badge/CORE-REACT_19-61DAFB?style=for-the-badge&logo=react)
 ![Vite](https://img.shields.io/badge/ENGINE-VITE-646CFF?style=for-the-badge&logo=vite)
 ![Framer Motion](https://img.shields.io/badge/ANIMATION-FRAMER_MOTION-FF00C1?style=for-the-badge&logo=framer)
