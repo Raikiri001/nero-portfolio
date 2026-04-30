@@ -1,9 +1,4 @@
-/* Contact Section */
-.contact-section {
-  position: relative;
-  min-height: 100vh;
-  padding: var(--section-pad-top) var(--hud-padding) 60px;
-}
+/* This block is intentionally left blank to merge with the below class */
 
 
 
@@ -149,7 +144,7 @@
    Comms Section — NERO TACTICAL OS
    ============================================================ */
 
-.comms-section {
+.contact-section {
   position: relative;
   min-height: 100vh;
   padding: var(--section-pad-top) var(--hud-padding) 40px;
@@ -239,8 +234,8 @@
   text-transform: uppercase;
 }
 
-/* --- Comms Footer --- */
-.comms-footer {
+/* --- Contact Footer --- */
+.contact-footer {
   margin-top: auto;
   padding: 60px var(--section-margin-x) 40px;
   display: flex;
@@ -249,14 +244,14 @@
   opacity: 0.7;
 }
 
-.comms-footer__line {
+.contact-footer__line {
   height: 1px;
   width: 100%;
   background: var(--nerd-primary);
   opacity: 0.4;
 }
 
-.comms-footer__content {
+.contact-footer__content {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -267,7 +262,7 @@
   text-transform: uppercase;
 }
 
-.comms-footer__timestamp {
+.contact-footer__timestamp {
   color: var(--nerd-primary);
 }
 

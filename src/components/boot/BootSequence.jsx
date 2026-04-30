@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'motion/react';
-import { SYSTEM_BOOT_SEQUENCE } from '../../data/siteData';
+import { SYSTEM_BOOT_SEQUENCE, SITE_TEXT } from '../../data/siteData';
 import './BootSequence.css';
 
 export function BootSequence({ onComplete }) {
@@ -79,7 +79,7 @@ export function BootSequence({ onComplete }) {
             exit={{ opacity: 0, scale: 0.8, filter: 'blur(10px)' }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
           >
-            <div className="neural-text" style={{ flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left', lineHeight: '1.6' }}>
+            <div className="neural-text">
               {terminalLines.map((line, idx) => (
                 <div key={idx} className="neural-text__content">
                   {line}
@@ -89,8 +89,8 @@ export function BootSequence({ onComplete }) {
               ))}
 
               {stage === 'awaiting_input' && (
-                <div className="neural-text__content neural-text__content--blink" style={{ marginTop: '10px' }}>
-                  CLICK OR PRESS ANY KEY TO INITIALIZE
+                <div className="neural-text__content neural-text__content--blink">
+                   {SITE_TEXT.boot.initializeLabel}
                 </div>
               )}
             </div>

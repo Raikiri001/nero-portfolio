@@ -1,19 +1,19 @@
 import { useState, useCallback, useEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from 'motion/react';
-import { BootSequence } from './components/BootSequence/BootSequence';
-import { CustomCursor } from './components/HUD/CustomCursor';
-import { ScanlineOverlay } from './components/HUD/ScanlineOverlay';
-import { Navigation } from './components/HUD/Navigation';
-import { TransitionOverlay } from './components/HUD/TransitionOverlay';
-import { ScrollIndicator } from './components/HUD/ScrollIndicator';
-import { Home } from './components/Sections/Home/Home';
-import { Portfolio } from './components/Sections/Portfolio/Portfolio';
-import { Hangar } from './components/Sections/Hangar/Hangar';
-import { Contact } from './components/Sections/Contact/Contact';
+import { BootSequence } from './components/boot/BootSequence';
+import { CustomCursor } from './components/ui/CustomCursor';
+import { ScanlineOverlay } from './components/ui/ScanlineOverlay';
+import { Navigation } from './components/ui/Navigation';
+import { TransitionOverlay } from './components/ui/TransitionOverlay';
+import { ScrollIndicator } from './components/ui/ScrollIndicator';
+import { Home } from './pages/Home/Home';
+import { Projects } from './pages/Projects/Projects';
+import { About } from './pages/About/About';
+import { Contact } from './pages/Contact/Contact';
 import './App.css';
 
-const SECTIONS = ['home', 'about', 'sorties', 'comms'];
+const SECTIONS = ['home', 'about', 'projects', 'contact'];
 
 function App() {
   const [bootComplete, setBootComplete] = useState(false);
@@ -63,7 +63,7 @@ function App() {
       if (e.target.closest('.mission-detail') || e.target.closest('.mission-detail-overlay')) return;
       
       // Allow natural scrolling if the section content overflows
-      const scrollContainer = e.target.closest('.eda-dashboard-section, .sorties-section, .home-section, .comms-section');
+      const scrollContainer = e.target.closest('.eda-dashboard-section, .projects-section, .home-section, .contact-section');
       if (scrollContainer) {
         const isScrollingUp = e.deltaY < 0;
         const isScrollingDown = e.deltaY > 0;
@@ -162,11 +162,11 @@ function App() {
                   exit="exit"
                   style={{ position: 'absolute', inset: 0, transformOrigin: 'center center', width: '100%', height: '100vh', overflowY: 'auto', overflowX: 'hidden' }}
                 >
-                  {/* Home and Sorties now take extra props to handle deep-linking. We will add them later. */}
+                  {/* Home and Projects now take extra props to handle deep-linking. We will add them later. */}
                   {activeSection === 'home' && <Home onNavigate={handleNavigate} />}
-                  {activeSection === 'about' && <Hangar />}
-                  {activeSection === 'sorties' && <Portfolio />}
-                  {activeSection === 'comms' && <Contact />}
+                  {activeSection === 'about' && <About />}
+                  {activeSection === 'projects' && <Projects />}
+                  {activeSection === 'contact' && <Contact />}
                   
                   {/* Scroll Indicators inside the push-back container so they transition out together */}
                   <ScrollIndicator direction="up" show={SECTIONS.indexOf(activeSection) > 0} />

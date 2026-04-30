@@ -161,12 +161,31 @@
   padding: 60px 80px;
 }
 
+@media (max-width: 768px) {
+  .boot-neural {
+    padding: 40px 20px;
+  }
+}
+
 .neural-text {
+  display: flex;
+  flex-direction: column;
   font-family: var(--font-mono);
   font-size: 1rem;
   color: var(--nerd-primary);
   text-shadow: 0 0 10px rgba(0, 144, 217, 0.5);
   z-index: 10;
+  max-width: 100%;
+  width: 100%;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 480px) {
+  .neural-text {
+    font-size: 0.85rem;
+  }
 }
 
 .neural-text__ok {
@@ -180,7 +199,12 @@
   margin-left: 2px;
 }
 
+.neural-text__content {
+  width: 100%;
+}
+
 .neural-text__content--blink {
+  margin-top: 10px;
   animation: blink 0.8s step-end infinite;
 }
 

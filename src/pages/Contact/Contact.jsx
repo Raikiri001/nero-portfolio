@@ -1,15 +1,15 @@
 import { useRef } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'motion/react';
-import { ScrambleText } from '../../HUD/ScrambleText';
-import { COMM_LINKS } from '../../../data/siteData';
+import { ScrambleText } from '../../components/ui/ScrambleText';
+import { COMM_LINKS, SITE_TEXT } from '../../data/siteData';
 import './Contact.css';
 
 export function Contact() {
   const sectionRef = useRef(null);
 
   return (
-    <section className="comms-section" id="comms" ref={sectionRef}>
+    <section className="contact-section" id="contact" ref={sectionRef}>
 
       <motion.div
         className="section-header"
@@ -18,8 +18,8 @@ export function Contact() {
         transition={{ duration: 0.6 }}
         style={{ marginLeft: 'var(--section-margin-x)' }}
       >
-        <span className="section-header__code"><ScrambleText text="SEC_04" /></span>
-        <h2 className="section-header__title"><ScrambleText text="COMMUNICATION // DATA NODES" /></h2>
+        <span className="section-header__code"><ScrambleText text={SITE_TEXT.contact.sectionCode} /></span>
+        <h2 className="section-header__title"><ScrambleText text={SITE_TEXT.contact.title} /></h2>
         <div className="section-header__line" />
       </motion.div>
 
@@ -55,11 +55,11 @@ export function Contact() {
         </div>
       </div>
 
-      <footer className="comms-footer">
-        <div className="comms-footer__line" />
-        <div className="comms-footer__content">
-          <span>&copy; Nero Garcia</span>
-          <span className="comms-footer__timestamp">EST_DATE: 2026.04.24</span>
+      <footer className="contact-footer">
+        <div className="contact-footer__line" />
+        <div className="contact-footer__content">
+          <span>{SITE_TEXT.contact.footerCopyright}</span>
+          <span className="contact-footer__timestamp">{SITE_TEXT.contact.footerEstDate}</span>
         </div>
       </footer>
     </section>

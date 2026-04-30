@@ -1,11 +1,6 @@
 import './Navigation.css';
 
-const NAV_ITEMS = [
-  { id: 'home', label: 'HOME', icon: '◆' },
-  { id: 'about', label: 'PILOT DATA', icon: '◆' },
-  { id: 'sorties', label: 'SORTIES', icon: '◆' },
-  { id: 'comms', label: 'COMMS', icon: '◆' },
-];
+import { NAV_ITEMS, NAV_TITLE } from '../../data/siteData';
 
 export function Navigation({ activeSection, onNavigate }) {
   const handleClick = (id) => {
@@ -16,7 +11,7 @@ export function Navigation({ activeSection, onNavigate }) {
     <nav className="hud-nav" id="main-navigation">
       <div className="hud-nav__header">
         <span className="hud-nav__bracket">[</span>
-        <span className="hud-nav__title">NERO GARCIA - PORTFOLIO</span>
+        <span className="hud-nav__title">{NAV_TITLE}</span>
         <span className="hud-nav__bracket">]</span>
       </div>
       <ul className="hud-nav__list">

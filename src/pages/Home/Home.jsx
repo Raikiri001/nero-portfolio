@@ -1,9 +1,9 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'motion/react';
-import { PROJECTS_ARRAY, TERMINAL_MESSAGES } from '../../../data/siteData';
-import { ScrambleText } from '../../HUD/ScrambleText';
-import { MultiLockCanvas } from '../../HUD/MultiLockCanvas';
+import { PROJECTS_ARRAY, TERMINAL_MESSAGES, SITE_TEXT } from '../../data/siteData';
+import { ScrambleText } from '../../components/ui/ScrambleText';
+import { MultiLockCanvas } from '../../components/ui/MultiLockCanvas';
 import './Home.css';
 
 // ... existing Home component ...
@@ -104,7 +104,7 @@ export function Home({ onNavigate }) {
           style={{ zIndex: 2, pointerEvents: 'none' }}
         >
           <div className="nero-title" style={{ margin: 0, lineHeight: 1 }}>
-            <ScrambleText text="NERO GARCIA" duration={600} />
+            <ScrambleText text={SITE_TEXT.home.title} duration={600} />
           </div>
         </motion.div>
 
@@ -116,7 +116,7 @@ export function Home({ onNavigate }) {
           style={{ width: 'min(95%, 1000px)', height: 'clamp(200px, 45vh, 420px)', marginTop: 'clamp(15px, 3vh, 40px)', zIndex: 2 }}
         >
           <div className="mission-log__header" style={{ borderBottom: '1px solid var(--nerd-accent-red)' }}>
-            <ScrambleText text="TERMINAL: ACTIVE" />
+            <ScrambleText text={SITE_TEXT.home.terminalHeader} />
           </div>
           <div className="mission-log__content" style={{ maxHeight: '320px', overflow: 'hidden' }}>
             <AnimatePresence>
@@ -222,7 +222,7 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
     if (onNavigate) {
       setTimeout(() => {
         window.sessionStorage.setItem('openProject', project.id);
-        onNavigate('sorties');
+        onNavigate('projects');
         setLockTarget(null);
       }, 800);
     }
@@ -255,7 +255,7 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
       }}
       data-clickable
     >
-      <span className="cv-box-internal-tgt">TGT #{project.id.replace('proj_', '')}</span>
+      <span className="cv-box-internal-tgt">{SITE_TEXT.home.targetPrefix}{project.id.replace('proj_', '')}</span>
 
       <div className="cv-box-corner top-left"></div>
       <div className="cv-box-corner top-right"></div>
@@ -275,7 +275,7 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
             style={{ textAlign: 'center', marginTop: '10px', pointerEvents: 'none', zIndex: 10, position: 'relative', overflow: 'hidden' }}
           >
             <div className="cv-proj-title" style={{ fontSize: '0.9rem', color: '#fff', textShadow: '0 0 5px red' }}>{project.title}</div>
-            <div className="cv-proj-action" style={{ color: 'var(--nerd-accent-red)', fontSize: '0.8rem', marginTop: '5px' }}>CLICK TO INTERCEPT</div>
+            <div className="cv-proj-action" style={{ color: 'var(--nerd-accent-red)', fontSize: '0.8rem', marginTop: '5px' }}>{SITE_TEXT.home.interceptLabel}</div>
           </motion.div>
         )}
       </AnimatePresence>

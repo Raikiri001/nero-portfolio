@@ -1,8 +1,8 @@
 /* ============================================================
-   Sorties Section — NERO TACTICAL OS
+   Projects Section — NERO TACTICAL OS
    ============================================================ */
 
-.sorties-section {
+.projects-section {
   position: relative;
   min-height: 100vh;
   padding: var(--section-pad-top) var(--hud-padding) 40px;

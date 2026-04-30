@@ -202,3 +202,56 @@ export const COMM_LINKS = {
   ]
 };
 
+export const PILOT_STATS = [
+  { label: "PROJECTS_COMPLETED", value: "7", color: "var(--nerd-primary)" },
+  { label: "SPECIALISATION", value: "AI, Data Analytics", color: "var(--nerd-accent-green)" },
+  { label: "MODELS_TRAINED", value: "30+", color: "var(--nerd-accent-red)" },
+  { label: "PAPERS_READ", value: "100+", color: "var(--nerd-accent-yellow)" }
+];
+
+export const PILOT_BIO = "I’m currently a fourth-year Computer Science student specializing in AI and Data Analytics, but my fascination with complex systems goes way beyond the code I write on my screen. I’ve always been drawn to the intersection where clean aesthetics and high-end engineering meet, which is a passion rooted in my long-standing love for aviation, mecha and piloting. I’ve spent a lot of time exploring the intricate worlds of Gundam SEED and Macross Frontier, and I’ve always viewed the ZGMF-X20A Strike Freedom as the absolute gold standard for mecha design. That appreciation eventually translated into a hands-on hobby of building Gunpla and other plastic models, where I’ve found that my academic and creative worlds overlap more than I ever expected. I’ve realized that the level of patience and precision needed to meticulously detail a Master Grade kit is almost identical to the mindset I need when I’m refining a neural network or debugging a difficult project. Both tasks require a deep curiosity for the under-the-hood mechanics that make a system work, and I truly enjoy the process of taking dozens of complex components and perfecting them into a functional whole, whether that’s inside a terminal or at my workbench.";
+
+export const NAV_TITLE = "NERO GARCIA - PORTFOLIO";
+
+export const NAV_ITEMS = [
+  { id: 'home', label: 'HOME', icon: '◆' },
+  { id: 'about', label: 'PILOT DATA', icon: '◆' },
+  { id: 'projects', label: 'PROJECTS', icon: '◆' },
+  { id: 'contact', label: 'CONTACT', icon: '◆' },
+];
+
+export const SITE_TEXT = {
+  home: {
+    title: "NERO GARCIA",
+    terminalHeader: "TERMINAL: ACTIVE",
+    targetPrefix: "TGT #",
+    interceptLabel: "CLICK TO INTERCEPT"
+  },
+  about: {
+    sectionCode: "SEC_02",
+    title: "PILOT DOSSIER // DASHBOARD",
+    statsHeader: "PILOT_STATS",
+    bioHeader: "ABOUT_ME",
+    skillsHeader: "SYSTEM_SKILLS_ACTIVE"
+  },
+  projects: {
+    sectionCode: "SEC_03",
+    title: "SORTIES // PROJECTS",
+    statusLabel: "STATUS:",
+    abortLabel: "ABORT",
+    tagsLabel: "Tags",
+    debriefLabel: "DEBRIEFING_LOG",
+    accessLabel: "ACCESS_REPOSITORY",
+    lockSuccess: "[TARGET_LOCK_ACQUIRED] // ENHANCING_ARCHIVAL_DATA",
+    lockFail: "[TARGET_LOCK_ACQUIRED] // NO_EXTERNAL_ARCHIVAL_DATA_AVAILABLE"
+  },
+  contact: {
+    sectionCode: "SEC_04",
+    title: "COMMUNICATION // DATA NODES",
+    footerCopyright: "© Nero Garcia",
+    footerEstDate: "EST_DATE: 2026.04.24"
+  },
+  boot: {
+    initializeLabel: "CLICK OR PRESS ANY KEY TO INITIALIZE"
+  }
+};

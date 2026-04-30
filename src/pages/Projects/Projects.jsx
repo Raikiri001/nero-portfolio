@@ -2,13 +2,13 @@ import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'motion/react';
-import { PROJECTS_ARRAY } from '../../../data/siteData';
-import { MultiLockCanvas } from '../../HUD/MultiLockCanvas';
-import { ScrambleText } from '../../HUD/ScrambleText';
-import { ScrollIndicator } from '../../HUD/ScrollIndicator';
-import './Portfolio.css';
+import { PROJECTS_ARRAY, SITE_TEXT } from '../../data/siteData';
+import { MultiLockCanvas } from '../../components/ui/MultiLockCanvas';
+import { ScrambleText } from '../../components/ui/ScrambleText';
+import { ScrollIndicator } from '../../components/ui/ScrollIndicator';
+import './Projects.css';
 
-export function Portfolio() {
+export function Projects() {
   const [selectedMission, setSelectedMission] = useState(null);
   const [lockTarget, setLockTarget] = useState(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -64,7 +64,7 @@ export function Portfolio() {
   };
 
   return (
-    <section className="portfolio-section sorties-section" id="sorties" ref={containerRef}>
+    <section className="projects-section" id="projects" ref={containerRef}>
       {/* Multi-lock overlay */}
       {lockTarget && <MultiLockCanvas target={lockTarget} />}
 
@@ -76,8 +76,8 @@ export function Portfolio() {
         transition={{ duration: 0.6 }}
         style={{ marginLeft: 'var(--section-margin-x)' }}
       >
-        <span className="section-header__code"><ScrambleText text="SEC_03" /></span>
-        <h2 className="section-header__title"><ScrambleText text="SORTIES // PROJECTS" delay={200} /></h2>
+        <span className="section-header__code"><ScrambleText text={SITE_TEXT.projects.sectionCode} /></span>
+        <h2 className="section-header__title"><ScrambleText text={SITE_TEXT.projects.title} delay={200} /></h2>
         <div className="section-header__line" />
       </motion.div>
 
@@ -120,7 +120,7 @@ export function Portfolio() {
               </div>
 
               <div className="mission-folder__status" data-status={project.status}>
-                STATUS: {project.status.replace(/_/g, ' ')}
+                {SITE_TEXT.projects.statusLabel} {project.status.replace(/_/g, ' ')}
               </div>
 
               <div className="mission-folder__footer">
@@ -157,10 +157,10 @@ export function Portfolio() {
                     {selectedMission.title}
                   </h3>
                   <div className="mission-detail__status" data-status={selectedMission.status}>
-                    STATUS: {selectedMission.status.replace(/_/g, ' ')} | {selectedMission.date}
+                    {SITE_TEXT.projects.statusLabel} {selectedMission.status.replace(/_/g, ' ')} | {selectedMission.date}
                   </div>
                   <button className="mission-detail__close" onClick={handleClose} data-clickable>
-                    ABORT
+                    {SITE_TEXT.projects.abortLabel}
                   </button>
                 </div>
 
@@ -169,7 +169,7 @@ export function Portfolio() {
                     {/* Left Col */}
                     <div>
                       <div className="mission-detail__section">
-                        <div className="mission-detail__label">Tags</div>
+                        <div className="mission-detail__label">{SITE_TEXT.projects.tagsLabel}</div>
                         <div className="armament-tags">
                           {selectedMission.tags.map(tech => (
                             <span key={tech} className="armament-tag">{tech}</span>
@@ -181,7 +181,7 @@ export function Portfolio() {
                     {/* Right Col */}
                     <div style={{ flex: 1 }}>
                       <div className="mission-detail__section">
-                        <div className="mission-detail__label">DEBRIEFING_LOG</div>
+                        <div className="mission-detail__label">{SITE_TEXT.projects.debriefLabel}</div>
                         <div className="mission-debrief">
                           {selectedMission.details}
                         </div>
@@ -191,11 +191,11 @@ export function Portfolio() {
 
                   <div className="mission-detail__meta">
                     <span style={{ color: 'var(--nerd-accent-red)', fontSize: '0.8rem', fontFamily: 'var(--font-mono)' }}>
-                      {selectedMission.repoUrl ? '[TARGET_LOCK_ACQUIRED] // ENHANCING_ARCHIVAL_DATA' : '[TARGET_LOCK_ACQUIRED] // NO_EXTERNAL_ARCHIVAL_DATA_AVAILABLE'}
+                      {selectedMission.repoUrl ? SITE_TEXT.projects.lockSuccess : SITE_TEXT.projects.lockFail}
                     </span>
                     {selectedMission.repoUrl && (
                       <a href={selectedMission.repoUrl} target="_blank" rel="noopener noreferrer" className="mission-detail__access" data-clickable>
-                        ACCESS_REPOSITORY
+                        {SITE_TEXT.projects.accessLabel}
                       </a>
                     )}
                   </div>

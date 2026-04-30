@@ -1,20 +1,12 @@
 import { useRef } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'motion/react';
-import { SKILLS_ARRAY } from '../../../data/siteData';
-import { ScrambleText } from '../../HUD/ScrambleText';
-import './Hangar.css';
+import { SKILLS_ARRAY, PILOT_STATS, PILOT_BIO, SITE_TEXT } from '../../data/siteData';
+import { ScrambleText } from '../../components/ui/ScrambleText';
+import './About.css';
 
-export function Hangar() {
+export function About() {
   const sectionRef = useRef(null);
-
-  // New informative pilot stats
-  const pilotStats = [
-    { label: "PROJECTS_COMPLETED", value: "7", color: "var(--nerd-primary)" },
-    { label: "SPECIALISATION", value: "AI, Data Analytics", color: "var(--nerd-accent-green)" },
-    { label: "MODELS_TRAINED", value: "30+", color: "var(--nerd-accent-red)" },
-    { label: "PAPERS_READ", value: "100+", color: "var(--nerd-accent-yellow)" }
-  ];
 
   return (
     <section className="eda-dashboard-section" id="about" ref={sectionRef}>
@@ -26,8 +18,8 @@ export function Hangar() {
         transition={{ duration: 0.6 }}
         style={{ marginLeft: 'var(--section-margin-x)' }}
       >
-        <span className="section-header__code"><ScrambleText text="SEC_02" /></span>
-        <h2 className="section-header__title"><ScrambleText text="PILOT DOSSIER // DASHBOARD" delay={200} /></h2>
+        <span className="section-header__code"><ScrambleText text={SITE_TEXT.about.sectionCode} /></span>
+        <h2 className="section-header__title"><ScrambleText text={SITE_TEXT.about.title} delay={200} /></h2>
       </motion.div>
 
       <div className="eda-layout">
@@ -41,9 +33,9 @@ export function Hangar() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <div className="eda-panel__header"><ScrambleText text="PILOT_STATS" /></div>
+            <div className="eda-panel__header"><ScrambleText text={SITE_TEXT.about.statsHeader} /></div>
             <div className="pilot-stats-grid">
-              {pilotStats.map((stat, i) => (
+              {PILOT_STATS.map((stat, i) => (
                 <div key={i} className="pilot-stat-box">
                   <span className="pilot-stat-label">{stat.label}</span>
                   <span className="pilot-stat-value" style={{ color: stat.color }}>
@@ -54,9 +46,9 @@ export function Hangar() {
             </div>
 
             <div className="pilot-bio-container mt-4">
-              <div className="eda-panel__header"><ScrambleText text="ABOUT_ME" /></div>
+              <div className="eda-panel__header"><ScrambleText text={SITE_TEXT.about.bioHeader} /></div>
               <div className="pilot-bio">
-                <span>I’m currently a fourth-year Computer Science student specializing in AI and Data Analytics, but my fascination with complex systems goes way beyond the code I write on my screen. I’ve always been drawn to the intersection where clean aesthetics and high-end engineering meet, which is a passion rooted in my long-standing love for aviation, mecha and piloting. I’ve spent a lot of time exploring the intricate worlds of Gundam SEED and Macross Frontier, and I’ve always viewed the ZGMF-X20A Strike Freedom as the absolute gold standard for mecha design. That appreciation eventually translated into a hands-on hobby of building Gunpla and other plastic models, where I’ve found that my academic and creative worlds overlap more than I ever expected. I’ve realized that the level of patience and precision needed to meticulously detail a Master Grade kit is almost identical to the mindset I need when I’m refining a neural network or debugging a difficult project. Both tasks require a deep curiosity for the under-the-hood mechanics that make a system work, and I truly enjoy the process of taking dozens of complex components and perfecting them into a functional whole, whether that’s inside a terminal or at my workbench.</span>
+                <span>{PILOT_BIO}</span>
               </div>
             </div>
           </motion.div>
@@ -71,7 +63,7 @@ export function Hangar() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <div className="eda-panel__header"><ScrambleText text="SYSTEM_SKILLS_ACTIVE" /></div>
+            <div className="eda-panel__header"><ScrambleText text={SITE_TEXT.about.skillsHeader} /></div>
 
             <div className="skills-static-container">
               {SKILLS_ARRAY.map((category) => (
