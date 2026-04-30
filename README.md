@@ -1,4 +1,4 @@
-# NERO Tactical OS // Portfolio v2.0
+# Nero Garcia Portfolio v2.0
 
 ![React](https://img.shields.io/badge/CORE-REACT_19-61DAFB?style=for-the-badge&logo=react)
 ![Vite](https://img.shields.io/badge/ENGINE-VITE-646CFF?style=for-the-badge&logo=vite)
