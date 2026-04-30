@@ -8,7 +8,7 @@ An advanced, high-performance personal portfolio website designed to mirror a mo
 
 ## 🖥️ System Overview
 
-The Portfolio is a React-based environment that prioritises immersive visual feedback and high-end styling. It features a custom-built design system inspired by military HUDs and industrial mecha dashboards.
+The portfolio is a React-based environment that prioritises immersive visual feedback and high-end styling. It features a custom-built design system inspired by military HUDs and industrial mecha dashboards.
 
 ### Key Features
 - **Neural Boot Sequence**: A fully interactive terminal-style boot sequence that initializes the OS.
