@@ -216,8 +216,8 @@ export const NAV_TITLE = "NERO GARCIA - PORTFOLIO";
 export const NAV_ITEMS = [
   { id: 'home', label: 'HOME', icon: '◆' },
   { id: 'about', label: 'PILOT DATA', icon: '◆' },
-  { id: 'projects', label: 'PROJECTS', icon: '◆' },
-  { id: 'contact', label: 'CONTACT', icon: '◆' },
+  { id: 'projects', label: 'SORTIES', icon: '◆' },
+  { id: 'contact', label: 'COMMS', icon: '◆' },
 ];
 
 export const SITE_TEXT = {

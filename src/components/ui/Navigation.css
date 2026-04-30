@@ -120,17 +120,17 @@
 /* ---- Responsive Breakpoints ---- */
 @media (max-width: 950px) {
   .hud-nav__text {
-    display: none;
+    display: block;
+    font-size: 0.75rem;
   }
   
   .hud-nav__link {
-    padding: clamp(5px, 1vw, 8px) 15px;
+    padding: 6px 12px;
+    gap: 4px;
   }
   
   .hud-nav__index {
-    margin-right: 0;
-    opacity: 1;
-    font-size: 0.8rem;
+    display: none;
   }
 }
 
@@ -141,5 +141,29 @@
 
   .hud-nav {
     justify-content: center;
+    padding: 10px 16px;
+    gap: 0;
+  }
+
+  .hud-nav__list {
+    gap: 6px;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hud-nav__item {
+    flex: 1 1 auto;
+    min-width: 70px;
+    max-width: 120px;
+  }
+
+  .hud-nav__link {
+    width: 100%;
+    padding: 10px 4px;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    text-align: center;
   }
 }
