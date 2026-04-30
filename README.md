@@ -22,7 +22,6 @@ The NERO Tactical OS is a React-based environment that prioritises immersive vis
 - **Build Tool**: Vite
 - **Animations**: Framer Motion
 - **Styling**: Vanilla CSS (Custom Design System)
-- **Deployment**: Optimized for Vercel/Netlify
 
 ## 📂 Architecture
 - `src/components/boot`: System startup sequence logic and styles.
