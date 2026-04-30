@@ -1,16 +1,37 @@
-# React + Vite
+# NERO Tactical OS // Portfolio v2.0
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![NERO OS Banner](https://img.shields.io/badge/INTERFACE-TACTICAL_HUD-0090d9?style=for-the-badge)
+![React](https://img.shields.io/badge/CORE-REACT_19-61DAFB?style=for-the-badge&logo=react)
+![Vite](https://img.shields.io/badge/ENGINE-VITE-646CFF?style=for-the-badge&logo=vite)
+![Framer Motion](https://img.shields.io/badge/ANIMATION-FRAMER_MOTION-FF00C1?style=for-the-badge&logo=framer)
 
-Currently, two official plugins are available:
+An advanced, high-performance personal portfolio website designed to mirror a mobile suit cockpit interface. This project bridges the gap between web development and the mechanical aesthetics of the **Gundam SEED** and **Macross Frontier** universes.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🖥️ System Overview
 
-## React Compiler
+The NERO Tactical OS is a React-based environment that prioritises immersive visual feedback and high-end styling. It features a custom-built design system inspired by military HUDs and industrial mecha dashboards.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Key Features
+- **Neural Boot Sequence**: A fully interactive terminal-style boot sequence that initializes the OS.
+- **Glassmorphism HUD**: Multi-layered panels with realistic blur and glow effects.
+- **Adaptive Interface**: Responsive navigation that optimizes for both wide-screen cockpit views and compact mobile modules.
+- **Project Sorties**: A mission-focused project display system with detailed archival data.
+- **Tactical Animations**: Staggered entry animations and smooth transitions powered by Framer Motion.
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
+- **Framework**: React 19
+- **Build Tool**: Vite
+- **Animations**: Framer Motion
+- **Styling**: Vanilla CSS (Custom Design System)
+- **Deployment**: Optimized for Vercel/Netlify
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📂 Architecture
+- `src/components/boot`: System startup sequence logic and styles.
+- `src/components/ui`: Global HUD elements (Navigation, Custom Cursor, Overlays).
+- `src/data`: Centralized `siteData.js` for all configurable text and project information.
+- `src/pages`: Modular section components (Home, Pilot Data, Project Sorties, Contact).
+
+---
+**OPERATOR:** NERO GARCIA  
+**SYSTEM STATUS:** MISSION_ONGOING  
+**EST_DATE:** 2026.04.24
