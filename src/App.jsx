@@ -7,6 +7,7 @@ import { ScanlineOverlay } from './components/ui/ScanlineOverlay';
 import { Navigation } from './components/ui/Navigation';
 import { TransitionOverlay } from './components/ui/TransitionOverlay';
 import { ScrollIndicator } from './components/ui/ScrollIndicator';
+import { GundamBackLayer, GundamFrontLayer, GundamModalLayer } from './components/ui/GundamBackgroundLayers';
 import { Home } from './pages/Home/Home';
 import { Projects } from './pages/Projects/Projects';
 import { About } from './pages/About/About';
@@ -146,10 +147,17 @@ function App() {
           </motion.div>
         ) : (
           <div key="main" className="main-app">
-            
+
             {/* HUD Elements */}
             <Navigation activeSection={activeSection} onNavigate={handleNavigate} />
             <ScanlineOverlay />
+
+            {/* Persistent, never unmounts across page navigation: every
+                Gundam flies continuously in the background on every page.
+                The 7 project-linked ones hand off to GundamFrontLayer
+                (rendered after page-container, so it renders on top) only
+                while Projects is the active section. */}
+            <GundamBackLayer activeSection={activeSection} />
 
             {/* Sections Container for Push-Back Transition */}
             <div className="page-container" style={{ position: 'relative', zIndex: 2 }}>
@@ -167,14 +175,17 @@ function App() {
                   {activeSection === 'about' && <About />}
                   {activeSection === 'projects' && <Projects />}
                   {activeSection === 'contact' && <Contact />}
-                  
+
                   {/* Scroll Indicators inside the push-back container so they transition out together */}
                   <ScrollIndicator direction="up" show={SECTIONS.indexOf(activeSection) > 0} />
                   <ScrollIndicator direction="down" show={SECTIONS.indexOf(activeSection) < SECTIONS.length - 1} />
                 </motion.div>
               </AnimatePresence>
             </div>
-            
+
+            <GundamFrontLayer activeSection={activeSection} />
+            <GundamModalLayer />
+
           </div>
         )}
       </AnimatePresence>
