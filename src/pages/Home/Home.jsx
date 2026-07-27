@@ -2,9 +2,15 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'motion/react';
 import { PROJECTS_ARRAY, TERMINAL_MESSAGES, SITE_TEXT } from '../../data/siteData';
+import { GUNDAM_ROSTER } from '../../data/gundamVisuals.jsx';
 import { ScrambleText } from '../../components/ui/ScrambleText';
 import { MultiLockCanvas } from '../../components/ui/MultiLockCanvas';
 import './Home.css';
+
+// First N entries in GUNDAM_ROSTER map 1:1 to PROJECTS_ARRAY (in order).
+// Everything after that is held in reserve — flown as non-interactive
+// background units until a matching project exists.
+const AMBIENT_GUNDAM_IDS = GUNDAM_ROSTER.map((_, i) => i).slice(PROJECTS_ARRAY.length);
 
 // ... existing Home component ...
 export function Home({ onNavigate }) {
@@ -83,6 +89,12 @@ export function Home({ onNavigate }) {
           position: 'relative'
         }}
       >
+        <div className="ambient-gundams" style={{ zIndex: 0 }}>
+          {AMBIENT_GUNDAM_IDS.map((gundamId, i) => (
+            <AmbientGundam key={gundamId} gundamId={gundamId} seed={i} />
+          ))}
+        </div>
+
         <div className="cv-overlay" style={{ zIndex: 1 }}>
           {PROJECTS_ARRAY.map((project, index) => (
             <CVBoundingBox
@@ -289,7 +301,7 @@ function MSBody({
   arm = "#f0f0f0", joint = "#a0a0a0", leg = "#f0f0f0", knee = "#ff0000", foot = "#ff0000",
   vfin = "#fff", visor = "#00ffcc", chin = "#ff0000",
   headBase = "#f0f0f0", centerChest = "#ff0000",
-  hideShoulders = false, hideChest = false, hideVfin = false,
+  hideShoulders = false, hideChest = false, hideVfin = false, hideVisor = false,
   wings = null, customParts = null
 }) {
   return (
@@ -303,7 +315,7 @@ function MSBody({
       )}
       <polygon points="29,7 31,7 30,10" fill={chin} />
       <polygon points="26,10 34,10 35,17 25,17" fill={headBase} />
-      <polygon points="27,12 33,12 32,14 28,14" fill={visor} />
+      {!hideVisor && <polygon points="27,12 33,12 32,14 28,14" fill={visor} />}
       <polygon points="28,17 32,17 30,20" fill={chin} />
 
       <polygon points="25,18 35,18 33,21 27,21" fill={joint} />
@@ -345,6 +357,14 @@ function MSBody({
       <polygon points="32,50 38,50 39,55 32,55" fill={knee} />
       <polygon points="32,64 43,64 45,68 31,68" fill={foot} />
 
+      <g opacity="0.5">
+        <line x1="15" y1="35" x2="14" y2="41" stroke="#000" strokeWidth="0.6" />
+        <line x1="45" y1="35" x2="46" y2="41" stroke="#000" strokeWidth="0.6" />
+        <line x1="21" y1="55" x2="20" y2="62" stroke="#000" strokeWidth="0.6" />
+        <line x1="39" y1="55" x2="40" y2="62" stroke="#000" strokeWidth="0.6" />
+        <polygon points="27,36 33,36 32,39 28,39" fill="#000" opacity="0.3" />
+      </g>
+
       {customParts}
     </g>
   );
@@ -368,145 +388,7 @@ function Robot({ dir, gundamId = 0 }) {
   const showRightThruster = isLeft;
   const showLeftThruster = isRight;
 
-  const id = gundamId % 9;
-
-  const getGundamProps = () => {
-    switch (id) {
-      case 0: // Strike Freedom
-        return {
-          props: {
-            chest: "#111", centerChest: "#DAA520", joint: "#DAA520", vfin: "#DAA520", wings: (
-              <g>
-                <path d="M 20 25 L -15 -10 L 5 15 Z" fill="#0055ff" />
-                <path d="M 20 25 L -25 5 L 0 20 Z" fill="#DAA520" />
-                <path d="M 40 25 L 75 -10 L 55 15 Z" fill="#0055ff" />
-                <path d="M 40 25 L 85 5 L 60 20 Z" fill="#DAA520" />
-              </g>
-            )
-          },
-          thruster: "#0055ff"
-        };
-      case 1: // Infinite Justice
-        return {
-          props: {
-            primary: "#ff0055", chest: "#80002a", headBase: "#ff0055", shoulder: "#ff0055", arm: "#ff0055", leg: "#ff0055", joint: "#d0d0d0", visor: "#0f0", chin: "#fff", wings: (
-              <g>
-                <path d="M 25 22 L 5 5 L 15 20 Z" fill="#d0d0d0" />
-                <path d="M 35 22 L 55 5 L 45 20 Z" fill="#d0d0d0" />
-                <polygon points="15,20 45,20 40,15 20,15" fill="#ff0055" />
-              </g>
-            )
-          },
-          thruster: "#ff0055"
-        };
-      case 2: // Destiny
-        return {
-          props: {
-            chest: "#55bbee", centerChest: "#ff0033", visor: "#0f0", foot: "#ff0033", wings: (
-              <g>
-                <path d="M 20 25 L -20 -15 L 0 10 L -30 15 L 5 25 Z" fill="#ff0033" opacity="0.8" />
-                <path d="M 40 25 L 80 -15 L 60 10 L 90 15 L 55 25 Z" fill="#ff0033" opacity="0.8" />
-                <path d="M 25 20 L 5 -5 L 15 15 Z" fill="#222" />
-                <path d="M 35 20 L 55 -5 L 45 15 Z" fill="#222" />
-              </g>
-            )
-          },
-          thruster: "#ff0033"
-        };
-      case 3: // Astray Red Frame
-        return {
-          props: {
-            chest: "#f0f0f0", centerChest: "#ff0000", joint: "#ff0000", shoulder: "#ff0000", shoulderAccent: "#f0f0f0", arm: "#f0f0f0", leg: "#f0f0f0", knee: "#ff0000", chin: "#ff0000", customParts: (
-              <g>
-                <path d="M 15 35 L -5 50 L -3 52 L 17 37 Z" fill="#111" />
-                <path d="M -5 50 L -15 60 L -14 61 L -3 52 Z" fill="#d0d0d0" />
-              </g>
-            )
-          },
-          thruster: "#ff0000"
-        };
-      case 4: // Exia
-        return {
-          props: {
-            hideChest: true, foot: "#0055ff", customParts: (
-              <g>
-                <polygon points="24,21 36,21 34,30 26,30" fill="#0055ff" />
-                <circle cx="30" cy="25" r="4" fill="#00ffcc" />
-                <polygon points="26,27 34,27 30,32" fill="#ff0000" />
-                <path d="M 12 19 L 5 30" stroke="#00ffcc" strokeWidth="2" opacity="0.7" />
-                <path d="M 48 19 L 55 30" stroke="#00ffcc" strokeWidth="2" opacity="0.7" />
-              </g>
-            )
-          },
-          thruster: "#00ffcc"
-        };
-      case 5: // Mighty Strike Freedom
-        return {
-          props: {
-            chest: "#111", centerChest: "#DAA520", joint: "#DAA520", vfin: "#DAA520", wings: (
-              <g>
-                <path d="M 25 22 L -15 -10 L 5 15 Z" fill="#fff" />
-                <path d="M 25 22 L -25 5 L 0 20 Z" fill="#DAA520" />
-                <path d="M -15 -10 L -25 5 L 0 20" stroke="#ff00aa" strokeWidth="2" fill="none" opacity="0.8" />
-                <path d="M 35 22 L 75 -10 L 55 15 Z" fill="#fff" />
-                <path d="M 35 22 L 85 5 L 60 20 Z" fill="#DAA520" />
-                <path d="M 75 -10 L 85 5 L 60 20" stroke="#ff00aa" strokeWidth="2" fill="none" opacity="0.8" />
-              </g>
-            )
-          },
-          thruster: "#ff00aa"
-        };
-      case 6: // Eclipse
-        return {
-          props: {
-            chest: "#f0f0f0", centerChest: "#0055ff", waist: "#ff0000", hideShoulders: true, hideVfin: true, customParts: (
-              <g>
-                <path d="M 30 9 L 20 0 L 26 8 Z" fill="#DAA520" />
-                <path d="M 30 9 L 40 0 L 34 8 Z" fill="#DAA520" />
-                <polygon points="28,5 32,5 30,12" fill="#0055ff" />
-                <polygon points="12,24 22,24 16,5 Z" fill="#f0f0f0" />
-                <polygon points="14,24 20,24 16,10 Z" fill="#0055ff" />
-                <polygon points="38,24 48,24 44,5 Z" fill="#f0f0f0" />
-                <polygon points="40,24 46,24 44,10 Z" fill="#0055ff" />
-              </g>
-            )
-          },
-          thruster: "#0055ff"
-        };
-      case 7: // Strike
-        return {
-          props: {
-            chest: "#0055ff", centerChest: "#f0f0f0", waist: "#f0f0f0", wings: (
-              <g>
-                <polygon points="20,20 10,10 5,25 15,30" fill="#222" />
-                <polygon points="40,20 50,10 55,25 45,30" fill="#222" />
-                <polygon points="10,10 5,12 8,25" fill="#ff0000" />
-                <polygon points="50,10 55,12 52,25" fill="#ff0000" />
-              </g>
-            )
-          },
-          thruster: "#00bfff"
-        };
-      case 8: // Rising Freedom
-        return {
-          props: {
-            chest: "#111", centerChest: "#0055ff", visor: "#0f0", chin: "#ff0000", wings: (
-              <g>
-                <path d="M 20 25 L -10 -15 L 5 15 Z" fill="#0055ff" />
-                <path d="M 20 25 L -20 0 L 10 20 Z" fill="#fff" />
-                <path d="M 40 25 L 70 -15 L 55 15 Z" fill="#0055ff" />
-                <path d="M 40 25 L 80 0 L 50 20 Z" fill="#fff" />
-              </g>
-            )
-          },
-          thruster: "#0055ff"
-        };
-      default:
-        return { props: {}, thruster: "var(--nerd-accent-red)" };
-    }
-  };
-
-  const gundam = getGundamProps();
+  const gundam = GUNDAM_ROSTER[gundamId % GUNDAM_ROSTER.length];
 
   return (
     <motion.div
@@ -563,6 +445,70 @@ function Robot({ dir, gundamId = 0 }) {
 
         <MSBody {...gundam.props} />
       </svg>
+    </motion.div>
+  );
+}
+
+// Decorative-only unit for Gundams not yet tied to a project. Drifts slowly
+// in the background at reduced scale/opacity. No pointer events, no hover
+// or clickable states — purely ambient, held in reserve for future projects.
+function AmbientGundam({ gundamId, seed }) {
+  const [dir, setDir] = useState('idle');
+  const motionX = useMotionValue(0);
+  const motionY = useMotionValue(0);
+  const prevPosRef = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    let cancelled = false;
+    let timeoutId;
+
+    const wander = () => {
+      const targetX = (Math.random() - 0.5) * (window.innerWidth - 100);
+      const targetY = (Math.random() - 0.5) * (window.innerHeight - 100);
+
+      const dx = targetX - prevPosRef.current.x;
+      const dy = targetY - prevPosRef.current.y;
+      let d = [];
+      if (dy < -50) d.push('up');
+      if (dy > 50) d.push('down');
+      if (dx < -50) d.push('left');
+      if (dx > 50) d.push('right');
+      if (d.length === 0) d.push('idle');
+      setDir(d.join('-'));
+      prevPosRef.current = { x: targetX, y: targetY };
+
+      const duration = 9 + Math.random() * 6;
+      animate(motionX, targetX, { duration, ease: 'easeInOut' });
+      animate(motionY, targetY, { duration, ease: 'easeInOut' });
+
+      if (!cancelled) {
+        timeoutId = setTimeout(wander, duration * 1000);
+      }
+    };
+
+    const initialDelay = (seed % 10) * 350;
+    timeoutId = setTimeout(wander, initialDelay);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, [motionX, motionY, seed]);
+
+  return (
+    <motion.div
+      style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        x: motionX,
+        y: motionY,
+        scale: 0.5,
+        opacity: 0.3,
+        pointerEvents: 'none'
+      }}
+    >
+      <Robot dir={dir} gundamId={gundamId} />
     </motion.div>
   );
 }

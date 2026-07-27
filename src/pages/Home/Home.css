@@ -73,6 +73,14 @@
   text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
 }
 
+/* --- Ambient background Gundams (reserved for future projects) --- */
+.ambient-gundams {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
 /* --- Dynamic CV Analysis Overlay --- */
 .cv-overlay {
   position: absolute;
