@@ -4,6 +4,8 @@ import { motion, AnimatePresence, useMotionValue, useTransform, animate } from '
 import { PROJECTS_ARRAY, TERMINAL_MESSAGES, SITE_TEXT } from '../../data/siteData';
 import { ScrambleText } from '../../components/ui/ScrambleText';
 import { MultiLockCanvas } from '../../components/ui/MultiLockCanvas';
+import { MechaBattleCanvas } from '../../components/ui/MechaBattleCanvas';
+import { Robot } from '../../components/ui/GundamRobot';
 import './Home.css';
 
 // ... existing Home component ...
@@ -146,13 +148,49 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
   const [dim, setDim] = useState({ w: 240, h: 140 });
   const [isHovered, setIsHovered] = useState(false);
   const [robotDir, setRobotDir] = useState('idle');
+  const boxRef = useRef(null);
+
+  // idle -> bracing (freezes + stands upright) -> battling (missile barrage;
+  // 'defend' fights it off, 'evade' just runs from it) -> launching (angles
+  // up and flies off) -> navigation happens once launching finishes.
+  const [phase, setPhase] = useState('idle');
+  const phaseRef = useRef('idle');
+  useEffect(() => { phaseRef.current = phase; }, [phase]);
+  const [mode, setMode] = useState('defend');
+  const [battleTarget, setBattleTarget] = useState(null);
+  // Whether MechaBattleCanvas is mounted. Deliberately NOT the same as
+  // `phase === 'battling'` — in evade mode the Gundam's launch (`phase`
+  // flips to 'launching') fires early, well before the missile pack's own
+  // scatter-and-explode tail is done playing. Gating the canvas's mount on
+  // `phase` used to unmount it (cancelling its rAF loop) the instant the
+  // boost fired, cutting that tail off mid-scatter instead of letting it
+  // finish. This stays true until the canvas's own onComplete says it's
+  // genuinely done.
+  const [battleActive, setBattleActive] = useState(false);
+  const [powering, setPowering] = useState(false);
+
+  // Start just off-screen past a random edge (offset from the box's
+  // center-anchored static position) so every box visibly flies inward on
+  // load instead of all seven fanning out from the exact same center point.
+  const [initialPos] = useState(() => {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const edge = Math.floor(Math.random() * 4);
+    const pad = 150 + Math.random() * 150;
+    switch (edge) {
+      case 0: return { x: (Math.random() - 0.5) * vw, y: -vh / 2 - pad };
+      case 1: return { x: (Math.random() - 0.5) * vw, y: vh / 2 + pad };
+      case 2: return { x: -vw / 2 - pad, y: (Math.random() - 0.5) * vh };
+      default: return { x: vw / 2 + pad, y: (Math.random() - 0.5) * vh };
+    }
+  });
 
   // Motion Values for real-time tracking
-  const motionX = useMotionValue(0);
-  const motionY = useMotionValue(0);
+  const motionX = useMotionValue(initialPos.x);
+  const motionY = useMotionValue(initialPos.y);
 
   const mouseRef = useRef({ x: typeof window !== 'undefined' ? window.innerWidth / 2 : 0, y: typeof window !== 'undefined' ? window.innerHeight / 2 : 0 });
-  const prevPosRef = useRef({ x: 0, y: 0 });
+  const prevPosRef = useRef(initialPos);
 
   useEffect(() => {
     const handleGlobalMouse = (e) => {
@@ -164,6 +202,8 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
 
   useEffect(() => {
     const scramble = () => {
+      if (phaseRef.current !== 'idle') return;
+
       let targetX = 0, targetY = 0;
       let attempts = 0;
 
@@ -210,26 +250,147 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
     return () => clearInterval(interval);
   }, [index, total, motionX, motionY]);
 
+  // Evade mode: instead of standing its ground, banks away and keeps
+  // gliding along a continuous curving heading — each leg only turns by a
+  // limited angle from the last, so it reads as one flowing flight path
+  // being outrun, rather than teleporting between random points. Stops the
+  // moment the chase ends and the launch sequence takes over (see
+  // handleBoost) — no separate "boost" dash beforehand, which used to look
+  // like an unmotivated teleport right before it flew up.
+  useEffect(() => {
+    if (phase !== 'battling' || mode !== 'evade') return;
+
+    let timeoutId;
+    let heading = Math.random() * Math.PI * 2;
+    const boundX = (window.innerWidth - 220) / 2;
+    const boundY = (window.innerHeight - 180) / 2;
+    // On a narrow/short viewport (mobile) these bounds are small relative to
+    // the fixed 340-620px dash distance below, so almost every dash clipped
+    // a wall and got its heading reflected — several sharp bounces per
+    // chase instead of one flowing path. That reflected heading feeds
+    // straight into the missile pack's aim point (getLiveTarget), so it
+    // read as the missiles themselves jittering. Scaling the dash distance
+    // down with the available space keeps it a full, uninterrupted glide on
+    // any screen size instead of a corner-bound ping-pong.
+    const spaceScale = Math.max(0.35, Math.min(1, Math.min(boundX, boundY) / 300));
+
+    const dash = () => {
+      heading += (Math.random() - 0.5) * Math.PI * 0.7;
+
+      const dist = (340 + Math.random() * 280) * spaceScale;
+      let targetX = prevPosRef.current.x + Math.cos(heading) * dist;
+      let targetY = prevPosRef.current.y + Math.sin(heading) * dist;
+
+      if (targetX > boundX) { targetX = boundX; heading = Math.PI - heading; }
+      if (targetX < -boundX) { targetX = -boundX; heading = Math.PI - heading; }
+      if (targetY > boundY) { targetY = boundY; heading = -heading; }
+      if (targetY < -boundY) { targetY = -boundY; heading = -heading; }
+
+      const dx = targetX - prevPosRef.current.x;
+      const dy = targetY - prevPosRef.current.y;
+      const dir = [];
+      if (dy < -40) dir.push('up');
+      if (dy > 40) dir.push('down');
+      if (dx < -40) dir.push('left');
+      if (dx > 40) dir.push('right');
+      setRobotDir(dir.length ? dir.join('-') : 'idle');
+      prevPosRef.current = { x: targetX, y: targetY };
+
+      const duration = 1.15 + Math.random() * 0.55;
+      animate(motionX, targetX, { duration, ease: "easeInOut" });
+      animate(motionY, targetY, { duration, ease: "easeInOut" });
+      timeoutId = setTimeout(dash, duration * 1000);
+    };
+
+    dash();
+    return () => clearTimeout(timeoutId);
+  }, [phase, mode, motionX, motionY]);
+
+  const getLiveTarget = useCallback(() => {
+    const el = boxRef.current;
+    if (!el) return null;
+    const rect = el.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  }, []);
+
   const handleClick = (e) => {
     e.preventDefault();
-    
-    const rect = e.currentTarget.getBoundingClientRect();
-    setLockTarget({
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
-    });
+    if (phase !== 'idle') return;
 
-    if (onNavigate) {
-      setTimeout(() => {
+    // Freeze exactly where it is right now — cancel whatever wander
+    // animation was already mid-flight rather than letting it keep sliding.
+    animate(motionX, motionX.get(), { duration: 0 });
+    animate(motionY, motionY.get(), { duration: 0 });
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const center = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    prevPosRef.current = center;
+
+    setMode(Math.random() < 0.5 ? 'evade' : 'defend');
+    setLockTarget(center);
+    setBattleTarget(center);
+    setRobotDir('idle');
+    setPhase('bracing');
+
+    // Brief "standing to attention" beat before the barrage appears.
+    setTimeout(() => {
+      setPhase('battling');
+      setBattleActive(true);
+    }, 380);
+  };
+
+  const handleCounter = useCallback(() => {
+    setPowering(true);
+    setTimeout(() => setPowering(false), 450);
+  }, []);
+
+  // Missile barrage has resolved enough to launch — in defend mode this is
+  // the counter's aftermath; in evade mode it's the chasing pack losing the
+  // lock (fired as `onBoost` from MechaBattleCanvas, well before that
+  // canvas's own scatter-and-explode tail is done — see `battleActive`
+  // above and handleBattleCanvasComplete below for why the canvas itself
+  // keeps playing independently of this). Freeze in place (cancels any
+  // in-flight wander/chase dash so the launch starts from one stable point
+  // instead of continuing to drift sideways), angle up and fly off, ping
+  // the site title as it passes, then hand off to Projects. The `phase`
+  // guard stops this from firing twice. The Robot itself rejoins the
+  // ambient background layer (GundamBackgroundLayers), which keeps flying
+  // underneath regardless of page, and pops back up next to its card once
+  // Projects is open.
+  const handleBoost = () => {
+    if (phaseRef.current === 'launching') return;
+
+    animate(motionX, motionX.get(), { duration: 0 });
+    animate(motionY, motionY.get(), { duration: 0 });
+
+    setLockTarget(null);
+    setPhase('launching');
+
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('gundam-title-ping'));
+    }, 550);
+
+    setTimeout(() => {
+      if (onNavigate) {
         window.sessionStorage.setItem('openProject', project.id);
         onNavigate('projects');
-        setLockTarget(null);
-      }, 800);
-    }
+      }
+    }, mode === 'evade' ? 1150 : 780);
+  };
+
+  // The canvas's own animation has genuinely finished (defend mode's
+  // counter resolution, or evade mode's missile scatter-and-explode tail
+  // playing all the way out) — safe to unmount it now. Defend mode has no
+  // separate boost signal, so this doubles as its launch trigger; evade
+  // mode already launched earlier via onBoost, so here it's purely cleanup.
+  const handleBattleCanvasComplete = () => {
+    setBattleActive(false);
+    if (mode !== 'evade') handleBoost();
   };
 
   return (
     <motion.button
+      ref={boxRef}
       onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -262,7 +423,52 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
       <div className="cv-box-corner bottom-left"></div>
       <div className="cv-box-corner bottom-right"></div>
 
-      <Robot dir={robotDir} gundamId={index} />
+      {battleActive && battleTarget && (
+        <MechaBattleCanvas
+          target={battleTarget}
+          gundamId={index}
+          mode={mode}
+          getLiveTarget={mode === 'evade' ? getLiveTarget : undefined}
+          onCounter={handleCounter}
+          onBoost={mode === 'evade' ? handleBoost : undefined}
+          onComplete={handleBattleCanvasComplete}
+        />
+      )}
+
+      {/* Brief power-surge flash right as the counter-attack fires, so it
+          reads unmistakably as the mech's own doing, not a random effect. */}
+      {powering && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.6 }}
+          animate={{ opacity: [0, 0.9, 0], scale: [0.6, 1.6, 2.1] }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(120,200,255,0.4) 40%, transparent 70%)',
+            pointerEvents: 'none',
+            zIndex: 0
+          }}
+        />
+      )}
+
+      <motion.div
+        key="robot"
+        style={{ position: 'absolute', inset: 0 }}
+        animate={
+          phase === 'launching'
+            ? { rotate: [0, -30, -18], y: [0, -30, -900], opacity: [1, 1, 0], scale: [1, 1.15, 1.3] }
+            : { rotate: 0, y: 0, opacity: 1, scale: 1 }
+        }
+        transition={
+          phase === 'launching'
+            ? { duration: 0.75, times: [0, 0.3, 1], ease: "easeIn" }
+            : { duration: 0.3 }
+        }
+      >
+        <Robot dir={robotDir} gundamId={index} />
+      </motion.div>
 
       <AnimatePresence>
         {isHovered && (
@@ -280,289 +486,5 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
         )}
       </AnimatePresence>
     </motion.button>
-  );
-}
-
-function MSBody({
-  chest = "#0055ff", waist = "#f0f0f0",
-  shoulder = "#f0f0f0", shoulderAccent = "#0055ff",
-  arm = "#f0f0f0", joint = "#a0a0a0", leg = "#f0f0f0", knee = "#ff0000", foot = "#ff0000",
-  vfin = "#fff", visor = "#00ffcc", chin = "#ff0000",
-  headBase = "#f0f0f0", centerChest = "#ff0000",
-  hideShoulders = false, hideChest = false, hideVfin = false,
-  wings = null, customParts = null
-}) {
-  return (
-    <g>
-      {wings}
-      {!hideVfin && (
-        <g>
-          <path d="M 30 7 L 22 2 L 28 9 Z" fill={vfin} />
-          <path d="M 30 7 L 38 2 L 32 9 Z" fill={vfin} />
-        </g>
-      )}
-      <polygon points="29,7 31,7 30,10" fill={chin} />
-      <polygon points="26,10 34,10 35,17 25,17" fill={headBase} />
-      <polygon points="27,12 33,12 32,14 28,14" fill={visor} />
-      <polygon points="28,17 32,17 30,20" fill={chin} />
-
-      <polygon points="25,18 35,18 33,21 27,21" fill={joint} />
-      {!hideChest && (
-        <g>
-          <polygon points="22,21 38,21 36,30 24,30" fill={chest} />
-          <polygon points="23,23 28,23 28,26 24,26" fill="#444" />
-          <polygon points="32,23 37,23 36,26 32,26" fill="#444" />
-          <polygon points="28,26 32,26 33,33 27,33" fill={centerChest} />
-        </g>
-      )}
-
-      <polygon points="26,30 34,30 35,36 25,36" fill={joint} />
-      <polygon points="23,36 29,36 29,44 21,44" fill={waist} />
-      <polygon points="31,36 37,36 39,44 31,44" fill={waist} />
-      <polygon points="29,34 31,34 32,42 28,42" fill={chin} />
-
-      {!hideShoulders && (
-        <g>
-          <polygon points="12,19 22,19 22,26 10,26" fill={shoulder} />
-          <polygon points="13,20 21,20 21,23 12,23" fill={shoulderAccent} />
-          <polygon points="38,19 48,19 50,26 38,26" fill={shoulder} />
-          <polygon points="39,20 47,20 48,23 39,23" fill={shoulderAccent} />
-        </g>
-      )}
-
-      <polygon points="15,26 19,26 19,33 16,33" fill={joint} />
-      <polygon points="14,33 20,33 19,43 12,43" fill={arm} />
-      <polygon points="41,26 45,26 44,33 41,33" fill={joint} />
-      <polygon points="40,33 46,33 48,43 41,43" fill={arm} />
-
-      <polygon points="22,44 28,44 28,52 21,52" fill={joint} />
-      <polygon points="20,52 29,52 30,64 17,64" fill={leg} />
-      <polygon points="22,50 28,50 28,55 21,55" fill={knee} />
-      <polygon points="17,64 28,64 29,68 15,68" fill={foot} />
-
-      <polygon points="32,44 38,44 39,52 32,52" fill={joint} />
-      <polygon points="31,52 40,52 43,64 30,64" fill={leg} />
-      <polygon points="32,50 38,50 39,55 32,55" fill={knee} />
-      <polygon points="32,64 43,64 45,68 31,68" fill={foot} />
-
-      {customParts}
-    </g>
-  );
-}
-
-function Robot({ dir, gundamId = 0 }) {
-  const isUp = dir.includes('up');
-  const isDown = dir.includes('down');
-  const isLeft = dir.includes('left');
-  const isRight = dir.includes('right');
-
-  let tilt = 0;
-  if (isLeft && isUp) tilt = -45;
-  else if (isRight && isUp) tilt = 45;
-  else if (isLeft && isDown) tilt = -15;
-  else if (isRight && isDown) tilt = 15;
-  else if (isLeft) tilt = -25;
-  else if (isRight) tilt = 25;
-
-  const showMainThruster = isUp;
-  const showRightThruster = isLeft;
-  const showLeftThruster = isRight;
-
-  const id = gundamId % 9;
-
-  const getGundamProps = () => {
-    switch (id) {
-      case 0: // Strike Freedom
-        return {
-          props: {
-            chest: "#111", centerChest: "#DAA520", joint: "#DAA520", vfin: "#DAA520", wings: (
-              <g>
-                <path d="M 20 25 L -15 -10 L 5 15 Z" fill="#0055ff" />
-                <path d="M 20 25 L -25 5 L 0 20 Z" fill="#DAA520" />
-                <path d="M 40 25 L 75 -10 L 55 15 Z" fill="#0055ff" />
-                <path d="M 40 25 L 85 5 L 60 20 Z" fill="#DAA520" />
-              </g>
-            )
-          },
-          thruster: "#0055ff"
-        };
-      case 1: // Infinite Justice
-        return {
-          props: {
-            primary: "#ff0055", chest: "#80002a", headBase: "#ff0055", shoulder: "#ff0055", arm: "#ff0055", leg: "#ff0055", joint: "#d0d0d0", visor: "#0f0", chin: "#fff", wings: (
-              <g>
-                <path d="M 25 22 L 5 5 L 15 20 Z" fill="#d0d0d0" />
-                <path d="M 35 22 L 55 5 L 45 20 Z" fill="#d0d0d0" />
-                <polygon points="15,20 45,20 40,15 20,15" fill="#ff0055" />
-              </g>
-            )
-          },
-          thruster: "#ff0055"
-        };
-      case 2: // Destiny
-        return {
-          props: {
-            chest: "#55bbee", centerChest: "#ff0033", visor: "#0f0", foot: "#ff0033", wings: (
-              <g>
-                <path d="M 20 25 L -20 -15 L 0 10 L -30 15 L 5 25 Z" fill="#ff0033" opacity="0.8" />
-                <path d="M 40 25 L 80 -15 L 60 10 L 90 15 L 55 25 Z" fill="#ff0033" opacity="0.8" />
-                <path d="M 25 20 L 5 -5 L 15 15 Z" fill="#222" />
-                <path d="M 35 20 L 55 -5 L 45 15 Z" fill="#222" />
-              </g>
-            )
-          },
-          thruster: "#ff0033"
-        };
-      case 3: // Astray Red Frame
-        return {
-          props: {
-            chest: "#f0f0f0", centerChest: "#ff0000", joint: "#ff0000", shoulder: "#ff0000", shoulderAccent: "#f0f0f0", arm: "#f0f0f0", leg: "#f0f0f0", knee: "#ff0000", chin: "#ff0000", customParts: (
-              <g>
-                <path d="M 15 35 L -5 50 L -3 52 L 17 37 Z" fill="#111" />
-                <path d="M -5 50 L -15 60 L -14 61 L -3 52 Z" fill="#d0d0d0" />
-              </g>
-            )
-          },
-          thruster: "#ff0000"
-        };
-      case 4: // Exia
-        return {
-          props: {
-            hideChest: true, foot: "#0055ff", customParts: (
-              <g>
-                <polygon points="24,21 36,21 34,30 26,30" fill="#0055ff" />
-                <circle cx="30" cy="25" r="4" fill="#00ffcc" />
-                <polygon points="26,27 34,27 30,32" fill="#ff0000" />
-                <path d="M 12 19 L 5 30" stroke="#00ffcc" strokeWidth="2" opacity="0.7" />
-                <path d="M 48 19 L 55 30" stroke="#00ffcc" strokeWidth="2" opacity="0.7" />
-              </g>
-            )
-          },
-          thruster: "#00ffcc"
-        };
-      case 5: // Mighty Strike Freedom
-        return {
-          props: {
-            chest: "#111", centerChest: "#DAA520", joint: "#DAA520", vfin: "#DAA520", wings: (
-              <g>
-                <path d="M 25 22 L -15 -10 L 5 15 Z" fill="#fff" />
-                <path d="M 25 22 L -25 5 L 0 20 Z" fill="#DAA520" />
-                <path d="M -15 -10 L -25 5 L 0 20" stroke="#ff00aa" strokeWidth="2" fill="none" opacity="0.8" />
-                <path d="M 35 22 L 75 -10 L 55 15 Z" fill="#fff" />
-                <path d="M 35 22 L 85 5 L 60 20 Z" fill="#DAA520" />
-                <path d="M 75 -10 L 85 5 L 60 20" stroke="#ff00aa" strokeWidth="2" fill="none" opacity="0.8" />
-              </g>
-            )
-          },
-          thruster: "#ff00aa"
-        };
-      case 6: // Eclipse
-        return {
-          props: {
-            chest: "#f0f0f0", centerChest: "#0055ff", waist: "#ff0000", hideShoulders: true, hideVfin: true, customParts: (
-              <g>
-                <path d="M 30 9 L 20 0 L 26 8 Z" fill="#DAA520" />
-                <path d="M 30 9 L 40 0 L 34 8 Z" fill="#DAA520" />
-                <polygon points="28,5 32,5 30,12" fill="#0055ff" />
-                <polygon points="12,24 22,24 16,5 Z" fill="#f0f0f0" />
-                <polygon points="14,24 20,24 16,10 Z" fill="#0055ff" />
-                <polygon points="38,24 48,24 44,5 Z" fill="#f0f0f0" />
-                <polygon points="40,24 46,24 44,10 Z" fill="#0055ff" />
-              </g>
-            )
-          },
-          thruster: "#0055ff"
-        };
-      case 7: // Strike
-        return {
-          props: {
-            chest: "#0055ff", centerChest: "#f0f0f0", waist: "#f0f0f0", wings: (
-              <g>
-                <polygon points="20,20 10,10 5,25 15,30" fill="#222" />
-                <polygon points="40,20 50,10 55,25 45,30" fill="#222" />
-                <polygon points="10,10 5,12 8,25" fill="#ff0000" />
-                <polygon points="50,10 55,12 52,25" fill="#ff0000" />
-              </g>
-            )
-          },
-          thruster: "#00bfff"
-        };
-      case 8: // Rising Freedom
-        return {
-          props: {
-            chest: "#111", centerChest: "#0055ff", visor: "#0f0", chin: "#ff0000", wings: (
-              <g>
-                <path d="M 20 25 L -10 -15 L 5 15 Z" fill="#0055ff" />
-                <path d="M 20 25 L -20 0 L 10 20 Z" fill="#fff" />
-                <path d="M 40 25 L 70 -15 L 55 15 Z" fill="#0055ff" />
-                <path d="M 40 25 L 80 0 L 50 20 Z" fill="#fff" />
-              </g>
-            )
-          },
-          thruster: "#0055ff"
-        };
-      default:
-        return { props: {}, thruster: "var(--nerd-accent-red)" };
-    }
-  };
-
-  const gundam = getGundamProps();
-
-  return (
-    <motion.div
-      style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        pointerEvents: 'none',
-        opacity: 0.85,
-        zIndex: 0
-      }}
-      animate={{ rotate: tilt, x: '-50%', y: '-50%' }}
-      transition={{ type: 'spring', stiffness: 50, damping: 20 }}
-    >
-      <svg width="60" height="70" viewBox="0 0 60 70" style={{ overflow: 'visible' }}>
-        {showMainThruster && (
-          <g>
-            <motion.path
-              d="M 21 66 L 25 80 L 28 66 Z"
-              fill={gundam.thruster}
-              animate={{ opacity: [0.4, 1, 0.4], scaleY: [0.8, 1.4, 0.8] }}
-              transition={{ duration: 0.15, repeat: Infinity }}
-              style={{ transformOrigin: "25px 66px" }}
-            />
-            <motion.path
-              d="M 32 66 L 35 80 L 39 66 Z"
-              fill={gundam.thruster}
-              animate={{ opacity: [0.4, 1, 0.4], scaleY: [0.8, 1.4, 0.8] }}
-              transition={{ duration: 0.15, repeat: Infinity }}
-              style={{ transformOrigin: "35px 66px" }}
-            />
-          </g>
-        )}
-
-        {showRightThruster && (
-          <motion.path
-            d="M 45 23 L 65 30 L 45 33 Z"
-            fill={gundam.thruster}
-            animate={{ opacity: [0.4, 1, 0.4], scaleX: [0.8, 1.4, 0.8] }}
-            transition={{ duration: 0.15, repeat: Infinity }}
-            style={{ transformOrigin: "45px 28px" }}
-          />
-        )}
-
-        {showLeftThruster && (
-          <motion.path
-            d="M 15 23 L -5 30 L 15 33 Z"
-            fill={gundam.thruster}
-            animate={{ opacity: [0.4, 1, 0.4], scaleX: [0.8, 1.4, 0.8] }}
-            transition={{ duration: 0.15, repeat: Infinity }}
-            style={{ transformOrigin: "15px 28px" }}
-          />
-        )}
-
-        <MSBody {...gundam.props} />
-      </svg>
-    </motion.div>
   );
 }

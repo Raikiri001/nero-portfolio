@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import './Navigation.css';
 
@@ -7,6 +8,18 @@ export function Navigation({ activeSection, onNavigate }) {
   const handleClick = (id) => {
     onNavigate(id);
   };
+
+  // Brief glow pulse on the title badge, timed to a launched Gundam passing
+  // overhead on its way off-screen (see Home.jsx's handleBattleComplete).
+  const [titlePing, setTitlePing] = useState(false);
+  useEffect(() => {
+    const handlePing = () => {
+      setTitlePing(true);
+      setTimeout(() => setTitlePing(false), 650);
+    };
+    window.addEventListener('gundam-title-ping', handlePing);
+    return () => window.removeEventListener('gundam-title-ping', handlePing);
+  }, []);
 
   const navContainerVariants = {
     hidden: { opacity: 0 },
@@ -46,7 +59,10 @@ export function Navigation({ activeSection, onNavigate }) {
       animate="visible"
       variants={navContainerVariants}
     >
-      <motion.div className="hud-nav__header" variants={headerVariants}>
+      <motion.div
+        className={`hud-nav__header ${titlePing ? 'hud-nav__header--ping' : ''}`}
+        variants={headerVariants}
+      >
         <span className="hud-nav__bracket">[</span>
         <span className="hud-nav__title">{NAV_TITLE}</span>
         <span className="hud-nav__bracket">]</span>

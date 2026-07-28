@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'motion/react';
 import './ScrollIndicator.css';
@@ -80,11 +81,16 @@ export function ScrollIndicator({ direction, show }) {
     }
   };
 
-  return (
+  // Portalled straight to <body> so `position: fixed` below resolves
+  // against the real viewport — nested inside the page-transition wrapper,
+  // whose `filter` transition (even at its brightness(1) blur(0px) resting
+  // value) makes it a containing block per spec, `fixed` would otherwise be
+  // pinned to that 100vh wrapper instead of tracking the actual page.
+  return createPortal(
     <AnimatePresence>
       {(show && isTimerVisible) && (
         <div className={`scroll-indicator-container scroll-${direction}`}>
-          <motion.div 
+          <motion.div
             initial={getInitial()}
             animate={getAnimate()}
             exit={getInitial()}
@@ -98,6 +104,7 @@ export function ScrollIndicator({ direction, show }) {
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

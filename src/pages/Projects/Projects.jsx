@@ -63,6 +63,17 @@ export function Projects() {
     setSelectedMission(null);
   };
 
+  // Lets the always-mounted GundamModalLayer (in App.jsx) know which
+  // project's Gundam should pop up and fly around the expanded panel.
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('project-modal-change', {
+      detail: { projectId: selectedMission?.id ?? null }
+    }));
+    return () => {
+      window.dispatchEvent(new CustomEvent('project-modal-change', { detail: { projectId: null } }));
+    };
+  }, [selectedMission]);
+
   return (
     <section className="projects-section" id="projects" ref={containerRef}>
       {/* Multi-lock overlay */}
@@ -95,6 +106,7 @@ export function Projects() {
             <motion.div
               key={project.id}
               className="mission-folder hud-panel"
+              data-project-id={project.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -107,7 +119,7 @@ export function Projects() {
 
               {/* Tactical Graphics Inside Card */}
               <div className="mission-folder__tactical-data">
-                {project.tacticalData && Object.entries(project.tacticalData).map(([key, value], i, arr) => {
+                {project.tacticalData && Object.entries(project.tacticalData).map(([key, value], i) => {
                   const colors = ['var(--nerd-accent-yellow)', 'var(--nerd-primary)', 'var(--nerd-primary)', 'var(--nerd-accent-green)'];
                   const color = colors[i % colors.length];
                   return (
@@ -145,6 +157,7 @@ export function Projects() {
             >
               <motion.div
                 className="mission-detail"
+                data-project-id={selectedMission.id}
                 initial={{ scale: 0.8, opacity: 0, rotateX: 10 }}
                 animate={{ scale: 1, opacity: 1, rotateX: 0 }}
                 exit={{ scale: 0.9, opacity: 0 }}
