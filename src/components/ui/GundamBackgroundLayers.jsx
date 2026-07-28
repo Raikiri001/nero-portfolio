@@ -143,22 +143,49 @@ export function GundamBackLayer({ activeSection }) {
 // than roaming, per request. Scoped to `.mission-folder` specifically so
 // this never accidentally matches the expanded modal panel, which carries
 // the same data-project-id while open.
+//
+// Also reports how much of the card is actually visible within the
+// horizontally-scrolling `.mission-grid` viewport — when a card is mostly
+// scrolled off (e.g. clipped on the right), its Gundam should fade out
+// with it rather than keep floating there detached, since this layer
+// itself is a full-viewport overlay and isn't clipped by the grid's own
+// scroll boundary.
 function getFrontAnchor(projectId) {
   const el = document.querySelector(`.mission-folder[data-project-id="${projectId}"]`);
   if (!el) return null;
   const rect = el.getBoundingClientRect();
   const x = rect.x + rect.width - rect.width * 0.1;
   const y = rect.y + rect.height * 0.08;
-  return { point: { x, y } };
+
+  const grid = document.querySelector('.mission-grid');
+  let visible = true;
+  if (grid) {
+    const gridRect = grid.getBoundingClientRect();
+    const visLeft = Math.max(rect.left, gridRect.left);
+    const visRight = Math.min(rect.right, gridRect.right);
+    const visTop = Math.max(rect.top, gridRect.top);
+    const visBottom = Math.min(rect.bottom, gridRect.bottom);
+    const visibleArea = Math.max(0, visRight - visLeft) * Math.max(0, visBottom - visTop);
+    const cardArea = rect.width * rect.height;
+    visible = cardArea > 0 && visibleArea / cardArea > 0.5;
+  }
+
+  return { point: { x, y }, visible };
 }
 
 // Flies in once (from an off-screen edge) to its anchor, then exposes
 // `resync` for snapping to a moved anchor (scroll/resize) — no continuous
 // wandering. A separate inner wrapper handles the idle bob once arrived.
+// Also tracks `visible` (see getFrontAnchor) so the caller can fade the
+// unit out when its card is scrolled mostly out of view.
 function useAnchorFlight(getAnchor) {
-  const [initial] = useState(() => getAnchor()?.point ?? pickEdgeStart());
+  const [{ initial, initialVisible }] = useState(() => {
+    const result = getAnchor();
+    return { initial: result?.point ?? pickEdgeStart(), initialVisible: result?.visible ?? true };
+  });
   const motionX = useMotionValue(initial.x);
   const motionY = useMotionValue(initial.y);
+  const [visible, setVisible] = useState(initialVisible);
   const arrivedRef = useRef(false);
   const getAnchorRef = useRef(getAnchor);
   useEffect(() => {
@@ -174,6 +201,7 @@ function useAnchorFlight(getAnchor) {
         timeoutId = setTimeout(tryArrive, 300);
         return;
       }
+      setVisible(result.visible !== false);
       const duration = arrivedRef.current ? 0.3 : 1.6 + Math.random() * 0.6;
       arrivedRef.current = true;
       animate(motionX, result.point.x, { duration, ease: 'easeInOut' });
@@ -181,7 +209,32 @@ function useAnchorFlight(getAnchor) {
     };
 
     tryArrive();
-    return () => clearTimeout(timeoutId);
+
+    // The card's own entrance animation (whileInView, staggered per index)
+    // may still be sliding into its final resting spot when the very first
+    // anchor snapshot above is taken, especially for later/lower-row cards
+    // — a couple of follow-up correction snaps once everything has surely
+    // settled keeps every card's Gundam consistently placed relative to it.
+    const settle1 = setTimeout(() => {
+      const result = getAnchorRef.current();
+      if (!result) return;
+      setVisible(result.visible !== false);
+      motionX.set(result.point.x);
+      motionY.set(result.point.y);
+    }, 900);
+    const settle2 = setTimeout(() => {
+      const result = getAnchorRef.current();
+      if (!result) return;
+      setVisible(result.visible !== false);
+      motionX.set(result.point.x);
+      motionY.set(result.point.y);
+    }, 1600);
+
+    return () => {
+      clearTimeout(timeoutId);
+      clearTimeout(settle1);
+      clearTimeout(settle2);
+    };
   }, [motionX, motionY]);
 
   // Instant (no tween) — this fires on every scroll frame, so any easing
@@ -189,16 +242,17 @@ function useAnchorFlight(getAnchor) {
   const resync = useCallback(() => {
     const result = getAnchorRef.current();
     if (!result) return;
+    setVisible(result.visible !== false);
     motionX.set(result.point.x);
     motionY.set(result.point.y);
   }, [motionX, motionY]);
 
-  return { motionX, motionY, resync };
+  return { motionX, motionY, resync, visible };
 }
 
 function FrontGundam({ gundamId, projectId }) {
   const getAnchor = useCallback(() => getFrontAnchor(projectId), [projectId]);
-  const { motionX, motionY, resync } = useAnchorFlight(getAnchor);
+  const { motionX, motionY, resync, visible } = useAnchorFlight(getAnchor);
 
   // Re-anchor immediately on scroll/resize instead of drifting — keeps it
   // stuck to its card's top-right corner as the grid scrolls horizontally.
@@ -231,7 +285,7 @@ function FrontGundam({ gundamId, projectId }) {
         pointerEvents: 'none'
       }}
       initial={{ opacity: 0, scale: 0.4 }}
-      animate={{ opacity: 0.95, scale: 0.7, transition: { duration: 0.5 } }}
+      animate={{ opacity: visible ? 0.95 : 0, scale: 0.7, transition: { duration: 0.35 } }}
       exit={{ opacity: 0, scale: 0.4, transition: { duration: 0.3 } }}
     >
       {/* Very slow, small-amplitude idle float — not wandering. */}

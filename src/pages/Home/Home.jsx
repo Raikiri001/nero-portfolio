@@ -158,6 +158,15 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
   useEffect(() => { phaseRef.current = phase; }, [phase]);
   const [mode, setMode] = useState('defend');
   const [battleTarget, setBattleTarget] = useState(null);
+  // Whether MechaBattleCanvas is mounted. Deliberately NOT the same as
+  // `phase === 'battling'` — in evade mode the Gundam's launch (`phase`
+  // flips to 'launching') fires early, well before the missile pack's own
+  // scatter-and-explode tail is done playing. Gating the canvas's mount on
+  // `phase` used to unmount it (cancelling its rAF loop) the instant the
+  // boost fired, cutting that tail off mid-scatter instead of letting it
+  // finish. This stays true until the canvas's own onComplete says it's
+  // genuinely done.
+  const [battleActive, setBattleActive] = useState(false);
   const [powering, setPowering] = useState(false);
 
   // Start just off-screen past a random edge (offset from the box's
@@ -244,7 +253,10 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
   // Evade mode: instead of standing its ground, banks away and keeps
   // gliding along a continuous curving heading — each leg only turns by a
   // limited angle from the last, so it reads as one flowing flight path
-  // being outrun, rather than teleporting between random points.
+  // being outrun, rather than teleporting between random points. Stops the
+  // moment the chase ends and the launch sequence takes over (see
+  // handleBoost) — no separate "boost" dash beforehand, which used to look
+  // like an unmotivated teleport right before it flew up.
   useEffect(() => {
     if (phase !== 'battling' || mode !== 'evade') return;
 
@@ -252,11 +264,20 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
     let heading = Math.random() * Math.PI * 2;
     const boundX = (window.innerWidth - 220) / 2;
     const boundY = (window.innerHeight - 180) / 2;
+    // On a narrow/short viewport (mobile) these bounds are small relative to
+    // the fixed 340-620px dash distance below, so almost every dash clipped
+    // a wall and got its heading reflected — several sharp bounces per
+    // chase instead of one flowing path. That reflected heading feeds
+    // straight into the missile pack's aim point (getLiveTarget), so it
+    // read as the missiles themselves jittering. Scaling the dash distance
+    // down with the available space keeps it a full, uninterrupted glide on
+    // any screen size instead of a corner-bound ping-pong.
+    const spaceScale = Math.max(0.35, Math.min(1, Math.min(boundX, boundY) / 300));
 
     const dash = () => {
       heading += (Math.random() - 0.5) * Math.PI * 0.7;
 
-      const dist = 260 + Math.random() * 200;
+      const dist = (340 + Math.random() * 280) * spaceScale;
       let targetX = prevPosRef.current.x + Math.cos(heading) * dist;
       let targetY = prevPosRef.current.y + Math.sin(heading) * dist;
 
@@ -312,7 +333,10 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
     setPhase('bracing');
 
     // Brief "standing to attention" beat before the barrage appears.
-    setTimeout(() => setPhase('battling'), 380);
+    setTimeout(() => {
+      setPhase('battling');
+      setBattleActive(true);
+    }, 380);
   };
 
   const handleCounter = useCallback(() => {
@@ -320,12 +344,25 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
     setTimeout(() => setPowering(false), 450);
   }, []);
 
-  // Missile barrage has resolved (fought off or outrun) — angle up and fly
-  // off, ping the site title as it passes, then hand off to Projects. The
-  // Robot itself rejoins the ambient background layer (GundamBackgroundLayers)
-  // which keeps flying underneath regardless of page, and pops back up next
-  // to its card once Projects is open.
-  const handleBattleComplete = () => {
+  // Missile barrage has resolved enough to launch — in defend mode this is
+  // the counter's aftermath; in evade mode it's the chasing pack losing the
+  // lock (fired as `onBoost` from MechaBattleCanvas, well before that
+  // canvas's own scatter-and-explode tail is done — see `battleActive`
+  // above and handleBattleCanvasComplete below for why the canvas itself
+  // keeps playing independently of this). Freeze in place (cancels any
+  // in-flight wander/chase dash so the launch starts from one stable point
+  // instead of continuing to drift sideways), angle up and fly off, ping
+  // the site title as it passes, then hand off to Projects. The `phase`
+  // guard stops this from firing twice. The Robot itself rejoins the
+  // ambient background layer (GundamBackgroundLayers), which keeps flying
+  // underneath regardless of page, and pops back up next to its card once
+  // Projects is open.
+  const handleBoost = () => {
+    if (phaseRef.current === 'launching') return;
+
+    animate(motionX, motionX.get(), { duration: 0 });
+    animate(motionY, motionY.get(), { duration: 0 });
+
     setLockTarget(null);
     setPhase('launching');
 
@@ -338,7 +375,17 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
         window.sessionStorage.setItem('openProject', project.id);
         onNavigate('projects');
       }
-    }, 780);
+    }, mode === 'evade' ? 1150 : 780);
+  };
+
+  // The canvas's own animation has genuinely finished (defend mode's
+  // counter resolution, or evade mode's missile scatter-and-explode tail
+  // playing all the way out) — safe to unmount it now. Defend mode has no
+  // separate boost signal, so this doubles as its launch trigger; evade
+  // mode already launched earlier via onBoost, so here it's purely cleanup.
+  const handleBattleCanvasComplete = () => {
+    setBattleActive(false);
+    if (mode !== 'evade') handleBoost();
   };
 
   return (
@@ -376,14 +423,15 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
       <div className="cv-box-corner bottom-left"></div>
       <div className="cv-box-corner bottom-right"></div>
 
-      {phase === 'battling' && battleTarget && (
+      {battleActive && battleTarget && (
         <MechaBattleCanvas
           target={battleTarget}
           gundamId={index}
           mode={mode}
           getLiveTarget={mode === 'evade' ? getLiveTarget : undefined}
           onCounter={handleCounter}
-          onComplete={handleBattleComplete}
+          onBoost={mode === 'evade' ? handleBoost : undefined}
+          onComplete={handleBattleCanvasComplete}
         />
       )}
 

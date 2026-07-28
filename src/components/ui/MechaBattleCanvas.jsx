@@ -7,7 +7,21 @@ const NUM_MISSILES = 34;
 const NUM_LASERS = 10;
 const COUNTER_TIME = 650;
 const DEFEND_DURATION = 1550;
-const EVADE_DURATION = 1900;
+// Evade mode: how long the pack genuinely chases before the Gundam's speed
+// burst breaks the pursuit. Both cutoffs are on the SAME global clock as the
+// boost trigger below (not relative to each projectile's own spawn delay) —
+// otherwise a late-spawned projectile would still be mid-chase, live-steering
+// toward the Gundam's position, for a beat after it has already teleported
+// away with the boost, producing a visible snap/glitch toward the new spot.
+const CHASE_PHASE_DURATION = 1850;
+const MISSILE_CHASE_END = CHASE_PHASE_DURATION;
+const LASER_CHASE_END = CHASE_PHASE_DURATION * 0.4;
+// Must outlast the slowest possible scatter-miss tail: a missile's peel-off
+// leg can run up to ~560ms (see convertToScatterMiss's duration range) and
+// its explosion fades over another 480ms after that — worst case ~1040ms
+// past the CHASE_PHASE_DURATION boost point. Cutting this shorter clips the
+// explosion mid-fade instead of letting it finish after the Gundam is gone.
+const EVADE_DURATION = CHASE_PHASE_DURATION + 1150;
 
 function pickEdgeSpawn(vw, vh) {
   // Bottom / left / right only — the top stays clear since the Gundam
@@ -20,6 +34,16 @@ function pickEdgeSpawn(vw, vh) {
 
 function lerp(a, b, t) { return a + (b - a) * t; }
 function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+// Frame-rate-independent exponential smoothing: eases `current` toward
+// `target` with time constant `tau` (seconds) instead of snapping to it in
+// one frame. Used to tame direction estimates that would otherwise jump
+// instantly whenever their source (the Gundam's own evade heading, or a
+// missile's steering target) changes abruptly — see its use below.
+function smoothTowards(current, target, dtSec, tau) {
+  const alpha = 1 - Math.exp(-dtSec / tau);
+  return current + (target - current) * alpha;
+}
 
 function quadBezier(p0, p1, p2, t) {
   const mt = 1 - t;
@@ -54,8 +78,55 @@ function projectilePos(m, t) {
   };
 }
 
-function makeProjectile(kind, vw, vh, target) {
+// In defend mode a projectile flies a direct curved path straight at
+// `target`. In evade mode it instead genuinely pursues a point just behind
+// the Gundam's live position — see the steering loop in the frame handler —
+// until the shared MISSILE_CHASE_END/LASER_CHASE_END cutoff, then peels off
+// into a scattered near-miss (convertToScatterMiss below). Missiles sustain
+// the chase close to the full CHASE_PHASE_DURATION (breaking off together
+// once the Gundam's speed burst hits); lasers are
+// quicker pot-shots that peel off well before that for variety.
+function makeProjectile(kind, vw, vh, target, evading) {
   const spawn = pickEdgeSpawn(vw, vh);
+  const base = {
+    kind,
+    x0: spawn.x,
+    y0: spawn.y,
+    size: kind === 'laser' ? 1.5 + Math.random() * 1 : 3 + Math.random() * 2.5,
+    burstSeed: Math.random() * Math.PI * 2,
+    destroyed: false,
+    destroyedAt: 0,
+    hitX: null,
+    hitY: null
+  };
+
+  if (evading) {
+    return {
+      ...base,
+      chasing: true,
+      curX: spawn.x,
+      curY: spawn.y,
+      // Fast — clearly faster than the Gundam's own flight — so the pack
+      // stays tucked in tight behind it rather than trailing far back.
+      chaseSpeed: kind === 'laser' ? 640 + Math.random() * 180 : 480 + Math.random() * 140,
+      // Formation offset behind (and slightly beside) the Gundam's travel
+      // direction, so the pack reads as tailing it rather than surrounding it.
+      trailDist: kind === 'laser' ? 30 + Math.random() * 60 : 45 + Math.random() * 110,
+      lateralOffset: (Math.random() - 0.5) * (kind === 'laser' ? 90 : 140),
+      wobbleAmp: kind === 'laser' ? 1.5 + Math.random() * 3 : 3 + Math.random() * 6,
+      wobbleFreq: 1.4 + Math.random() * 1.8,
+      wobblePhase: Math.random() * Math.PI * 2,
+      delay: Math.random() * (kind === 'laser' ? 280 : 380),
+      // Smoothed steering heading, populated on first chase frame — see
+      // smoothTowards' use in the chase loop below.
+      headingX: null,
+      headingY: null,
+      // Bezier flight fields, populated once it peels off — see
+      // convertToScatterMiss. Placeholder values until then.
+      targetX: spawn.x, targetY: spawn.y, ctrl: { x: spawn.x, y: spawn.y }, perpX: 0, perpY: 1, duration: 300
+    };
+  }
+
   const dx = target.x - spawn.x;
   const dy = target.y - spawn.y;
   const len = Math.hypot(dx, dy) || 1;
@@ -65,9 +136,8 @@ function makeProjectile(kind, vw, vh, target) {
   const bend = (20 + Math.random() * bendRange) * (Math.random() < 0.5 ? -1 : 1);
 
   return {
-    kind,
-    x0: spawn.x,
-    y0: spawn.y,
+    ...base,
+    chasing: false,
     targetX: target.x,
     targetY: target.y,
     ctrl: {
@@ -80,14 +150,38 @@ function makeProjectile(kind, vw, vh, target) {
     wobbleFreq: 1.2 + Math.random() * 2,
     wobblePhase: Math.random() * Math.PI * 2,
     delay: Math.random() * (kind === 'laser' ? 480 : 550),
-    duration: kind === 'laser' ? 480 + Math.random() * 220 : 750 + Math.random() * 300,
-    size: kind === 'laser' ? 1.5 + Math.random() * 1 : 3 + Math.random() * 2.5,
-    burstSeed: Math.random() * Math.PI * 2,
-    destroyed: false,
-    destroyedAt: 0,
-    hitX: null,
-    hitY: null
+    duration: kind === 'laser' ? 480 + Math.random() * 220 : 750 + Math.random() * 300
   };
+}
+
+// Called once a chasing projectile's lock window runs out: it keeps its
+// current position but gets a fresh short curved leg toward a nearby miss
+// point, so it reads as "lost the lock, peeling off" rather than resetting.
+function convertToScatterMiss(m, elapsed, x, y) {
+  const angle = Math.random() * Math.PI * 2;
+  const dist = 90 + Math.random() * 190;
+  const missX = x + Math.cos(angle) * dist;
+  const missY = y + Math.sin(angle) * dist;
+  const dx = missX - x;
+  const dy = missY - y;
+  const len = Math.hypot(dx, dy) || 1;
+  const perpX = -dy / len;
+  const perpY = dx / len;
+  const bend = (10 + Math.random() * 50) * (Math.random() < 0.5 ? -1 : 1);
+
+  m.x0 = x;
+  m.y0 = y;
+  m.targetX = missX;
+  m.targetY = missY;
+  m.ctrl = { x: (x + missX) / 2 + perpX * bend, y: (y + missY) / 2 + perpY * bend };
+  m.perpX = perpX;
+  m.perpY = perpY;
+  m.wobbleAmp = m.kind === 'laser' ? 1 + Math.random() * 3 : 3 + Math.random() * 7;
+  m.wobbleFreq = 1.5 + Math.random() * 2;
+  m.wobblePhase = Math.random() * Math.PI * 2;
+  m.delay = elapsed;
+  m.duration = m.kind === 'laser' ? 200 + Math.random() * 160 : 300 + Math.random() * 260;
+  m.chasing = false;
 }
 
 // Full-screen, canvas-based cinematic: a missile + laser barrage converges
@@ -96,19 +190,22 @@ function makeProjectile(kind, vw, vh, target) {
 // projectile down right as it arrives, tied together with a shared impact
 // beat (flash/shake/counter-VFX/label) so it reads as one deliberate action
 // rather than the barrage just separately fizzling out. In 'evade' mode the
-// Gundam instead runs — `getLiveTarget` is polled every frame so the whole
-// barrage keeps bending toward wherever it currently is, and every
-// projectile just overshoots past a moving target instead of being blocked.
-// Calls onComplete once resolved so the caller can continue (launch flight,
-// navigation, etc).
-export function MechaBattleCanvas({ target, gundamId, mode = 'defend', getLiveTarget, onCounter, onComplete }) {
+// Gundam instead runs — every projectile genuinely pursues its live position
+// (`getLiveTarget`, polled every frame) for its own short lock window, then
+// loses the lock and peels off into a scattered near-miss that explodes on
+// arrival, so it reads as: chased for a few seconds, they lose the lock and
+// scatter, and it bolts. Calls onComplete once resolved so the caller can
+// continue (launch flight, navigation, etc).
+export function MechaBattleCanvas({ target, gundamId, mode = 'defend', getLiveTarget, onCounter, onBoost, onComplete }) {
   const canvasRef = useRef(null);
   const onCompleteRef = useRef(onComplete);
   const onCounterRef = useRef(onCounter);
+  const onBoostRef = useRef(onBoost);
   const getLiveTargetRef = useRef(getLiveTarget);
   useEffect(() => {
     onCompleteRef.current = onComplete;
     onCounterRef.current = onCounter;
+    onBoostRef.current = onBoost;
     getLiveTargetRef.current = getLiveTarget;
   });
 
@@ -130,14 +227,20 @@ export function MechaBattleCanvas({ target, gundamId, mode = 'defend', getLiveTa
     const style = COMBAT_STYLES[gundamId % COMBAT_STYLES.length];
     const color = gundam.thruster || '#00e5ff';
 
-    const missiles = Array.from({ length: NUM_MISSILES }, () => makeProjectile('missile', vw, vh, target));
-    const lasers = Array.from({ length: NUM_LASERS }, () => makeProjectile('laser', vw, vh, target));
+    const missiles = Array.from({ length: NUM_MISSILES }, () => makeProjectile('missile', vw, vh, target, evading));
+    const lasers = Array.from({ length: NUM_LASERS }, () => makeProjectile('laser', vw, vh, target, evading));
     const projectiles = [...missiles, ...lasers];
 
     let dodgeGhostAngle = null;
     let counterFired = false;
+    let boostFired = false;
     let rafId;
     const startTime = performance.now();
+    let lastTime = startTime;
+    let prevLiveX = null;
+    let prevLiveY = null;
+    let smoothVelX = 0;
+    let smoothVelY = 0;
 
     const drawGlowLine = (x1, y1, x2, y2, w, glowColor, alpha) => {
       ctx.save();
@@ -249,8 +352,6 @@ export function MechaBattleCanvas({ target, gundamId, mode = 'defend', getLiveTa
       grad.addColorStop(1, 'rgba(255,255,255,1)');
       ctx.strokeStyle = grad;
       ctx.lineWidth = 2;
-      ctx.shadowColor = '#9fefff';
-      ctx.shadowBlur = 10;
       ctx.beginPath();
       ctx.moveTo(-len, 0);
       ctx.lineTo(4, 0);
@@ -420,6 +521,8 @@ export function MechaBattleCanvas({ target, gundamId, mode = 'defend', getLiveTa
 
     const frame = (now) => {
       const elapsed = now - startTime;
+      const dtSec = Math.min(0.05, Math.max(0, (now - lastTime) / 1000));
+      lastTime = now;
       ctx.clearRect(0, 0, vw, vh);
 
       const liveTarget = evading ? (getLiveTargetRef.current?.() ?? target) : target;
@@ -433,17 +536,105 @@ export function MechaBattleCanvas({ target, gundamId, mode = 'defend', getLiveTa
         onCounterRef.current?.();
       }
 
+      if (evading && !boostFired && elapsed >= CHASE_PHASE_DURATION) {
+        boostFired = true;
+        onBoostRef.current?.();
+      }
+
+      // Where the pack aims while chasing: a point trailing behind the
+      // Gundam's current travel direction (estimated from consecutive live
+      // positions), not the Gundam itself — a tailing formation, not a
+      // ring converging on it from every side.
+      let behindX = 0;
+      let behindY = 1;
+      let lateralX = 1;
+      let lateralY = 0;
+      if (evading) {
+        if (prevLiveX == null) { prevLiveX = liveTarget.x; prevLiveY = liveTarget.y; }
+        const rawVelX = (liveTarget.x - prevLiveX) / Math.max(dtSec, 0.001);
+        const rawVelY = (liveTarget.y - prevLiveY) / Math.max(dtSec, 0.001);
+        prevLiveX = liveTarget.x;
+        prevLiveY = liveTarget.y;
+        // Low-pass filter the Gundam's estimated travel direction. Its own
+        // evade dash (see Home.jsx) snaps to a brand-new heading every
+        // ~1.2-1.7s; feeding that raw frame-to-frame velocity straight into
+        // the pack's aim point made every missile's steering direction (and
+        // therefore its wobble axis + sprite rotation) snap with it, which
+        // read as the whole pack flinching/wiggling instead of chasing
+        // smoothly. Easing toward the new heading over ~0.12s fixes that
+        // without meaningfully lagging the pursuit.
+        smoothVelX = smoothTowards(smoothVelX, rawVelX, dtSec, 0.12);
+        smoothVelY = smoothTowards(smoothVelY, rawVelY, dtSec, 0.12);
+        const speed = Math.hypot(smoothVelX, smoothVelY);
+        if (speed > 5) {
+          behindX = -smoothVelX / speed;
+          behindY = -smoothVelY / speed;
+          lateralX = -behindY;
+          lateralY = behindX;
+        }
+      }
+
       const activeForArchetype = [];
       projectiles.forEach((m) => {
+        // Evade mode, still locked on: steer toward a point trailing just
+        // behind the Gundam (a real pursuit, not a fixed curve) until its
+        // lock window runs out, then peel off into a scattered miss below.
+        if (m.chasing) {
+          if (elapsed < m.delay) return;
+          // Global-clock cutoff (not relative to this projectile's own
+          // spawn delay) — every still-chasing projectile loses the lock in
+          // the same frame the boost fires, so none of them keep live-
+          // steering toward a Gundam that has already teleported away.
+          const chaseEnd = m.kind === 'laser' ? LASER_CHASE_END : MISSILE_CHASE_END;
+          if (elapsed >= chaseEnd) {
+            convertToScatterMiss(m, elapsed, m.curX, m.curY);
+            // falls through to the normal flight branch below, starting
+            // its new short leg from this exact frame (t = 0)
+          } else {
+            const aimX = liveTarget.x + behindX * m.trailDist + lateralX * m.lateralOffset;
+            const aimY = liveTarget.y + behindY * m.trailDist + lateralY * m.lateralOffset;
+            const dxp = aimX - m.curX;
+            const dyp = aimY - m.curY;
+            const dist = Math.hypot(dxp, dyp) || 0.001;
+            const dirX = dxp / dist;
+            const dirY = dyp / dist;
+            const step = Math.min(dist, m.chaseSpeed * dtSec);
+            m.curX += dirX * step;
+            m.curY += dirY * step;
+            // The sprite's drawn heading is smoothed separately from the
+            // raw steering direction above: `dirX/dirY` can flip hard from
+            // one frame to the next (aim point jumps, missile briefly
+            // overtaking its target, etc.), and using that same jittery
+            // vector as the wobble's perpendicular axis made the wobble
+            // itself look erratic rather than a clean sine wave. Easing the
+            // drawn heading toward it instead keeps the pack's actual
+            // pursuit responsive while the visible flight looks steady.
+            if (m.headingX == null) { m.headingX = dirX; m.headingY = dirY; }
+            m.headingX = smoothTowards(m.headingX, dirX, dtSec, 0.09);
+            m.headingY = smoothTowards(m.headingY, dirY, dtSec, 0.09);
+            const hLen = Math.hypot(m.headingX, m.headingY) || 1;
+            const hx = m.headingX / hLen;
+            const hy = m.headingY / hLen;
+            const wob = Math.sin(elapsed * 0.006 * m.wobbleFreq + m.wobblePhase) * m.wobbleAmp;
+            const px = -hy;
+            const py = hx;
+            const drawX = m.curX + px * wob;
+            const drawY = m.curY + py * wob;
+            const angle = Math.atan2(hy, hx);
+            if (m.kind === 'laser') drawLaser(drawX, drawY, angle, 1);
+            else drawMissile(drawX, drawY, angle, m.size, 1);
+            return;
+          }
+        }
+
         const t = elapsed - m.delay;
         if (t < 0) return;
 
-        if (evading) {
-          m.targetX = liveTarget.x;
-          m.targetY = liveTarget.y;
-        }
-
-        const passThrough = evading || style.archetype === 'newtype-dodge';
+        // True canon Newtype precognition dodge (defend mode only) — the
+        // projectile visibly continues past/through where the Gundam no
+        // longer is. Evade mode instead always explodes on arrival (below),
+        // just at a scattered near-miss point rather than a precise hit.
+        const passThrough = !evading && style.archetype === 'newtype-dodge';
 
         if (passThrough) {
           const p = t / m.duration;
@@ -454,7 +645,7 @@ export function MechaBattleCanvas({ target, gundamId, mode = 'defend', getLiveTa
           const alpha = Math.max(0, 1 - overshoot);
           if (m.kind === 'laser') drawLaser(x, y, angle, alpha);
           else drawMissile(x, y, angle, m.size, alpha);
-          if (!evading && p > 1.3 && dodgeGhostAngle == null) {
+          if (p > 1.3 && dodgeGhostAngle == null) {
             m.hitX = x; m.hitY = y;
           }
           return;
@@ -470,7 +661,13 @@ export function MechaBattleCanvas({ target, gundamId, mode = 'defend', getLiveTa
         const ease = easeOutCubic(p);
         const { x, y, angle } = projectilePos(m, ease);
 
-        if (elapsed >= COUNTER_TIME && p < 0.97) {
+        // Defend mode destroys everything still incoming right at the
+        // synced counter beat; evade mode just lets each one finish its own
+        // flight and explode near its scattered aim point. Either way,
+        // nothing is allowed to just reach p=1 and silently vanish.
+        const shouldDestroy = evading ? p >= 0.97 : (p >= 0.97 || elapsed >= COUNTER_TIME);
+
+        if (shouldDestroy) {
           m.destroyed = true;
           m.destroyedAt = elapsed;
           m.hitX = x;
@@ -478,11 +675,9 @@ export function MechaBattleCanvas({ target, gundamId, mode = 'defend', getLiveTa
           return;
         }
 
-        if (p < 0.97) {
-          if (m.kind === 'laser') drawLaser(x, y, angle, 1);
-          else drawMissile(x, y, angle, m.size, 1);
-          activeForArchetype.push({ hitX: x, hitY: y });
-        }
+        if (m.kind === 'laser') drawLaser(x, y, angle, 1);
+        else drawMissile(x, y, angle, m.size, 1);
+        activeForArchetype.push({ hitX: x, hitY: y });
       });
 
       if (evading) {
