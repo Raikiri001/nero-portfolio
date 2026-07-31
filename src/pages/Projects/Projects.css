@@ -1,346 +1,300 @@
 /* ============================================================
-   Projects Section — NERO TACTICAL OS
+   Projects Section — NERO TACTICAL OS — Hangar Bay
    ============================================================ */
 
 .projects-section {
   position: relative;
   min-height: 100vh;
-  padding: var(--section-pad-top) var(--hud-padding) 40px;
-}
-
-.mission-grid {
-  display: grid;
-  grid-template-rows: repeat(2, 1fr);
-  grid-auto-flow: column;
-  grid-auto-columns: clamp(280px, 35vw, 450px);
-  gap: clamp(15px, 2vw, 30px);
-  margin: 30px var(--section-margin-x) 40px;
-  width: auto;
-  overflow-x: auto;
-  padding-bottom: 30px;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.mission-grid::-webkit-scrollbar {
-  display: none;
-}
-
-
-/* --- Mission Folder Card --- */
-.mission-folder {
-  position: relative;
-  background: rgba(0, 5, 13, 0.6);
-  border: 1px solid rgba(0, 144, 217, 0.4);
-  padding: 25px;
+  padding: var(--section-pad-top) var(--hud-padding) 30px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  cursor: none;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
-  min-height: 280px;
-  width: 100%;
-  scroll-snap-align: start;
 }
 
-.mission-folder:hover {
-  background: rgba(255, 0, 60, 0.1);
-  border-color: var(--nerd-accent-red);
-  box-shadow: inset 0 0 30px rgba(255, 0, 60, 0.2);
-  transform: translateY(-5px);
-}
-
-.mission-folder__id {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--nerd-accent-red);
-  letter-spacing: 0.1em;
-  font-weight: bold;
-}
-
-.mission-folder__title {
-  font-family: var(--font-ui);
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 0.05em;
-  line-height: 1.2;
-  margin: 0;
-  min-height: 3.4rem; /* Standardizes for 1 or 2 line titles */
-  display: flex;
-  align-items: flex-start;
-}
-
-.mission-folder__tactical-data {
-  margin: 5px 0 10px;
-  border-top: 1px solid rgba(0, 144, 217, 0.3);
-  border-bottom: 1px solid rgba(0, 144, 217, 0.3);
-  padding: 10px 0;
-  font-size: 0.8rem;
-  font-family: var(--font-mono);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.tac-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
-}
-
-.tac-label {
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-  white-space: nowrap;
-  font-weight: bold;
-  opacity: 0.8;
-}
-
-.tac-val {
-  text-align: right;
-  flex: 1;
-  overflow-wrap: break-word;
-  word-break: break-word;
-  line-height: 1.4;
-}
-
-.mission-folder__graphic {
+/* --- Pager shell --- */
+.hangar-pager {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px dashed rgba(0, 144, 217, 0.3);
-  min-height: 100px;
+  align-items: stretch;
+  gap: clamp(6px, 1.5vw, 20px);
+  margin: 20px var(--section-margin-x) 10px;
+  min-height: 0;
+}
+
+.hangar-pager__stage {
+  flex: 1;
   position: relative;
+  min-height: clamp(480px, 62vh, 720px);
   overflow: hidden;
 }
 
-.tactical-wireframe-placeholder {
-  width: 100%;
-  height: 100%;
-  background-image:
-    linear-gradient(rgba(0, 144, 217, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 144, 217, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.wireframe-crosshair {
-  width: 40px;
-  height: 40px;
-  border: 1px solid rgba(255, 23, 68, 0.4);
-  border-radius: 50%;
-  position: relative;
-}
-
-.wireframe-crosshair::before,
-.wireframe-crosshair::after {
-  content: '';
+.hangar-pager__slide {
   position: absolute;
-  background: rgba(255, 23, 68, 0.6);
+  inset: 0;
 }
 
-.wireframe-crosshair::before {
-  top: 50%;
-  left: -10px;
-  right: -10px;
-  height: 1px;
-  transform: translateY(-50%);
-}
-
-.wireframe-crosshair::after {
-  left: 50%;
-  top: -10px;
-  bottom: -10px;
-  width: 1px;
-  transform: translateX(-50%);
-}
-
-.mission-folder__status {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+.hangar-nav {
+  flex-shrink: 0;
+  width: clamp(36px, 4vw, 56px);
+  background: rgba(0, 5, 13, 0.5);
+  border: 1px solid rgba(0, 144, 217, 0.4);
   color: var(--nerd-primary);
-  background: rgba(0, 144, 217, 0.1);
-  padding: 6px 10px;
-  width: max-content;
-  border-left: 3px solid var(--nerd-primary);
-  font-weight: bold;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  cursor: none;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
   transition: var(--transition-fast);
 }
 
-.mission-folder__status[data-status="MISSION_COMPLETE"] {
-  color: var(--nerd-accent-green);
-  border-left-color: var(--nerd-accent-green);
-  background: rgba(0, 255, 102, 0.1);
+.hangar-nav:hover:not(:disabled) {
+  background: rgba(255, 0, 60, 0.12);
+  border-color: var(--nerd-accent-red);
+  color: var(--nerd-accent-red);
+  box-shadow: var(--glow-intense-red);
 }
 
-.mission-folder__status[data-status="MISSION_ONGOING"] {
-  color: var(--nerd-accent-yellow);
-  border-left-color: var(--nerd-accent-yellow);
-  background: rgba(255, 230, 0, 0.1);
+.hangar-nav:disabled {
+  opacity: 0.25;
+  cursor: default;
 }
 
-.mission-folder__footer {
+.hangar-dots {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-top: auto;
-  padding-top: 15px;
-  border-top: 1px solid rgba(0, 144, 217, 0.2);
+  justify-content: center;
+  gap: 10px;
+  padding: 6px 0 4px;
 }
 
-.mission-folder__date {
+.hangar-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 144, 217, 0.5);
+  background: transparent;
+  cursor: none;
+  transition: var(--transition-fast);
+}
+
+.hangar-dot--active {
+  background: var(--nerd-accent-red);
+  border-color: var(--nerd-accent-red);
+  box-shadow: 0 0 8px var(--nerd-accent-red);
+}
+
+/* --- One bay: docked-mech viewport + always-visible info panel --- */
+.hangar-bay {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.9fr);
+  gap: clamp(14px, 2vw, 28px);
+  width: 100%;
+  height: 100%;
+}
+
+.hangar-bay__viewport {
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(0, 80, 130, 0.25) 0%, rgba(0, 5, 13, 0.75) 75%);
+}
+
+.hangar-bay__gantry {
+  position: absolute;
+  inset: 18px;
+  pointer-events: none;
+  border: 1px dashed rgba(0, 144, 217, 0.25);
+}
+
+.hangar-bay__gantry::before,
+.hangar-bay__gantry::after {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--nerd-primary);
+  opacity: 0.6;
+}
+
+.hangar-bay__gantry::before {
+  top: -2px;
+  left: -2px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.hangar-bay__gantry::after {
+  bottom: -2px;
+  right: -2px;
+  border-left: none;
+  border-top: none;
+}
+
+.hangar-bay__unit-id {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--nerd-accent-red);
+  letter-spacing: 0.15em;
+  font-weight: bold;
+  z-index: 3;
+}
+
+.hangar-callouts__lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hangar-callout {
+  position: absolute;
+  transform: translateY(-50%);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: rgba(0, 5, 13, 0.7);
+  border-left: 2px solid var(--nerd-primary);
+  padding: 5px 10px;
   font-family: var(--font-mono);
   font-size: 0.7rem;
+  max-width: 170px;
+  pointer-events: none;
+  backdrop-filter: blur(3px);
+}
+
+.hangar-callout--left {
+  transform: translate(-100%, -50%);
+  border-left: none;
+  border-right: 2px solid var(--nerd-primary);
+  text-align: right;
+}
+
+.hangar-callout .tac-label {
   color: var(--color-text-secondary);
-}
-
-.mission-folder__classification {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--nerd-accent-red);
-  letter-spacing: 0.1em;
   font-weight: bold;
+  opacity: 0.85;
 }
 
-/* mission-folder__overlay removed */
-
-/* Mission Placeholder */
-.mission-placeholder {
-  min-height: 280px;
-  border: 1px dashed rgba(0, 144, 217, 0.2);
-  clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.mission-placeholder__inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  opacity: 0.4;
-}
-
-.mission-placeholder__icon {
-  font-size: 2rem;
+.hangar-callout .tac-val {
   color: var(--nerd-primary);
+  text-shadow: 0 0 6px rgba(0, 144, 217, 0.6);
 }
 
-.mission-placeholder__label {
-  font-family: var(--font-ui);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  letter-spacing: 0.2em;
-}
-
-.mission-placeholder__sub {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--color-text-secondary);
-  letter-spacing: 0.1em;
-}
-
-/* --- Expanded Mission Detail Overlay --- */
-.mission-detail-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 5000;
-  background: rgba(0, 2, 5, 0.85);
-  /* Deep dark sea blue backdrop */
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-}
-
-.mission-detail {
-  max-width: 90vw;
-  width: 950px;
-  max-height: 90vh;
-  background: rgba(0, 144, 217, 0.12);
-  border: 1.5px solid rgba(0, 144, 217, 0.5);
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5), inset 0 0 30px rgba(0, 144, 217, 0.1);
+/* --- Info panel --- */
+.hangar-bay__info {
   display: flex;
   flex-direction: column;
-  clip-path: polygon(clamp(12px,2vw,30px) 0, 100% 0, 100% calc(100% - clamp(12px,2vw,30px)), calc(100% - clamp(12px,2vw,30px)) 100%, 0 100%, 0 clamp(12px,2vw,30px));
-  padding: clamp(16px, 3vw, 40px);
+  gap: 14px;
   overflow-y: auto;
+  min-height: 0;
 }
 
-.mission-detail__header {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 25px;
-  position: relative;
-  flex-shrink: 0;
-  padding-right: 120px; /* Buffer for ABORT button */
-}
-
-.mission-detail__id {
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  color: var(--nerd-accent-red);
-  letter-spacing: 0.2em;
-  font-weight: bold;
-}
-
-.mission-detail__title {
+.hangar-bay__title {
   font-family: var(--font-ui);
-  font-size: clamp(1.3rem, 3.5vw, 2.5rem);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
   font-weight: 700;
   color: var(--nerd-primary);
   text-shadow: 0 0 10px rgba(0, 144, 217, 0.8);
-  letter-spacing: 0.05em;
-  line-height: 1.2;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
 }
 
-.mission-detail__status {
+.hangar-bay__status {
   font-family: var(--font-mono);
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: bold;
+  color: var(--nerd-primary);
 }
 
-.mission-detail__status[data-status="MISSION_COMPLETE"] {
-  color: var(--nerd-accent-green);
+.hangar-bay__status[data-status="MISSION_COMPLETE"] { color: var(--nerd-accent-green); }
+.hangar-bay__status[data-status="MISSION_ONGOING"] { color: var(--nerd-accent-yellow); }
+
+.hangar-bay__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 144, 217, 0.3);
 }
 
-.mission-detail__status[data-status="MISSION_ONGOING"] {
-  color: var(--nerd-accent-yellow);
-}
-
-.mission-detail__close {
-  position: absolute;
-  top: 40px;
-  right: 20px; /* Aligned with nested content (40px base + 15px body + 5px meta padding) */
-  background: rgba(255, 23, 68, 0.1);
-  border: 1px solid var(--nerd-accent-red);
+.hangar-bay__repo-status {
   color: var(--nerd-accent-red);
+  font-size: 0.75rem;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  padding: 6px 12px;
+}
+
+.hangar-bay__deploy {
+  margin-top: auto;
+  padding: 14px 20px;
+  background: rgba(255, 0, 60, 0.12);
+  border: 1.5px solid var(--nerd-accent-red);
+  color: var(--nerd-accent-red);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.25em;
   cursor: none;
-  letter-spacing: 0.1em;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
   transition: var(--transition-fast);
 }
 
-.mission-detail__close:hover {
+.hangar-bay__deploy:hover {
   background: var(--nerd-accent-red);
   color: #fff;
-  box-shadow: 0 0 20px var(--nerd-accent-red);
+  box-shadow: var(--glow-intense-red);
+}
+
+/* --- Shared readout styles (also used by HangarBay's info panel) --- */
+.mission-detail__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mission-detail__label {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: var(--nerd-primary);
+  letter-spacing: 0.15em;
+  border-bottom: 1px solid rgba(0, 144, 217, 0.4);
+  padding-bottom: 6px;
+}
+
+.armament-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.armament-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-primary);
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 144, 217, 0.2);
+  padding: 5px 10px;
+  letter-spacing: 0.05em;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  transition: all 0.2s ease;
+  cursor: crosshair;
+}
+
+.armament-tag:hover {
+  background: rgba(0, 144, 217, 0.2);
+  border-color: var(--nerd-primary);
+  box-shadow: 0 0 15px rgba(0, 144, 217, 0.4);
+  color: #fff;
+}
+
+.mission-debrief {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--color-text-primary);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 15px;
+  border: 1px solid rgba(0, 144, 217, 0.2);
 }
 
 .mission-detail__access {
@@ -355,6 +309,7 @@
   transition: var(--transition-fast);
   text-decoration: none;
   text-transform: uppercase;
+  width: max-content;
 }
 
 .mission-detail__access:hover {
@@ -364,141 +319,26 @@
   box-shadow: 0 0 20px var(--nerd-accent-green);
 }
 
-.mission-detail__body {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 15px;
-  /* for scrollbar */
-}
-
-.mission-detail__schematic {
-  grid-column: 1 / -1;
-  min-height: 250px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(0, 144, 217, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.schematic-grid {
-  width: 100%;
-  height: 100%;
-  background-image:
-    linear-gradient(rgba(0, 144, 217, 0.15) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 144, 217, 0.15) 1px, transparent 1px);
-  background-size: 40px 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  color: rgba(0, 144, 217, 0.5);
-  font-size: 1.5rem;
-  letter-spacing: 0.2em;
-  animation: pulse 2s infinite alternate;
-}
-
-.mission-detail__section {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.mission-detail__label {
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  font-weight: bold;
-  color: var(--nerd-primary);
-  letter-spacing: 0.15em;
-  border-bottom: 2px solid rgba(0, 144, 217, 0.4);
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-}
-
-.armament-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.armament-tag {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--color-text-primary);
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(0, 144, 217, 0.2);
-  padding: 8px 15px;
-  letter-spacing: 0.05em;
-  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-  transition: all 0.2s ease;
-  cursor: crosshair;
-}
-
-.armament-tag:hover {
-  background: rgba(0, 144, 217, 0.2);
-  border-color: var(--nerd-primary);
-  box-shadow: 0 0 15px rgba(0, 144, 217, 0.4);
-  color: #fff;
-}
-
-.mission-debrief {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  line-height: 1.6;
-  color: var(--color-text-primary);
-  background: rgba(0, 0, 0, 0.4);
-  padding: 25px;
-  border: 1px solid rgba(0, 144, 217, 0.2);
-}
-
-.mission-detail__meta {
-  display: flex;
-  gap: 20px;
-  justify-content: space-between;
-  align-items: center;
-  padding: 25px 5px 15px; /* Added side and bottom padding for glow */
-  border-top: 1px solid rgba(0, 144, 217, 0.3);
-  margin-top: 20px;
-  flex-shrink: 0;
-}
-
-/* Removed large repo-link styles, we will use hud-nav__link styling in JSX */
-
 /* ---- Responsive Breakpoints ---- */
-@media (max-width: 768px) {
-  .mission-grid {
-    grid-template-rows: none;
-    grid-auto-flow: row;
-    grid-auto-columns: unset;
+@media (max-width: 900px) {
+  .hangar-bay {
     grid-template-columns: 1fr;
+    grid-template-rows: minmax(280px, 45%) auto;
+    overflow-y: auto;
   }
 
-  .mission-folder {
-    min-height: 200px;
+  .hangar-pager__stage {
+    overflow-y: auto;
   }
 
-  .mission-detail__header {
-    padding-right: 0;
+  .hangar-callout {
+    max-width: 130px;
+    font-size: 0.62rem;
   }
+}
 
-  .mission-detail__close {
-    position: static;
-    align-self: flex-end;
-    margin-bottom: 10px;
-  }
-
-  .mission-detail-overlay {
-    padding: 16px;
-  }
-
-  .mission-detail__meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+@media (max-width: 640px) {
+  .hangar-nav {
+    display: none;
   }
 }

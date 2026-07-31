@@ -7,11 +7,13 @@ import { ScanlineOverlay } from './components/ui/ScanlineOverlay';
 import { Navigation } from './components/ui/Navigation';
 import { TransitionOverlay } from './components/ui/TransitionOverlay';
 import { ScrollIndicator } from './components/ui/ScrollIndicator';
-import { GundamBackLayer, GundamFrontLayer, GundamModalLayer } from './components/ui/GundamBackgroundLayers';
+import { GundamBackLayer } from './components/ui/GundamBackgroundLayers';
 import { Home } from './pages/Home/Home';
 import { Projects } from './pages/Projects/Projects';
 import { About } from './pages/About/About';
 import { Contact } from './pages/Contact/Contact';
+import { LaunchSequence } from './game/LaunchSequence';
+import { Combat } from './game/Combat';
 import './App.css';
 
 const SECTIONS = ['home', 'about', 'projects', 'contact'];
@@ -20,9 +22,23 @@ function App() {
   const [bootComplete, setBootComplete] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [isTransitioning, setIsTransitioning] = useState(false);
+  // null | { phase: 'launching' | 'combat', gundamId }
+  const [deploySession, setDeploySession] = useState(null);
 
   const handleBootComplete = useCallback(() => {
     setBootComplete(true);
+  }, []);
+
+  const handleDeploy = useCallback((gundamId) => {
+    setDeploySession({ phase: 'launching', gundamId });
+  }, []);
+
+  const handleLaunchComplete = useCallback(() => {
+    setDeploySession((s) => (s ? { ...s, phase: 'combat' } : s));
+  }, []);
+
+  const handleCombatReturn = useCallback(() => {
+    setDeploySession(null);
   }, []);
 
   const changeSection = useCallback((direction, targetSection = null) => {
@@ -60,8 +76,8 @@ function App() {
     let wheelAccumulator = 0;
     
     const handleWheel = (e) => {
-      // Don't trigger if user is scrolling inside a scrollable container (like the mission detail overlay)
-      if (e.target.closest('.mission-detail') || e.target.closest('.mission-detail-overlay')) return;
+      // Don't trigger if user is scrolling inside a scrollable container (like the hangar bay's debrief panel)
+      if (e.target.closest('.hangar-bay__info')) return;
       
       // Allow natural scrolling if the section content overflows
       const scrollContainer = e.target.closest('.eda-dashboard-section, .projects-section, .home-section, .contact-section');
@@ -148,15 +164,16 @@ function App() {
         ) : (
           <div key="main" className="main-app">
 
-            {/* HUD Elements */}
-            <Navigation activeSection={activeSection} onNavigate={handleNavigate} />
+            {/* HUD Elements — nav drops out during a deploy session so it
+                doesn't overlap the combat HUD's own controls/reticle. */}
+            {!deploySession && <Navigation activeSection={activeSection} onNavigate={handleNavigate} />}
             <ScanlineOverlay />
 
             {/* Persistent, never unmounts across page navigation: every
                 Gundam flies continuously in the background on every page.
-                The 7 project-linked ones hand off to GundamFrontLayer
-                (rendered after page-container, so it renders on top) only
-                while Projects is the active section. */}
+                While Projects is active, the 7 project-linked units drop
+                out of this layer — they're the docked 3D models in the
+                hangar bay instead (see pages/Projects/HangarBay.jsx). */}
             <GundamBackLayer activeSection={activeSection} />
 
             {/* Sections Container for Push-Back Transition */}
@@ -173,7 +190,7 @@ function App() {
                   {/* Home and Projects now take extra props to handle deep-linking. We will add them later. */}
                   {activeSection === 'home' && <Home onNavigate={handleNavigate} />}
                   {activeSection === 'about' && <About />}
-                  {activeSection === 'projects' && <Projects />}
+                  {activeSection === 'projects' && <Projects onDeploy={handleDeploy} />}
                   {activeSection === 'contact' && <Contact />}
 
                   {/* Scroll Indicators inside the push-back container so they transition out together */}
@@ -183,8 +200,16 @@ function App() {
               </AnimatePresence>
             </div>
 
-            <GundamFrontLayer activeSection={activeSection} />
-            <GundamModalLayer />
+            {/* Deploy flow: hangar's DEPLOY button -> catapult launch
+                cinematic -> 3D combat duel -> Retry/Return back here.
+                Rendered as full-screen overlays above everything else,
+                outside the section push-back cycle. */}
+            {deploySession?.phase === 'launching' && (
+              <LaunchSequence gundamId={deploySession.gundamId} onComplete={handleLaunchComplete} />
+            )}
+            {deploySession?.phase === 'combat' && (
+              <Combat gundamId={deploySession.gundamId} onReturn={handleCombatReturn} />
+            )}
 
           </div>
         )}

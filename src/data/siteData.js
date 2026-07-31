@@ -243,12 +243,12 @@ export const SITE_TEXT = {
     sectionCode: "SEC_03",
     title: "SORTIES // PROJECTS",
     statusLabel: "STATUS:",
-    abortLabel: "ABORT",
     tagsLabel: "Tags",
     debriefLabel: "DEBRIEFING_LOG",
     accessLabel: "ACCESS_REPOSITORY",
     lockSuccess: "[TARGET_LOCK_ACQUIRED] // ENHANCING_ARCHIVAL_DATA",
-    lockFail: "[TARGET_LOCK_ACQUIRED] // NO_EXTERNAL_ARCHIVAL_DATA_AVAILABLE"
+    lockFail: "[TARGET_LOCK_ACQUIRED] // NO_EXTERNAL_ARCHIVAL_DATA_AVAILABLE",
+    deployLabel: "DEPLOY"
   },
   contact: {
     sectionCode: "SEC_04",
