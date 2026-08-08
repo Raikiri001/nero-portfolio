@@ -76,8 +76,8 @@ function App() {
     let wheelAccumulator = 0;
     
     const handleWheel = (e) => {
-      // Don't trigger if user is scrolling inside a scrollable container (like the hangar bay's debrief panel)
-      if (e.target.closest('.hangar-bay__info')) return;
+      // Don't trigger if user is scrolling inside a scrollable container (like the hangar's info panel)
+      if (e.target.closest('.hangar-info')) return;
       
       // Allow natural scrolling if the section content overflows
       const scrollContainer = e.target.closest('.eda-dashboard-section, .projects-section, .home-section, .contact-section');
@@ -171,9 +171,9 @@ function App() {
 
             {/* Persistent, never unmounts across page navigation: every
                 Gundam flies continuously in the background on every page.
-                While Projects is active, the 7 project-linked units drop
+                While Projects is active, the project-linked units drop
                 out of this layer — they're the docked 3D models in the
-                hangar bay instead (see pages/Projects/HangarBay.jsx). */}
+                hangar corridor instead (see game/hangar/HangarCorridor.jsx). */}
             <GundamBackLayer activeSection={activeSection} />
 
             {/* Sections Container for Push-Back Transition */}

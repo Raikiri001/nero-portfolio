@@ -1,0 +1,72 @@
+/* Doubled-up selector (not just .hangar-info) so this reliably beats
+   .hud-panel's own `position: relative` regardless of CSS import order —
+   both are single-class selectors, so cascade order alone would otherwise
+   decide the winner and this component doesn't control that ordering. */
+.hangar-info.hud-panel {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  width: min(85vw, 320px);
+  max-height: min(70vh, 520px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.hangar-info__title {
+  font-family: var(--font-ui);
+  font-size: clamp(1.05rem, 2vw, 1.4rem);
+  font-weight: 700;
+  color: var(--nerd-primary);
+  text-shadow: 0 0 10px rgba(0, 144, 217, 0.8);
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+}
+
+.hangar-info__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--nerd-primary);
+  cursor: none;
+  padding: 3px 0;
+}
+
+.hangar-info__status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--nerd-primary);
+  box-shadow: 0 0 8px var(--nerd-primary);
+  flex-shrink: 0;
+}
+
+.hangar-info__status[data-status="MISSION_COMPLETE"] { color: var(--nerd-accent-green); }
+.hangar-info__status[data-status="MISSION_COMPLETE"] .hangar-info__status-dot { background: var(--nerd-accent-green); box-shadow: 0 0 8px var(--nerd-accent-green); }
+.hangar-info__status[data-status="MISSION_ONGOING"] { color: var(--nerd-accent-yellow); }
+.hangar-info__status[data-status="MISSION_ONGOING"] .hangar-info__status-dot { background: var(--nerd-accent-yellow); box-shadow: 0 0 8px var(--nerd-accent-yellow); }
+
+.hangar-info__debrief {
+  font-size: 0.75rem;
+}
+
+.hangar-info__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 144, 217, 0.3);
+}
+
+@media (max-width: 640px) {
+  .hangar-info {
+    right: 12px;
+    bottom: 12px;
+    width: min(90vw, 280px);
+  }
+}

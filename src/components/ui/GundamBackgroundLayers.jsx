@@ -111,8 +111,8 @@ function BackgroundGundam({ gundamId, seed }) {
 // Always-mounted layer, sitting just above the starfield background and
 // below all page content. Holds every Gundam not currently taking a
 // dedicated foreground role — i.e. all 22 on every page except Projects
-// (now a 3D hangar bay, see pages/Projects/HangarBay.jsx), where the 7
-// project-linked units are busy being the docked model and only the 15
+// (now a 3D hangar corridor, see game/hangar/HangarCorridor.jsx), where the
+// project-linked units are busy being the docked models and only the
 // reserve/excess designs wander back here.
 export function GundamBackLayer({ activeSection }) {
   const ids = activeSection === 'projects' ? EXCESS_IDS : ALL_IDS;
