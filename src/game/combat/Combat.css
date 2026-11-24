@@ -1,17 +1,7 @@
-.combat-page {
-  position: fixed;
-  inset: 0;
-  z-index: 4000;
-  background: #02050a;
-  /* No cursor override here — CustomCursor (already a crosshair/lock-on
-     reticle, see components/ui/CustomCursor) covers this everywhere, and
-     the site hides the native cursor globally via body{cursor:none}. */
-}
-
 .combat-hud {
   position: fixed;
   inset: 0;
-  z-index: 4001;
+  z-index: var(--z-combat-hud);
   pointer-events: none;
 }
 
@@ -35,21 +25,21 @@
   font-family: var(--font-mono);
   font-size: 0.8rem;
   letter-spacing: 0.2em;
-  color: var(--nerd-accent-red);
+  color: var(--nero-accent-red);
   text-align: center;
   margin-bottom: 6px;
 }
 
 .combat-hud__bar {
   height: 8px;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(var(--rgb-black), 0.5);
+  border: 1px solid rgba(var(--rgb-white), 0.2);
   overflow: hidden;
 }
 
 .combat-hud__bar--boss .combat-hud__bar-fill {
-  background: var(--nerd-accent-red);
-  box-shadow: 0 0 10px var(--nerd-accent-red);
+  background: var(--nero-accent-red);
+  box-shadow: 0 0 10px var(--nero-accent-red);
 }
 
 .combat-hud__bar-fill {
@@ -80,13 +70,28 @@
 }
 
 .combat-hud__bar--player .combat-hud__bar-fill {
-  background: var(--nerd-accent-green);
-  box-shadow: 0 0 10px var(--nerd-accent-green);
+  background: var(--nero-accent-green);
+  box-shadow: 0 0 10px var(--nero-accent-green);
 }
 
 .combat-hud__bar--boost .combat-hud__bar-fill {
-  background: var(--nerd-primary);
-  box-shadow: 0 0 10px var(--nerd-primary);
+  background: var(--nero-primary);
+  box-shadow: 0 0 10px var(--nero-primary);
+}
+
+.combat-hud__bar--special .combat-hud__bar-fill {
+  background: var(--nero-accent-yellow);
+  box-shadow: 0 0 10px var(--nero-accent-yellow);
+}
+
+.combat-hud__bar--special .combat-hud__bar-fill--active {
+  background: var(--nero-accent-red);
+  box-shadow: 0 0 14px var(--nero-accent-red);
+}
+
+.combat-hud__label--ready {
+  color: var(--nero-accent-yellow);
+  text-shadow: 0 0 8px rgba(var(--rgb-yellow), 0.7);
 }
 
 .combat-hud__controls-hint {
@@ -102,10 +107,10 @@
   max-width: 320px;
 }
 
-.combat-hud__result-overlay {
+.combat-hud__overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 2, 5, 0.8);
+  background: rgba(var(--rgb-void), 0.8);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -113,7 +118,7 @@
   pointer-events: auto;
 }
 
-.combat-hud__result-panel {
+.combat-hud__modal {
   padding: 40px 50px;
   display: flex;
   flex-direction: column;
@@ -121,53 +126,281 @@
   gap: 24px;
 }
 
-.combat-hud__result-title {
+.combat-hud__modal-title {
   font-family: var(--font-ui);
   font-size: clamp(1.4rem, 4vw, 2.2rem);
   font-weight: 700;
   letter-spacing: 0.15em;
 }
 
-.combat-hud__result-title--won {
-  color: var(--nerd-accent-green);
-  text-shadow: 0 0 20px rgba(0, 255, 102, 0.7);
+.combat-hud__modal-title--won {
+  color: var(--nero-accent-green);
+  text-shadow: 0 0 20px rgba(var(--rgb-green), 0.7);
 }
 
-.combat-hud__result-title--lost {
-  color: var(--nerd-accent-red);
-  text-shadow: 0 0 20px rgba(255, 0, 60, 0.7);
+.combat-hud__modal-title--lost {
+  color: var(--nero-accent-red);
+  text-shadow: 0 0 20px rgba(var(--rgb-red), 0.7);
 }
 
-.combat-hud__result-actions {
+.combat-hud__modal-actions {
   display: flex;
   gap: 16px;
 }
 
-.combat-hud__result-btn {
+.combat-hud__btn {
   padding: 12px 22px;
-  background: rgba(0, 144, 217, 0.12);
-  border: 1.5px solid var(--nerd-primary);
-  color: var(--nerd-primary);
+  background: rgba(var(--rgb-primary), 0.12);
+  border: 1.5px solid var(--nero-primary);
+  color: var(--nero-primary);
   font-family: var(--font-ui);
   font-weight: 700;
   letter-spacing: 0.15em;
-  cursor: none;
   transition: var(--transition-fast);
 }
 
-.combat-hud__result-btn:hover {
-  background: var(--nerd-primary);
-  color: #000;
+.combat-hud__btn:hover {
+  background: var(--nero-primary);
+  color: var(--color-text-dark);
   box-shadow: var(--glow-intense-primary);
 }
 
-.combat-hud__result-btn--secondary {
-  border-color: rgba(255, 255, 255, 0.4);
+.combat-hud__btn--secondary {
+  border-color: rgba(var(--rgb-white), 0.4);
   color: var(--color-text-primary);
 }
 
-.combat-hud__result-btn--secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
+.combat-hud__btn--secondary:hover {
+  background: rgba(var(--rgb-white), 0.15);
+  color: var(--color-text-primary);
   box-shadow: none;
+}
+
+.combat-hud__modal-title--neutral {
+  color: var(--nero-primary);
+  text-shadow: 0 0 20px rgba(var(--rgb-primary), 0.7);
+}
+
+@media (max-width: 768px) {
+  .combat-hud__controls-hint {
+    display: none;
+  }
+
+  .combat-hud__modal {
+    padding: 28px 24px;
+  }
+
+  .combat-hud__modal-actions {
+    flex-direction: column;
+  }
+}
+
+/* ============================================================
+   Sortie overlay — text over the LIVE launch shot. No backdrop, ever:
+   the hangar canvas behind it is the whole point.
+   ============================================================ */
+.sortie-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-combat-hud);
+  pointer-events: none;
+}
+
+/* Subtitle block: centred just above the bottom letterbox bar, the way a
+   film carries dialogue. */
+.sortie-overlay__subtitle {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--sortie-bar-h) + clamp(12px, 3vh, 28px));
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: clamp(0.75rem, 1.4vw, 0.95rem);
+  letter-spacing: 0.14em;
+  text-align: center;
+  color: var(--nero-primary);
+  text-shadow: 0 0 10px rgba(var(--rgb-primary), 0.7);
+}
+
+.sortie-overlay__line {
+  animation: fade-in-line 0.3s ease-out both;
+}
+
+.sortie-overlay__line--head {
+  font-family: var(--font-ui);
+  font-size: clamp(0.95rem, 2vw, 1.3rem);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--color-text-primary);
+  text-shadow: var(--text-glow-primary);
+}
+
+.sortie-overlay__subtitle--alert .sortie-overlay__line--head {
+  font-size: clamp(1.3rem, 3.4vw, 2.2rem);
+  color: var(--nero-accent-red);
+  text-shadow: var(--text-glow-red);
+}
+
+.sortie-overlay__subtitle--alert {
+  color: var(--nero-accent-red);
+  text-shadow: 0 0 10px rgba(var(--rgb-red), 0.7);
+}
+
+/* 3 · 2 · 1 — each number re-mounts (keyed), so the tick replays. */
+.sortie-overlay__countdown {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: clamp(4rem, 14vw, 9rem);
+  line-height: 1;
+  color: var(--nero-accent-yellow);
+  text-shadow: 0 0 20px rgba(var(--rgb-yellow), 0.8), 0 0 60px rgba(var(--rgb-yellow), 0.35);
+}
+
+.sortie-overlay__count {
+  display: block;
+  animation: sortie-count-tick 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes sortie-count-tick {
+  0% { opacity: 0; transform: scale(1.6); }
+  25% { opacity: 1; transform: scale(1); }
+  80% { opacity: 1; transform: scale(0.96); }
+  100% { opacity: 0; transform: scale(0.9); }
+}
+
+/* Skip hint sits INSIDE the bottom bar, out of the picture. */
+.sortie-overlay__skip {
+  position: absolute;
+  right: clamp(16px, 4vw, 48px);
+  bottom: calc(var(--sortie-bar-h) / 2);
+  transform: translateY(50%);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--color-text-secondary);
+  animation: blink 1.6s step-end infinite;
+}
+
+.sortie-overlay__call {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  animation: sortie-call-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes sortie-call-in {
+  from { opacity: 0; transform: translateX(-50%) scale(0.7); }
+  to { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+
+.sortie-overlay__unit-name {
+  font-family: var(--font-ui);
+  font-size: clamp(1rem, 2.4vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--color-text-primary);
+  text-shadow: var(--text-glow-red);
+}
+
+.sortie-overlay__jp {
+  font-family: var(--font-ui);
+  font-size: clamp(2.4rem, 8vw, 5.5rem);
+  font-weight: 700;
+  color: var(--nero-accent-red);
+  text-shadow: 0 0 20px rgba(var(--rgb-red), 0.9), 0 0 60px rgba(var(--rgb-red), 0.5);
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   Sortie cinema — letterbox bars and the hatch-exit flash. The bars are
+   PARTIAL: the live canvas shows between them the whole time. The flash
+   is white at partial opacity, never black (CLAUDE.md PART 2).
+   ============================================================ */
+.sortie-cine {
+  --sortie-bar-h: 9vh;
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-combat-hud);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* The overlay reads the bar height to sit its text on top of / inside it. */
+.sortie-overlay {
+  --sortie-bar-h: 9vh;
+}
+
+.sortie-cine__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--sortie-bar-h);
+  background: var(--color-void);
+  animation: sortie-bar-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sortie-cine__bar--top {
+  --sortie-bar-from: -100%;
+  top: 0;
+  border-bottom: 1px solid rgba(var(--rgb-primary), 0.35);
+}
+
+.sortie-cine__bar--bottom {
+  --sortie-bar-from: 100%;
+  bottom: 0;
+  border-top: 1px solid rgba(var(--rgb-primary), 0.35);
+}
+
+.sortie-cine--out .sortie-cine__bar {
+  animation: sortie-bar-out 0.6s cubic-bezier(0.7, 0, 0.84, 0) both;
+}
+
+@keyframes sortie-bar-in {
+  from { transform: translateY(var(--sortie-bar-from)); }
+  to { transform: translateY(0); }
+}
+
+@keyframes sortie-bar-out {
+  from { transform: translateY(0); }
+  to { transform: translateY(var(--sortie-bar-from)); }
+}
+
+.sortie-cine__flash {
+  position: absolute;
+  inset: 0;
+  background: var(--color-text-primary);
+  opacity: 0;
+  animation: sortie-flash 0.35s ease-out both;
+}
+
+@keyframes sortie-flash {
+  0% { opacity: 0; }
+  20% { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+
+@media (max-width: 480px) {
+  .sortie-cine,
+  .sortie-overlay {
+    --sortie-bar-h: 7vh;
+  }
+
+  .sortie-overlay__skip {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+  }
 }

@@ -3,14 +3,12 @@
    ============================================================ */
 
 /* A real, fixed-height, natively-scrollable element — its scrollTop drives
-   HangarCorridor's camera dolly. Also what App.jsx's global wheel handler
-   already checks scrollTop/scrollHeight on before hijacking vertical wheel
-   for site-section switching (src/App.jsx handleWheel) — keeping this a
-   genuine scroll container, not a flex layout, is what makes that keep
-   working without touching App.jsx. */
+   HangarCorridor's camera dolly, and App.jsx's wheel handler reads its
+   scrollTop/scrollHeight before switching sections. Keep it a genuine
+   scroll container, not a flex layout. */
 .projects-section {
   position: relative;
-  height: 100vh;
+  height: 100dvh;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
@@ -20,10 +18,17 @@
   display: none;
 }
 
+/* A deploy owns the camera: no scrolling the corridor out from under it */
+.projects-section--deploying {
+  overflow: hidden;
+}
+
+/* The shared header, overlaid on the 3D viewport rather than in flow */
 .hangar-section-header {
   position: absolute;
   top: var(--section-pad-top);
   left: var(--section-margin-x);
+  margin-left: 0;
   z-index: 6;
   pointer-events: none;
 }
@@ -41,7 +46,7 @@
   position: sticky;
   top: 0;
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -60,6 +65,13 @@
   pointer-events: auto;
 }
 
+/* The hangar UI steps aside for the launch shot and the fight */
+.hangar-hud--hidden {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+}
+
 /* --- Nav / dots --- */
 .hangar-nav {
   position: absolute;
@@ -67,12 +79,11 @@
   transform: translateY(-50%);
   width: clamp(36px, 4vw, 56px);
   height: clamp(56px, 8vh, 90px);
-  background: rgba(0, 5, 13, 0.5);
-  border: 1px solid rgba(0, 144, 217, 0.4);
-  color: var(--nerd-primary);
+  --bevel: 10px;
+  background: rgba(var(--rgb-void), 0.5);
+  border: 1px solid rgba(var(--rgb-primary), 0.4);
+  color: var(--nero-primary);
   font-size: clamp(1.6rem, 3vw, 2.4rem);
-  cursor: none;
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
   transition: var(--transition-fast);
 }
 
@@ -80,15 +91,14 @@
 .hangar-nav--right { right: 16px; }
 
 .hangar-nav:hover:not(:disabled) {
-  background: rgba(255, 0, 60, 0.12);
-  border-color: var(--nerd-accent-red);
-  color: var(--nerd-accent-red);
+  background: rgba(var(--rgb-red), 0.12);
+  border-color: var(--nero-accent-red);
+  color: var(--nero-accent-red);
   box-shadow: var(--glow-intense-red);
 }
 
 .hangar-nav:disabled {
   opacity: 0.25;
-  cursor: default;
 }
 
 .hangar-dots {
@@ -105,82 +115,19 @@
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  border: 1px solid rgba(0, 144, 217, 0.5);
+  border: 1px solid rgba(var(--rgb-primary), 0.5);
   background: transparent;
-  cursor: none;
   transition: var(--transition-fast);
 }
 
 .hangar-dot--active {
-  background: var(--nerd-accent-red);
-  border-color: var(--nerd-accent-red);
-  box-shadow: 0 0 8px var(--nerd-accent-red);
+  background: var(--nero-accent-red);
+  border-color: var(--nero-accent-red);
+  box-shadow: 0 0 8px var(--nero-accent-red);
 }
 
-/* --- Info panel building blocks still used by HangarInfo.jsx (title,
-   status badge, and meta layout now live in HangarInfo.css instead) --- */
-.hangar-bay__repo-status {
-  color: var(--nerd-accent-red);
-  font-size: 0.75rem;
-  font-family: var(--font-mono);
-}
-
-.hangar-bay__deploy {
-  margin-top: auto;
-  padding: 14px 20px;
-  background: rgba(255, 0, 60, 0.12);
-  border: 1.5px solid var(--nerd-accent-red);
-  color: var(--nerd-accent-red);
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 1.05rem;
-  letter-spacing: 0.25em;
-  cursor: none;
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-  transition: var(--transition-fast);
-}
-
-.hangar-bay__deploy:hover {
-  background: var(--nerd-accent-red);
-  color: #fff;
-  box-shadow: var(--glow-intense-red);
-}
-
-/* --- Shared readout styles still used by HangarInfo.jsx --- */
-.mission-debrief {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  line-height: 1.55;
-  color: var(--color-text-primary);
-  background: rgba(0, 0, 0, 0.4);
-  padding: 15px;
-  border: 1px solid rgba(0, 144, 217, 0.2);
-}
-
-.mission-detail__access {
-  background: rgba(0, 255, 136, 0.1);
-  border: 1px solid var(--nerd-accent-green);
-  color: var(--nerd-accent-green);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  padding: 6px 12px;
-  cursor: none;
-  letter-spacing: 0.1em;
-  transition: var(--transition-fast);
-  text-decoration: none;
-  text-transform: uppercase;
-  width: max-content;
-}
-
-.mission-detail__access:hover {
-  background: var(--nerd-accent-green);
-  color: #000;
-  font-weight: bold;
-  box-shadow: 0 0 20px var(--nerd-accent-green);
-}
-
-/* ---- Responsive Breakpoints ---- */
-@media (max-width: 640px) {
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
   .hangar-nav {
     display: none;
   }

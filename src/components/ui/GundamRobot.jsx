@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'motion/react';
 import { GUNDAM_ROSTER } from '../../data/gundamVisuals.jsx';
 
@@ -77,7 +76,23 @@ function MSBody({
   );
 }
 
-export function Robot({ dir, gundamId = 0 }) {
+// One shared transition object rather than a fresh literal per flame per
+// render — four of these are created on every render of every robot.
+const FLAME = { duration: 0.15, repeat: Infinity };
+
+/**
+ * `flicker` drives the thruster flames.
+ *
+ * TURN IT OFF FOR ANYTHING IN THE BACKGROUND. Each flame is a
+ * `repeat: Infinity` tween on an SVG `<path>`'s opacity AND its scale, and a
+ * scale on an SVG element is not compositor-accelerated — it re-rasterizes
+ * the whole `<svg>` every frame. `GundamBackLayer` mounts 22 of these on
+ * EVERY page and never unmounts them, so leaving it on cost 88 permanent
+ * per-frame re-rasters site-wide, for a flame drawn at 30 % opacity and half
+ * scale where nobody can see it flicker. The foreground robot on Home keeps
+ * it; that one is the size it was drawn for.
+ */
+export function Robot({ dir, gundamId = 0, flicker = true }) {
   const isUp = dir.includes('up');
   const isDown = dir.includes('down');
   const isLeft = dir.includes('left');
@@ -116,16 +131,16 @@ export function Robot({ dir, gundamId = 0 }) {
             <motion.path
               d="M 21 66 L 25 80 L 28 66 Z"
               fill={gundam.thruster}
-              animate={{ opacity: [0.4, 1, 0.4], scaleY: [0.8, 1.4, 0.8] }}
-              transition={{ duration: 0.15, repeat: Infinity }}
-              style={{ transformOrigin: "25px 66px" }}
+              animate={flicker ? { opacity: [0.4, 1, 0.4], scaleY: [0.8, 1.4, 0.8] } : undefined}
+              transition={FLAME}
+              style={{ transformOrigin: "25px 66px", opacity: flicker ? undefined : 0.8 }}
             />
             <motion.path
               d="M 32 66 L 35 80 L 39 66 Z"
               fill={gundam.thruster}
-              animate={{ opacity: [0.4, 1, 0.4], scaleY: [0.8, 1.4, 0.8] }}
-              transition={{ duration: 0.15, repeat: Infinity }}
-              style={{ transformOrigin: "35px 66px" }}
+              animate={flicker ? { opacity: [0.4, 1, 0.4], scaleY: [0.8, 1.4, 0.8] } : undefined}
+              transition={FLAME}
+              style={{ transformOrigin: "35px 66px", opacity: flicker ? undefined : 0.8 }}
             />
           </g>
         )}
@@ -134,9 +149,9 @@ export function Robot({ dir, gundamId = 0 }) {
           <motion.path
             d="M 45 23 L 65 30 L 45 33 Z"
             fill={gundam.thruster}
-            animate={{ opacity: [0.4, 1, 0.4], scaleX: [0.8, 1.4, 0.8] }}
-            transition={{ duration: 0.15, repeat: Infinity }}
-            style={{ transformOrigin: "45px 28px" }}
+            animate={flicker ? { opacity: [0.4, 1, 0.4], scaleX: [0.8, 1.4, 0.8] } : undefined}
+            transition={FLAME}
+            style={{ transformOrigin: "45px 28px", opacity: flicker ? undefined : 0.8 }}
           />
         )}
 
@@ -144,9 +159,9 @@ export function Robot({ dir, gundamId = 0 }) {
           <motion.path
             d="M 15 23 L -5 30 L 15 33 Z"
             fill={gundam.thruster}
-            animate={{ opacity: [0.4, 1, 0.4], scaleX: [0.8, 1.4, 0.8] }}
-            transition={{ duration: 0.15, repeat: Infinity }}
-            style={{ transformOrigin: "15px 28px" }}
+            animate={flicker ? { opacity: [0.4, 1, 0.4], scaleX: [0.8, 1.4, 0.8] } : undefined}
+            transition={FLAME}
+            style={{ transformOrigin: "15px 28px", opacity: flicker ? undefined : 0.8 }}
           />
         )}
 

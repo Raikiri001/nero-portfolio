@@ -1,4 +1,9 @@
-.circuit-callouts__lines {
+/* Tag-qualified deliberately. This SVG is a direct child of .hangar-hud,
+   whose `.hangar-hud > * { pointer-events: auto }` rule has equal
+   specificity and lands later in the cascade — which made this full-bleed
+   decorative overlay swallow clicks on DEPLOY. The extra element selector
+   keeps it click-through regardless of stylesheet order. */
+svg.circuit-callouts__lines {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -10,20 +15,20 @@
 
 .circuit-callout__path {
   fill: none;
-  stroke: var(--nerd-primary);
+  stroke: var(--nero-primary);
   stroke-width: 1.2;
   opacity: 0.75;
-  filter: drop-shadow(0 0 3px rgba(0, 144, 217, 0.7));
+  filter: drop-shadow(0 0 3px rgba(var(--rgb-primary), 0.7));
 }
 
 .circuit-callout__node {
-  fill: var(--nerd-primary);
-  filter: drop-shadow(0 0 3px rgba(0, 144, 217, 0.9));
+  fill: var(--nero-primary);
+  filter: drop-shadow(0 0 3px rgba(var(--rgb-primary), 0.9));
 }
 
 .circuit-callout__node--end {
-  fill: var(--nerd-accent-red);
-  filter: drop-shadow(0 0 4px rgba(255, 0, 60, 0.9));
+  fill: var(--nero-accent-red);
+  filter: drop-shadow(0 0 4px rgba(var(--rgb-red), 0.9));
 }
 
 .circuit-callout {
@@ -33,15 +38,14 @@
   display: flex;
   align-items: baseline;
   gap: 6px;
-  background: rgba(0, 5, 13, 0.75);
-  border: 1px solid var(--nerd-primary);
+  background: rgba(var(--rgb-void), 0.75);
+  border: 1px solid var(--nero-primary);
   padding: 4px 9px;
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.08em;
-  cursor: none;
   backdrop-filter: blur(3px);
-  box-shadow: 0 0 10px rgba(0, 144, 217, 0.3);
+  box-shadow: 0 0 10px rgba(var(--rgb-primary), 0.3);
   transition: background 0.15s ease, box-shadow 0.15s ease;
   max-width: 210px;
 }
@@ -52,8 +56,8 @@
 
 .circuit-callout:hover,
 .circuit-callout--expanded {
-  background: rgba(0, 20, 35, 0.92);
-  box-shadow: 0 0 16px rgba(0, 144, 217, 0.55);
+  background: rgba(var(--rgb-deep), 0.92);
+  box-shadow: 0 0 16px rgba(var(--rgb-primary), 0.55);
 }
 
 .circuit-callout--expanded {
@@ -67,9 +71,9 @@
 }
 
 .circuit-callout__key {
-  color: var(--nerd-primary);
+  color: var(--nero-primary);
   font-weight: bold;
-  text-shadow: 0 0 6px rgba(0, 144, 217, 0.6);
+  text-shadow: 0 0 6px rgba(var(--rgb-primary), 0.6);
 }
 
 .circuit-callout .tac-label {
@@ -80,11 +84,11 @@
 }
 
 .circuit-callout .tac-val {
-  color: var(--nerd-primary);
-  text-shadow: 0 0 6px rgba(0, 144, 217, 0.6);
+  color: var(--nero-primary);
+  text-shadow: 0 0 6px rgba(var(--rgb-primary), 0.6);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .circuit-callout {
     max-width: 150px;
     font-size: 0.6rem;

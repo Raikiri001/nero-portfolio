@@ -704,7 +704,7 @@ export function MechaBattleCanvas({ target, gundamId, mode = 'defend', getLiveTa
   return createPortal(
     <canvas
       ref={canvasRef}
-      style={{ position: 'fixed', inset: 0, zIndex: 5001, pointerEvents: 'none', width: '100vw', height: '100vh' }}
+      style={{ position: 'fixed', inset: 0, zIndex: 'var(--z-fx)', pointerEvents: 'none', width: '100vw', height: '100vh' }}
     />,
     document.body
   );

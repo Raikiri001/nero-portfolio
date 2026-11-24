@@ -1,8 +1,9 @@
-/* Doubled-up selector (not just .hangar-info) so this reliably beats
-   .hud-panel's own `position: relative` regardless of CSS import order —
-   both are single-class selectors, so cascade order alone would otherwise
-   decide the winner and this component doesn't control that ordering. */
-.hangar-info.hud-panel {
+/* ============================================================
+   Hangar info panel — the docked bay's project readout + DEPLOY
+   ============================================================ */
+
+/* index.css (.hud-panel) loads first, so a single class beats it. */
+.hangar-info {
   position: absolute;
   right: 24px;
   bottom: 24px;
@@ -18,12 +19,13 @@
   font-family: var(--font-ui);
   font-size: clamp(1.05rem, 2vw, 1.4rem);
   font-weight: 700;
-  color: var(--nerd-primary);
-  text-shadow: 0 0 10px rgba(0, 144, 217, 0.8);
+  color: var(--nero-primary);
+  text-shadow: 0 0 10px rgba(var(--rgb-primary), 0.8);
   letter-spacing: 0.03em;
   line-height: 1.25;
 }
 
+/* Status badge — hover or focus reveals the full status and date */
 .hangar-info__status {
   display: inline-flex;
   align-items: center;
@@ -32,27 +34,33 @@
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: bold;
-  color: var(--nerd-primary);
-  cursor: none;
+  color: var(--nero-primary);
+  background: none;
+  border: none;
   padding: 3px 0;
+  text-align: left;
 }
 
 .hangar-info__status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--nerd-primary);
-  box-shadow: 0 0 8px var(--nerd-primary);
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
   flex-shrink: 0;
 }
 
-.hangar-info__status[data-status="MISSION_COMPLETE"] { color: var(--nerd-accent-green); }
-.hangar-info__status[data-status="MISSION_COMPLETE"] .hangar-info__status-dot { background: var(--nerd-accent-green); box-shadow: 0 0 8px var(--nerd-accent-green); }
-.hangar-info__status[data-status="MISSION_ONGOING"] { color: var(--nerd-accent-yellow); }
-.hangar-info__status[data-status="MISSION_ONGOING"] .hangar-info__status-dot { background: var(--nerd-accent-yellow); box-shadow: 0 0 8px var(--nerd-accent-yellow); }
+.hangar-info__status[data-status="MISSION_COMPLETE"] { color: var(--nero-accent-green); }
+.hangar-info__status[data-status="MISSION_ONGOING"] { color: var(--nero-accent-yellow); }
 
 .hangar-info__debrief {
+  font-family: var(--font-mono);
   font-size: 0.75rem;
+  line-height: 1.55;
+  color: var(--color-text-primary);
+  background: rgba(var(--rgb-black), 0.4);
+  padding: 15px;
+  border: 1px solid rgba(var(--rgb-primary), 0.2);
 }
 
 .hangar-info__meta {
@@ -60,10 +68,57 @@
   flex-direction: column;
   gap: 8px;
   padding-top: 8px;
-  border-top: 1px solid rgba(0, 144, 217, 0.3);
+  border-top: 1px solid rgba(var(--rgb-primary), 0.3);
 }
 
-@media (max-width: 640px) {
+.hangar-info__repo-status {
+  color: var(--nero-accent-red);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+}
+
+.hangar-info__access {
+  background: rgba(var(--rgb-green), 0.1);
+  border: 1px solid var(--nero-accent-green);
+  color: var(--nero-accent-green);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 6px 12px;
+  letter-spacing: 0.1em;
+  transition: var(--transition-fast);
+  text-decoration: none;
+  text-transform: uppercase;
+  width: max-content;
+}
+
+.hangar-info__access:hover {
+  background: var(--nero-accent-green);
+  color: var(--color-text-dark);
+  font-weight: bold;
+  box-shadow: 0 0 20px var(--nero-accent-green);
+}
+
+.hangar-info__deploy {
+  --bevel: 10px;
+  margin-top: auto;
+  padding: 14px 20px;
+  background: rgba(var(--rgb-red), 0.12);
+  border: 1.5px solid var(--nero-accent-red);
+  color: var(--nero-accent-red);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.25em;
+  transition: var(--transition-fast);
+}
+
+.hangar-info__deploy:hover {
+  background: var(--nero-accent-red);
+  color: var(--color-text-primary);
+  box-shadow: var(--glow-intense-red);
+}
+
+@media (max-width: 768px) {
   .hangar-info {
     right: 12px;
     bottom: 12px;

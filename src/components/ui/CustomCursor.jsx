@@ -1,65 +1,75 @@
 import { useState, useEffect, useRef } from 'react';
 import './CustomCursor.css';
 
+const LERP = 0.15;
+const CLICKABLE = 'a, button, [role="button"], input, textarea, select, [data-clickable]';
+
+// The reticle only replaces a real mouse; index.css hides the system cursor
+// under the same media query.
+const FINE_POINTER = typeof window !== 'undefined'
+  && window.matchMedia?.('(hover: hover) and (pointer: fine)').matches;
+
+/**
+ * Tactical reticle that eases after the mouse. Position is written straight
+ * to the element's transform from a rAF loop that only runs while the
+ * reticle is still catching up — React re-renders only when lock-on or
+ * visibility changes, never per frame.
+ */
 export function CustomCursor() {
-  const [pos, setPos] = useState({ x: -100, y: -100 });
+  const elRef = useRef(null);
   const [isLocked, setIsLocked] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const targetPosRef = useRef({ x: -100, y: -100 });
-  const currentPosRef = useRef({ x: -100, y: -100 });
-  const animRef = useRef(null);
-  const wasLockedRef = useRef(false);
 
   useEffect(() => {
+    if (!FINE_POINTER) return undefined;
+
+    const target = { x: -100, y: -100 };
+    const current = { x: -100, y: -100 };
+    let raf = 0;
+
+    const step = () => {
+      current.x += (target.x - current.x) * LERP;
+      current.y += (target.y - current.y) * LERP;
+      if (elRef.current) {
+        elRef.current.style.transform = `translate3d(${current.x}px, ${current.y}px, 0) translate(-50%, -50%)`;
+      }
+      // Settled: stop until the mouse moves again
+      raf = Math.abs(target.x - current.x) + Math.abs(target.y - current.y) > 0.3
+        ? requestAnimationFrame(step)
+        : 0;
+    };
+
     const handleMove = (e) => {
-      targetPosRef.current = { x: e.clientX, y: e.clientY };
-      if (!isVisible) setIsVisible(true);
+      target.x = e.clientX;
+      target.y = e.clientY;
+      setIsVisible(true);
+      if (!raf) raf = requestAnimationFrame(step);
     };
 
     const handleOver = (e) => {
-      const target = e.target;
-      const clickableElement = target.closest('a, button, [role="button"], .clickable, input, textarea, select, [data-clickable]');
-      if (clickableElement && !wasLockedRef.current) {
-        setIsLocked(true);
-        wasLockedRef.current = true;
-      } else if (!clickableElement) {
-        setIsLocked(false);
-        wasLockedRef.current = false;
-      }
+      setIsLocked(!!e.target.closest?.(CLICKABLE));
     };
 
-    const handleLeave = () => {
-      setIsVisible(false);
-    };
+    const handleLeave = () => setIsVisible(false);
 
-    // Smooth follow animation
-    const animate = () => {
-      const lerp = 0.15;
-      currentPosRef.current.x += (targetPosRef.current.x - currentPosRef.current.x) * lerp;
-      currentPosRef.current.y += (targetPosRef.current.y - currentPosRef.current.y) * lerp;
-      setPos({ x: currentPosRef.current.x, y: currentPosRef.current.y });
-      animRef.current = requestAnimationFrame(animate);
-    };
-
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('mouseover', handleOver);
+    window.addEventListener('mousemove', handleMove, { passive: true });
+    window.addEventListener('mouseover', handleOver, { passive: true });
     document.addEventListener('mouseleave', handleLeave);
-    animRef.current = requestAnimationFrame(animate);
-
     return () => {
       window.removeEventListener('mousemove', handleMove);
       window.removeEventListener('mouseover', handleOver);
       document.removeEventListener('mouseleave', handleLeave);
-      cancelAnimationFrame(animRef.current);
+      cancelAnimationFrame(raf);
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
-  if (!isVisible) return null;
+  if (!FINE_POINTER) return null;
 
   return (
     <div
-      className={`custom-cursor ${isLocked ? 'custom-cursor--locked' : ''}`}
-      style={{ left: pos.x, top: pos.y }}
+      ref={elRef}
+      className={`custom-cursor ${isLocked ? 'custom-cursor--locked' : ''} ${isVisible ? '' : 'custom-cursor--hidden'}`}
+      aria-hidden="true"
     >
       {/* Outer rotating ring */}
       <svg className="cursor-ring cursor-ring--outer" width="40" height="40" viewBox="0 0 40 40">
@@ -80,8 +90,7 @@ export function CustomCursor() {
       {/* Lock-on diamond */}
       {isLocked && (
         <svg className="cursor-lock" width="50" height="50" viewBox="0 0 50 50">
-          <rect x="10" y="10" width="30" height="30" fill="none" strokeWidth="1.5"
-                transform="rotate(45 25 25)" />
+          <rect x="10" y="10" width="30" height="30" fill="none" strokeWidth="1.5" transform="rotate(45 25 25)" />
         </svg>
       )}
     </div>

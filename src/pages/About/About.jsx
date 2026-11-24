@@ -1,26 +1,13 @@
-import { useRef } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'motion/react';
 import { SKILLS_ARRAY, PILOT_STATS, PILOT_BIO, SITE_TEXT } from '../../data/siteData';
 import { ScrambleText } from '../../components/ui/ScrambleText';
+import { SectionHeader } from '../../components/ui/SectionHeader';
 import './About.css';
 
 export function About() {
-  const sectionRef = useRef(null);
-
   return (
-    <section className="eda-dashboard-section" id="about" ref={sectionRef}>
-      <motion.div
-        className="section-header"
-        initial={{ opacity: 0, x: -30 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        style={{ marginLeft: 'var(--section-margin-x)' }}
-      >
-        <span className="section-header__code"><ScrambleText text={SITE_TEXT.about.sectionCode} /></span>
-        <h2 className="section-header__title"><ScrambleText text={SITE_TEXT.about.title} delay={200} /></h2>
-      </motion.div>
+    <section className="about-section" id="about">
+      <SectionHeader code={SITE_TEXT.about.sectionCode} title={SITE_TEXT.about.title} />
 
       <div className="eda-layout">
 
@@ -35,17 +22,15 @@ export function About() {
           >
             <div className="eda-panel__header"><ScrambleText text={SITE_TEXT.about.statsHeader} /></div>
             <div className="pilot-stats-grid">
-              {PILOT_STATS.map((stat, i) => (
-                <div key={i} className="pilot-stat-box">
+              {PILOT_STATS.map((stat) => (
+                <div key={stat.label} className="pilot-stat-box bevel">
                   <span className="pilot-stat-label">{stat.label}</span>
-                  <span className="pilot-stat-value" style={{ color: stat.color }}>
-                    {stat.value}
-                  </span>
+                  <span className={`pilot-stat-value pilot-stat-value--${stat.tone}`}>{stat.value}</span>
                 </div>
               ))}
             </div>
 
-            <div className="pilot-bio-container mt-4">
+            <div className="pilot-bio-container">
               <div className="eda-panel__header"><ScrambleText text={SITE_TEXT.about.bioHeader} /></div>
               <div className="pilot-bio">
                 <span>{PILOT_BIO}</span>
@@ -71,7 +56,7 @@ export function About() {
                   <div className="skill-static-label">[{category.category}]</div>
                   <div className="skill-static-items">
                     {category.items.map(skill => (
-                      <span key={skill} className="skill-static-item">{skill}</span>
+                      <span key={skill} className="skill-static-item bevel">{skill}</span>
                     ))}
                   </div>
                 </div>

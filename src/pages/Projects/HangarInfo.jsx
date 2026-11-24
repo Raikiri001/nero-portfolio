@@ -1,17 +1,16 @@
 import { useState } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'motion/react';
 import { ScrambleText } from '../../components/ui/ScrambleText';
 import { SITE_TEXT } from '../../data/siteData';
 import './HangarInfo.css';
 
-// Restructured per your feedback: title, a compact status badge (hover
-// reveals the full status+date the same way the mech's circuit callouts
-// expand), the project description, and the repo link/access button — the
-// tactical data + tags moved out to CircuitCallout on the mech itself, but
-// description and repo access stay here.
+// The docked bay's readout: title, a compact status badge (hover or focus
+// reveals the full status and date, the same way the mech's circuit
+// callouts expand), the description, the repo link, and DEPLOY. The
+// tactical data and tags live on the mech itself as circuit callouts.
 export function HangarInfo({ project, onDeploy }) {
   const [statusExpanded, setStatusExpanded] = useState(false);
+  const status = project.status.replace(/_/g, ' ');
 
   return (
     <motion.div
@@ -23,24 +22,26 @@ export function HangarInfo({ project, onDeploy }) {
     >
       <h3 className="hangar-info__title"><ScrambleText text={project.title} /></h3>
 
-      <div
-        className={`hangar-info__status ${statusExpanded ? 'hangar-info__status--expanded' : ''}`}
+      <button
+        type="button"
+        className="hangar-info__status"
         data-status={project.status}
+        aria-expanded={statusExpanded}
         onMouseEnter={() => setStatusExpanded(true)}
         onMouseLeave={() => setStatusExpanded(false)}
+        onFocus={() => setStatusExpanded(true)}
+        onBlur={() => setStatusExpanded(false)}
       >
         <span className="hangar-info__status-dot" />
-        <span className="hangar-info__status-text">
-          {statusExpanded
-            ? `${SITE_TEXT.projects.statusLabel} ${project.status.replace(/_/g, ' ')} | ${project.date}`
-            : project.status.replace(/_/g, ' ')}
+        <span>
+          {statusExpanded ? `${SITE_TEXT.projects.statusLabel} ${status} | ${project.date}` : status}
         </span>
-      </div>
+      </button>
 
-      <div className="mission-debrief hangar-info__debrief">{project.details}</div>
+      <div className="hangar-info__debrief">{project.details}</div>
 
       <div className="hangar-info__meta">
-        <span className="hangar-bay__repo-status">
+        <span className="hangar-info__repo-status">
           {project.repoUrl ? SITE_TEXT.projects.lockSuccess : SITE_TEXT.projects.lockFail}
         </span>
         {project.repoUrl && (
@@ -48,7 +49,7 @@ export function HangarInfo({ project, onDeploy }) {
             href={project.repoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mission-detail__access"
+            className="hangar-info__access"
             data-clickable
           >
             {SITE_TEXT.projects.accessLabel}
@@ -56,7 +57,7 @@ export function HangarInfo({ project, onDeploy }) {
         )}
       </div>
 
-      <button className="hangar-bay__deploy" onClick={onDeploy} data-clickable>
+      <button type="button" className="hangar-info__deploy bevel" onClick={onDeploy} data-clickable>
         {SITE_TEXT.projects.deployLabel}
       </button>
     </motion.div>

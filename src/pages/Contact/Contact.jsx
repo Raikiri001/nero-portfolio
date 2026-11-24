@@ -1,27 +1,12 @@
-import { useRef } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'motion/react';
-import { ScrambleText } from '../../components/ui/ScrambleText';
+import { SectionHeader } from '../../components/ui/SectionHeader';
 import { COMM_LINKS, SITE_TEXT } from '../../data/siteData';
 import './Contact.css';
 
 export function Contact() {
-  const sectionRef = useRef(null);
-
   return (
-    <section className="contact-section" id="contact" ref={sectionRef}>
-
-      <motion.div
-        className="section-header"
-        initial={{ opacity: 0, x: -30 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6 }}
-        style={{ marginLeft: 'var(--section-margin-x)' }}
-      >
-        <span className="section-header__code"><ScrambleText text={SITE_TEXT.contact.sectionCode} /></span>
-        <h2 className="section-header__title"><ScrambleText text={SITE_TEXT.contact.title} /></h2>
-        <div className="section-header__line" />
-      </motion.div>
+    <section className="contact-section" id="contact">
+      <SectionHeader code={SITE_TEXT.contact.sectionCode} title={SITE_TEXT.contact.title} />
 
       <div className="contact-content">
         <div className="data-nodes-grid">
@@ -29,8 +14,8 @@ export function Contact() {
             <motion.a
               key={link.id}
               href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
+              // a mailto: link must not open a blank tab
+              {...(link.url.startsWith('mailto:') ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
               className="data-node hud-panel"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -40,7 +25,7 @@ export function Contact() {
             >
               <div className="data-node__header">
                 <span className="data-node__freq">
-                  {COMM_LINKS.headers.status}: <span className="status-value">{link.active}</span>
+                  {COMM_LINKS.headers.status}: <span className="data-node__status">{link.active}</span>
                 </span>
               </div>
 

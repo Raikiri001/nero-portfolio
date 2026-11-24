@@ -104,16 +104,18 @@ const psychoLines = (color) => (
 
 const roundEye = (color) => <circle cx="30" cy="13" r="1.6" fill={color} />;
 
-// Ordered exactly as requested — indices 0-6 are assigned 1:1 to
-// PROJECTS_ARRAY (in order); indices 7-21 are the "excess" roster held in
-// reserve for future projects and only ever rendered as non-interactive
-// background units.
+// The index IS the gundamId, and it is the same index as the project:
+// roster unit n belongs to PROJECTS_ARRAY[n]. Units past the project count
+// are held in reserve and render only as background sprites until a
+// project is added for them. COMBAT_STYLES and UNIT_SPECS are indexed the
+// same way — `npm run check` fails if the three lengths differ.
 export const GUNDAM_ROSTER = [
   {
     name: "Strike Freedom Gundam",
     thruster: "#0055ff",
     props: {
       chest: "#111", centerChest: "#DAA520", joint: "#DAA520", vfin: "#DAA520",
+      foot: "#2340c8", knee: "#f0f0f0", chin: "#c8102e", navy: "#232f6b",
       wings: wingSwept("#0055ff", "#DAA520")
     }
   },
@@ -161,10 +163,14 @@ export const GUNDAM_ROSTER = [
   },
   {
     name: "Infinite Justice Gundam",
-    thruster: "#ff0055",
+    thruster: "#ff3355",
+    // White body with red/gold trim and dark blue boots — the suit is not
+    // the all-over pink-red this entry used to specify.
     props: {
-      chest: "#80002a", headBase: "#ff0055", shoulder: "#ff0055", arm: "#ff0055",
-      leg: "#ff0055", joint: "#d0d0d0", visor: "#0f0", chin: "#fff",
+      chest: "#e8eaee", centerChest: "#d4232e", headBase: "#e8eaee",
+      shoulder: "#e8eaee", shoulderAccent: "#d4232e", arm: "#e8eaee",
+      leg: "#e8eaee", waist: "#d4232e", knee: "#d4232e", foot: "#1b2a4a",
+      joint: "#c9a227", vfin: "#c9a227", visor: "#0f0", chin: "#c9a227",
       wings: (
         <g>
           <path d="M 25 22 L 5 5 L 15 20 Z" fill="#d0d0d0" />
@@ -193,20 +199,28 @@ export const GUNDAM_ROSTER = [
   },
   {
     name: "Justice Gundam",
-    thruster: "#aa00ff",
+    thruster: "#ff4422",
+    // Red/white with gold trim — the purple scheme this used to carry isn't
+    // the ZGMF-X09A's palette.
     props: {
-      chest: "#f0f0f0", centerChest: "#ff0000", waist: "#8800aa", shoulder: "#f0f0f0",
-      shoulderAccent: "#8800aa", visor: "#0f0",
-      wings: wingDual("#8800aa", "#f0f0f0"),
-      customParts: beamSaberPack("#8800aa")
+      chest: "#e8eaee", centerChest: "#c9a227", waist: "#b32234", shoulder: "#b32234",
+      shoulderAccent: "#e8eaee", arm: "#e8eaee", leg: "#e8eaee",
+      knee: "#b32234", foot: "#b32234", joint: "#c9a227", vfin: "#c9a227", visor: "#0f0",
+      wings: wingDual("#b32234", "#e8eaee"),
+      customParts: beamSaberPack("#c9a227")
     }
   },
   {
     name: "Immortal Justice Gundam",
-    thruster: "#ff66cc",
+    thruster: "#ff3355",
+    // Shares the Rising Freedom frame: white/blue base carrying Justice's
+    // red, rather than the dark purple this used to be.
     props: {
-      chest: "#220033", centerChest: "#ff66cc", joint: "#ff66cc", vfin: "#DAA520",
-      wings: wingSwept("#8800aa", "#ff66cc")
+      chest: "#1f3f7a", centerChest: "#d4232e", headBase: "#e8eaee",
+      shoulder: "#e8eaee", shoulderAccent: "#d4232e", arm: "#e8eaee", leg: "#e8eaee",
+      waist: "#e8eaee", knee: "#d4232e", foot: "#1f3f7a",
+      joint: "#c9a227", vfin: "#c9a227", visor: "#0f0",
+      wings: wingSwept("#1f3f7a", "#d4232e")
     }
   },
   {
@@ -243,14 +257,18 @@ export const GUNDAM_ROSTER = [
   },
   {
     name: "Unicorn Gundam Final Battle Ver",
-    thruster: "#ff0033",
+    thruster: "#ff2d55",
+    // Destroy Mode is WHITE armour with the psycho-frame glowing red
+    // through the opened seams — it isn't a black suit.
     props: {
-      chest: "#111", centerChest: "#ff0033", waist: "#222", headBase: "#222", visor: "#ff0033",
+      chest: "#e8eaee", centerChest: "#ff2d55", waist: "#e8eaee", headBase: "#e8eaee",
+      shoulder: "#e8eaee", arm: "#e8eaee", leg: "#e8eaee",
+      joint: "#ff2d55", knee: "#ff2d55", foot: "#c8ccd4", visor: "#ff8fa3",
       hideVfin: true,
       customParts: (
         <g>
-          {hornSingle("#f0f0f0", true)}
-          {psychoLines("#ff0033")}
+          {hornSingle("#c8ccd4", true)}
+          {psychoLines("#ff2d55")}
         </g>
       )
     }
@@ -282,8 +300,11 @@ export const GUNDAM_ROSTER = [
   {
     name: "Exia",
     thruster: "#00ffcc",
+    // White body with blue and red trim; the GN Drive reads cyan.
     props: {
-      hideChest: true, foot: "#0055ff",
+      hideChest: true, foot: "#1f4fa8", headBase: "#e8eaee",
+      shoulder: "#e8eaee", shoulderAccent: "#1f4fa8", arm: "#e8eaee", leg: "#e8eaee",
+      waist: "#1f4fa8", knee: "#c1272d", joint: "#5a6070", vfin: "#c9a227", visor: "#00ffcc",
       customParts: (
         <g>
           <polygon points="24,21 36,21 34,30 26,30" fill="#0055ff" />
@@ -314,11 +335,14 @@ export const GUNDAM_ROSTER = [
   {
     name: "Gundam Barbatos",
     thruster: "#ff6600",
+    // Off-white nanolaminate armour over an exposed dark gunmetal frame,
+    // with orange-red accents — not the purple/tan this used to specify.
     props: {
-      chest: "#5a2d82", centerChest: "#c9a86a", waist: "#c9a86a", shoulder: "#5a2d82",
-      shoulderAccent: "#c9a86a", arm: "#c9a86a", leg: "#5a2d82", knee: "#c9a86a",
-      foot: "#333", joint: "#333", hideVfin: true,
-      customParts: hornSingle("#c9a86a", true)
+      chest: "#c8ccd4", centerChest: "#d4442a", waist: "#4a5058", shoulder: "#c8ccd4",
+      shoulderAccent: "#6d7480", arm: "#6d7480", leg: "#c8ccd4", knee: "#6d7480",
+      foot: "#3a3f47", joint: "#3a3f47", headBase: "#c8ccd4", chin: "#d4442a",
+      hideVfin: true,
+      customParts: hornSingle("#c8a54a", true)
     }
   },
   {
@@ -337,10 +361,13 @@ export const GUNDAM_ROSTER = [
   },
   {
     name: "Astray Gundam",
-    thruster: "#ff0000",
+    thruster: "#ff2200",
+    // Red Frame is predominantly RED over a grey inner frame — the body was
+    // previously mostly white with red trim, which reads as the wrong suit.
     props: {
-      chest: "#f0f0f0", centerChest: "#ff0000", joint: "#ff0000", shoulder: "#ff0000",
-      shoulderAccent: "#f0f0f0", arm: "#f0f0f0", leg: "#f0f0f0", knee: "#ff0000", chin: "#ff0000",
+      chest: "#c1272d", centerChest: "#e8eaee", joint: "#6d7480", shoulder: "#c1272d",
+      shoulderAccent: "#e8eaee", arm: "#c1272d", leg: "#c1272d", waist: "#6d7480",
+      knee: "#e8eaee", foot: "#6d7480", headBase: "#e8eaee", vfin: "#c9a227", chin: "#c1272d",
       customParts: (
         <g>
           <path d="M 15 35 L -5 50 L -3 52 L 17 37 Z" fill="#111" />

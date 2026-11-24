@@ -1,5 +1,5 @@
 {
-  "name": "portfolio_website_2",
+  "name": "nero-portfolio",
   "private": true,
   "version": "0.0.0",
   "homepage": "https://www.leinerogarcia.com",
@@ -7,9 +7,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
+    "lint": "eslint .",
+    "check:conventions": "node --import ./scripts/resolve.mjs scripts/check-conventions.mjs",
+    "check:kit": "node --import ./scripts/resolve.mjs scripts/kit-smoke.mjs",
+    "check:models": "node --import ./scripts/resolve.mjs scripts/check-models.mjs",
+    "check:regions": "node --import ./scripts/resolve.mjs scripts/verify-region.mjs --all",
+    "check:sortie": "node --import ./scripts/resolve.mjs scripts/check-sortie.mjs",
+    "check": "npm run lint && npm run check:conventions && npm run check:kit && npm run check:models && npm run check:regions && npm run check:sortie",
+    "predeploy": "npm run check && npm run build",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
@@ -26,6 +32,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^9.39.4",
+    "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "gh-pages": "^6.3.0",

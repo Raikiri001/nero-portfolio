@@ -1,16 +1,25 @@
 import { useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { hudRgba } from '../../data/hudColors';
 
+// A ring of reticles converging on the clicked bounding box — the
+// "multi-lock" beat before the missile battle.
 export function MultiLockCanvas({ target }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) return undefined;
 
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    canvas.width = vw * dpr;
+    canvas.height = vh * dpr;
+    canvas.style.width = `${vw}px`;
+    canvas.style.height = `${vh}px`;
+    ctx.scale(dpr, dpr);
 
     const reticles = [];
     for (let i = 0; i < 12; i++) {
@@ -32,7 +41,7 @@ export function MultiLockCanvas({ target }) {
     const animate = (now) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, vw, vh);
 
       reticles.forEach((r) => {
         const p = Math.max(0, Math.min((progress - r.delay) / (1 - r.delay), 1));
@@ -41,8 +50,7 @@ export function MultiLockCanvas({ target }) {
         const y = r.startY + (r.endY - r.startY) * ease;
         const s = r.size;
 
-        // Reticle cross - NERO Primary Dark Skyblue
-        ctx.strokeStyle = `rgba(0, 144, 217, ${0.8 * (1 - progress * 0.3)})`;
+        ctx.strokeStyle = hudRgba('primary', 0.8 * (1 - progress * 0.3));
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(x - s, y); ctx.lineTo(x - s * 0.3, y);
@@ -58,32 +66,31 @@ export function MultiLockCanvas({ target }) {
         ctx.lineTo(x, y + s * 0.6);
         ctx.lineTo(x - s * 0.6, y);
         ctx.closePath();
-        ctx.strokeStyle = `rgba(0, 144, 217, ${0.4 * (1 - progress * 0.5)})`;
+        ctx.strokeStyle = hudRgba('primary', 0.4 * (1 - progress * 0.5));
         ctx.stroke();
       });
 
-      // Central lock confirmation ring - NERO Accent Red
+      // Central lock-confirmation ring
       if (progress > 0.7) {
         const lockProgress = (progress - 0.7) / 0.3;
         ctx.beginPath();
         ctx.arc(target.x, target.y, 30 + lockProgress * 10, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255, 23, 68, ${lockProgress * 0.6})`;
+        ctx.strokeStyle = hudRgba('red', lockProgress * 0.6);
         ctx.lineWidth = 2;
         ctx.stroke();
       }
 
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
+      if (progress < 1) raf = requestAnimationFrame(animate);
     };
 
-    requestAnimationFrame(animate);
+    let raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
   }, [target]);
 
   return createPortal(
     <canvas
       ref={canvasRef}
-      style={{ position: 'fixed', inset: 0, zIndex: 5001, pointerEvents: 'none' }}
+      style={{ position: 'fixed', inset: 0, zIndex: 'var(--z-fx)', pointerEvents: 'none' }}
     />,
     document.body
   );

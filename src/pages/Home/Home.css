@@ -4,7 +4,7 @@
 
 .home-section {
   position: relative;
-  min-height: 100vh;
+  min-height: 100dvh;
   padding: var(--section-pad-top) var(--hud-padding) 40px;
   display: flex;
   flex-direction: column;
@@ -22,13 +22,13 @@
   height: 100%;
 }
 
-/* --- Centerpiece NERO Text --- */
+/* --- Centrepiece NERO title --- */
 .nero-centerpiece {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: 2;
   pointer-events: none;
   text-align: center;
 }
@@ -37,47 +37,18 @@
   font-family: var(--font-ui);
   font-size: clamp(2.5rem, 8vw, 8rem);
   font-weight: 700;
-  color: #fff;
+  color: var(--color-text-primary);
   letter-spacing: 0.25em;
   text-shadow: var(--text-glow-primary);
-  margin-bottom: clamp(10px, 2vh, 20px);
+  margin: 0;
   line-height: 1;
 }
 
-.nero-subtitle-container {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  background: var(--panel-bg-dark);
-  padding: 10px 25px;
-  border-top: 1px solid var(--nerd-primary);
-  border-bottom: 1px solid var(--nerd-primary);
-  box-shadow: 0 0 15px rgba(0, 144, 217, 0.3);
-}
-
-.subtitle-bracket-left,
-.subtitle-bracket-right {
-  font-family: var(--font-mono);
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--nerd-primary);
-}
-
-.nero-subtitle {
-  font-family: var(--font-mono);
-  font-size: clamp(0.55rem, 1.2vw, 0.9rem);
-  color: #fff;
-  max-width: 700px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
-}
-
-/* --- Dynamic CV Analysis Overlay --- */
+/* --- CV analysis overlay: one wandering bounding box per project --- */
 .cv-overlay {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 1;
   pointer-events: none;
   display: flex;
   justify-content: center;
@@ -86,76 +57,62 @@
 
 .cv-bounding-box {
   position: absolute;
-  border: 1px solid rgba(0, 144, 217, 0.2);
-  background: rgba(0, 144, 217, 0.05);
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  box-shadow: inset 0 0 10px rgba(0, 144, 217, 0.1);
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  color: var(--color-text-primary);
+  border: 1px solid var(--nero-primary);
+  background: transparent;
+  box-shadow: inset 0 0 10px rgba(var(--rgb-primary), 0.1);
   text-decoration: none;
   pointer-events: auto;
-  cursor: none;
   overflow: visible;
   transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
 
-.cv-bounding-box:hover {
-  border-color: var(--nerd-accent-red);
-  background: rgba(255, 23, 68, 0.1);
-  box-shadow: inset 0 0 20px rgba(255, 23, 68, 0.2);
+/* hovered OR keyboard-focused (Home.jsx sets --hot for both) */
+.cv-bounding-box--hot {
+  border-color: var(--nero-accent-red);
+  background: rgba(var(--rgb-red), 0.05);
+  box-shadow: inset 0 0 20px rgba(var(--rgb-red), 0.2);
   z-index: 100;
 }
 
-.cv-bounding-box:hover .cv-box-corner {
-  border-color: var(--nerd-accent-red);
+.cv-bounding-box--hot .cv-box-corner {
+  border-color: var(--nero-accent-red);
 }
 
 .cv-box-corner {
   position: absolute;
   width: 15px;
   height: 15px;
-  border-color: var(--nerd-primary);
+  border-color: var(--nero-primary);
   border-style: solid;
   border-width: 0;
   transition: border-color 0.3s ease, transform 0.3s ease;
 }
 
-.cv-box-corner.top-left { top: -8px; left: -8px; border-top-width: 3px; border-left-width: 3px; animation: corner-tl-idle 4s infinite ease-in-out; }
-.cv-box-corner.top-right { top: -8px; right: -8px; border-top-width: 3px; border-right-width: 3px; animation: corner-tr-idle 4s infinite ease-in-out; }
-.cv-box-corner.bottom-left { bottom: -8px; left: -8px; border-bottom-width: 3px; border-left-width: 3px; animation: corner-bl-idle 4s infinite ease-in-out; }
-.cv-box-corner.bottom-right { bottom: -8px; right: -8px; border-bottom-width: 3px; border-right-width: 3px; animation: corner-br-idle 4s infinite ease-in-out; }
+.cv-box-corner--tl { top: -8px; left: -8px; border-top-width: 3px; border-left-width: 3px; animation: corner-tl-idle 4s infinite ease-in-out; }
+.cv-box-corner--tr { top: -8px; right: -8px; border-top-width: 3px; border-right-width: 3px; animation: corner-tr-idle 4s infinite ease-in-out; }
+.cv-box-corner--bl { bottom: -8px; left: -8px; border-bottom-width: 3px; border-left-width: 3px; animation: corner-bl-idle 4s infinite ease-in-out; }
+.cv-box-corner--br { bottom: -8px; right: -8px; border-bottom-width: 3px; border-right-width: 3px; animation: corner-br-idle 4s infinite ease-in-out; }
 
 @keyframes corner-tl-idle { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-4px, -4px); } }
 @keyframes corner-tr-idle { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(4px, -4px); } }
 @keyframes corner-bl-idle { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-4px, 4px); } }
 @keyframes corner-br-idle { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(4px, 4px); } }
 
-.cv-bounding-box:hover .cv-box-corner.top-left { animation: corner-tl-high 0.8s infinite ease-in-out; }
-.cv-bounding-box:hover .cv-box-corner.top-right { animation: corner-tr-high 0.8s infinite ease-in-out; }
-.cv-bounding-box:hover .cv-box-corner.bottom-left { animation: corner-bl-high 0.8s infinite ease-in-out; }
-.cv-bounding-box:hover .cv-box-corner.bottom-right { animation: corner-br-high 0.8s infinite ease-in-out; }
+.cv-bounding-box--hot .cv-box-corner--tl { animation: corner-tl-high 0.8s infinite ease-in-out; }
+.cv-bounding-box--hot .cv-box-corner--tr { animation: corner-tr-high 0.8s infinite ease-in-out; }
+.cv-bounding-box--hot .cv-box-corner--bl { animation: corner-bl-high 0.8s infinite ease-in-out; }
+.cv-bounding-box--hot .cv-box-corner--br { animation: corner-br-high 0.8s infinite ease-in-out; }
 
 @keyframes corner-tl-high { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-10px, -10px) scale(1.3); } }
 @keyframes corner-tr-high { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(10px, -10px) scale(1.3); } }
 @keyframes corner-bl-high { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-10px, 10px) scale(1.3); } }
 @keyframes corner-br-high { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(10px, 10px) scale(1.3); } }
-
-.cv-label-container {
-  display: flex;
-  flex-direction: column;
-  background: transparent;
-  padding: 6px 10px;
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--color-text-primary);
-  transition: border-color 0.3s ease;
-  border: none;
-}
-
-.cv-bounding-box:hover .cv-label-container {
-  border-color: var(--nerd-accent-red);
-}
 
 .cv-box-internal-tgt {
   position: absolute;
@@ -164,7 +121,7 @@
   font-family: var(--font-mono);
   font-size: 0.6rem;
   font-weight: bold;
-  color: var(--nerd-primary);
+  color: var(--nero-primary);
   letter-spacing: 0.1em;
   pointer-events: none;
   z-index: 10;
@@ -173,89 +130,77 @@
   transition: color 0.3s ease;
 }
 
-.cv-bounding-box:hover .cv-box-internal-tgt {
-  color: var(--nerd-accent-red);
+.cv-bounding-box--hot .cv-box-internal-tgt {
+  color: var(--nero-accent-red);
 }
 
-.cv-box-coords {
+/* The 2D suit flying inside the box */
+.cv-robot {
   position: absolute;
-  bottom: -35px;
-  right: -4px;
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  font-weight: bold;
-  background: var(--nerd-primary);
-  color: #fff;
-  padding: 2px 6px;
-  border-radius: 2px;
-  letter-spacing: 0.1em;
+  inset: 0;
+}
+
+/* White flash as the counter-attack fires */
+.cv-power-flash {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--rgb-white), 0.9) 0%, rgba(var(--rgb-primary), 0.4) 40%, transparent 70%);
   pointer-events: none;
-  z-index: 100;
-  white-space: nowrap;
-  box-shadow: 0 0 10px rgba(0, 144, 217, 0.4);
-  transition: background 0.3s ease, box-shadow 0.3s ease;
-}
-
-.cv-bounding-box:hover .cv-box-coords {
-  background: var(--nerd-accent-red);
-  box-shadow: 0 0 15px rgba(255, 0, 60, 0.6);
-}
-
-.cv-confidence {
-  color: var(--nerd-accent-yellow);
+  z-index: 0;
 }
 
 .cv-expanded-details {
+  position: relative;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 0 10px 10px;
-  font-family: var(--font-mono);
   width: 100%;
-  box-sizing: border-box;
+  margin-top: 10px;
+  padding: 0 10px 10px;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  text-align: center;
+  pointer-events: none;
 }
 
 .cv-proj-title {
-  color: #fff;
+  color: var(--color-text-primary);
   font-family: var(--font-ui);
   font-weight: bold;
   font-size: 0.9rem;
   letter-spacing: 0.05em;
   white-space: normal;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   text-align: center;
-}
-
-.cv-proj-status {
-  color: var(--nerd-primary);
-  font-size: 0.65rem;
+  text-shadow: 0 0 5px var(--nero-accent-red);
 }
 
 .cv-proj-action {
-  color: var(--nerd-accent-red);
-  font-size: 0.65rem;
+  color: var(--nero-accent-red);
+  font-size: 0.8rem;
   font-weight: bold;
   animation: blink 1s infinite alternate;
   margin-top: 5px;
 }
 
-/* --- Mission Log / Scrolling Terminal --- */
+/* --- Mission log / scrolling terminal --- */
 .mission-log {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: clamp(280px, 45vw, 500px);
-  height: clamp(150px, 30vh, 250px);
+  /* position/overflow/padding come from .hud-panel */
+  width: min(95%, 1000px);
+  height: clamp(200px, 45vh, 420px);
+  margin-top: clamp(15px, 3vh, 40px);
+  z-index: 2;
   display: flex;
   flex-direction: column;
   font-family: var(--font-mono);
   font-size: clamp(0.6rem, 1vw, 0.8rem);
-  z-index: 20;
 }
 
 .mission-log__header {
-  color: var(--nerd-primary);
-  border-bottom: 2px solid rgba(0, 144, 217, 0.4);
+  color: var(--nero-primary);
+  border-bottom: 1px solid var(--nero-accent-red);
   padding-bottom: 10px;
   margin-bottom: 12px;
   display: flex;
@@ -265,16 +210,9 @@
   letter-spacing: 0.1em;
 }
 
-.blink-dot {
-  width: 8px;
-  height: 8px;
-  background-color: var(--nerd-accent-red);
-  border-radius: 50%;
-  animation: blink 1s infinite alternate;
-}
-
 .mission-log__content {
   flex: 1;
+  max-height: 320px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -289,13 +227,13 @@
   animation: chromatic-flicker 0.15s ease-out;
 }
 
-.log-timestamp {
-  color: var(--nerd-primary);
+.mission-log__time {
+  color: var(--nero-accent-red);
   opacity: 0.8;
   white-space: nowrap;
 }
 
-.log-text {
+.mission-log__text {
   color: var(--color-text-primary);
-  text-shadow: 0 0 4px rgba(0, 144, 217, 0.4);
+  text-shadow: 0 0 4px rgba(var(--rgb-primary), 0.4);
 }

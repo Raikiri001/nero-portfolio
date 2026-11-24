@@ -1,12 +1,3 @@
-export const SCANNER_LABELS = [
-  "DEEP_LEARNING",
-  "COMPUTER_VISION",
-  "DATA_ANALYSIS",
-  "NEURAL_NETWORKS",
-  "PATTERN_RECOGNITION",
-  "ALGORITHM_OPTIMIZATION"
-];
-
 export const TERMINAL_MESSAGES = [
   "Hello, Welcome!",
   "I am an aspiring Machine Learning Engineer and Data Analyst.",
@@ -25,8 +16,8 @@ export const TERMINAL_MESSAGES = [
   "Special thanks to Denver M!",
   "Special thanks to Jeriko A!",
   "Special thanks to Jet S!",
-  "Asian Kung-fu generation makes the best rock music ever!!!",
-  "I find Object detection and Instance segmentation verty interesting!",
+  "Asian Kung-Fu Generation makes the best rock music ever!!!",
+  "I find object detection and instance segmentation very interesting!",
   "Developing and building Neural Networks is fun!",
   "I like to develop projects that have great social impact!",
   "I aim to use my experience and skills to help society!",
@@ -89,7 +80,7 @@ export const PROJECTS_ARRAY = [
     title: "Will It Rain Tomorrow Binary Classifier",
     date: "July 2024 - November 2024",
     status: "MISSION_COMPLETE",
-    details: "Analyzed >50k weather samples using KNIME/Python. Imputed, normalized, and one-hot encoded features. Evaluated Decision Trees, RF, KNN, XGBoost. Achieved 0.89 precision, 0.81 recall, 0.87 accuracy with a fine-tuned MLP.",
+    details: "Analysed >50k weather samples using KNIME/Python. Imputed, normalised and one-hot encoded features. Evaluated Decision Trees, RF, KNN, XGBoost. Achieved 0.89 precision, 0.81 recall, 0.87 accuracy with a fine-tuned MLP.",
     repoUrl: "",
     tags: ["KNIME", "Python", "MLP", "XGBoost"],
     tacticalData: {
@@ -104,7 +95,7 @@ export const PROJECTS_ARRAY = [
     title: "Artificially Generated Images Binary Image Classifier",
     date: "July 2024 - November 2024",
     status: "MISSION_COMPLETE",
-    details: "Developed real-time YOLOv11l Classification model to distinguish authentic from synthetic images. Improved generalization via targeted augmentation. Achieved unified 0.73 Precision, Recall, and Accuracy.",
+    details: "Developed a real-time YOLOv11l classification model to distinguish authentic from synthetic images. Improved generalisation via targeted augmentation. Achieved unified 0.73 Precision, Recall, and Accuracy.",
     repoUrl: "",
     tags: ["YOLOv11l-cls", "Classification", "Deep Learning", "Image Processing"],
     tacticalData: {
@@ -134,14 +125,14 @@ export const PROJECTS_ARRAY = [
     title: "Illegal Parking Detector",
     date: "February 2025 - June 2025",
     status: "MISSION_COMPLETE",
-    details: "Two-stage CV system integrating road instance segmentation (YOLOv8l-seg) with vehicle detection (YOLOv11s). Analyzes spatial relationships for complex violations (double parking, kerb alignment). Applied convex hull post-processing to refine masks.",
+    details: "Two-stage CV system integrating road instance segmentation (YOLOv8l-seg) with vehicle detection (YOLOv11s). Analyses spatial relationships for complex violations (double parking, kerb alignment). Applied convex hull post-processing to refine masks.",
     repoUrl: "https://github.com/Raikiri001/Illegal-Parking-Detector",
     tags: ["YOLOv8l-seg", "YOLOv11s", "Instance Segmentation", "Object Tracking", "Object Detection", "Behaviour Classification"],
     tacticalData: {
       OBJECTIVE: "OBJECT_DETECTION, OBJECT_TRACKING, INSTANCE_SEGMENTATION, CLASSIFICATION",
       MODEL_USED: "YOLOv8l-seg, YOLOv11s",
       DATASET_SIZE: "12,000",
-      KEY_METRIC: "YOLOv8l-seg: 0.831 mAP50-95, YOLOv11s 0.893 mAP50"
+      KEY_METRIC: "YOLOv8l-seg: 0.831 mAP50-95, YOLOv11s: 0.893 mAP50"
     }
   },
   {
@@ -149,14 +140,14 @@ export const PROJECTS_ARRAY = [
     title: "Image Mean Opinion Score Regressor",
     date: "July 2025 - October 2025",
     status: "MISSION_COMPLETE",
-    details: "Developed EfficientNetB2 CNN for Image Quality Assessment (IQA). Custom regression head for MOS. Achieved PLCC of 0.83 and SROCC of 0.79. Designed and implemented a custom regression head optimized for this IQA task.",
+    details: "Developed an EfficientNetB2 CNN for Image Quality Assessment (IQA), with a custom regression head optimised for Mean Opinion Score (MOS) prediction. Achieved PLCC of 0.83 and SROCC of 0.79.",
     repoUrl: "https://github.com/Raikiri001/Image-Mean-Opinion-Score-Regressor",
     tags: ["EfficientNetB2", "Image Quality Assessment", "Regression"],
     tacticalData: {
       OBJECTIVE: "REGRESSION",
       MODEL_USED: "Custom EfficientNetB2",
       DATASET_SIZE: "11,000",
-      KEY_METRIC: "0.83 PLCC, SROCC 0.79"
+      KEY_METRIC: "0.83 PLCC, 0.79 SROCC"
     }
   },
   {
@@ -164,12 +155,12 @@ export const PROJECTS_ARRAY = [
     title: "Personal Portfolio Website v2.0",
     date: "March 2026 - Present",
     status: "MISSION_ONGOING",
-    details: "Developed an interactive, high-performance portfolio website designed to mirror a mobile suit cockpit interface. This project bridges the gap between web development and the mechanical aesthetics of the Gundam SEED and Macross Frontier universes. Developed to display projects.",
+    details: "Developed an interactive, high-performance portfolio website designed to mirror a mobile suit cockpit interface. This project bridges the gap between web development and the mechanical aesthetics of the Gundam SEED and Macross Frontier universes.",
     repoUrl: "https://github.com/Raikiri001/nero-portfolio",
-    tags: ["Three.js", "JavaScript", "Website Development"],
+    tags: ["React", "Three.js", "React Three Fiber", "JavaScript", "Website Development"],
     tacticalData: {
-      OBJECTIVE: "WEB_DEV",
-      FRAMEWORK: "REACT",
+      OBJECTIVE: "WEB_DEVELOPMENT",
+      FRAMEWORK: "REACT, THREE.JS",
     }
   }
 ];
@@ -184,7 +175,6 @@ export const COMM_LINKS = {
       id: 'github',
       label: 'GITHUB',
       type: 'REPOSITORY',
-      value: 'Nero_G',
       url: 'https://github.com/Raikiri001',
       active: 'TRUE'
     },
@@ -192,7 +182,6 @@ export const COMM_LINKS = {
       id: 'linkedin',
       label: 'LINKEDIN',
       type: 'PROFESSIONAL_NET',
-      value: 'Nero_G',
       url: 'https://www.linkedin.com/in/nero-garcia-935a8b283/',
       active: 'TRUE'
     },
@@ -200,29 +189,34 @@ export const COMM_LINKS = {
       id: 'email',
       label: 'EMAIL',
       type: 'DIRECT_COMM',
-      value: 'nero@example.com',
       url: 'mailto:n_garcia_20a@outlook.com',
       active: 'TRUE'
     }
   ]
 };
 
+// `tone` picks a HUD colour (.pilot-stat-value--<tone> in About.css):
+// primary | red | green | yellow. Data never holds CSS.
 export const PILOT_STATS = [
-  { label: "PROJECTS_COMPLETED", value: "7", color: "var(--nerd-primary)" },
-  { label: "SPECIALISATION", value: "AI, Data Analytics", color: "var(--nerd-accent-green)" },
-  { label: "MODELS_TRAINED", value: "30+", color: "var(--nerd-accent-red)" },
-  { label: "PAPERS_READ", value: "100+", color: "var(--nerd-accent-yellow)" }
+  {
+    label: "PROJECTS_COMPLETED",
+    value: String(PROJECTS_ARRAY.filter((p) => p.status === "MISSION_COMPLETE").length),
+    tone: "primary",
+  },
+  { label: "SPECIALISATION", value: "AI, Data Analytics", tone: "green" },
+  { label: "MODELS_TRAINED", value: "30+", tone: "red" },
+  { label: "PAPERS_READ", value: "100+", tone: "yellow" }
 ];
 
-export const PILOT_BIO = "I’m currently a fourth-year Computer Science student specializing in AI and Data Analytics, but my fascination with complex systems goes way beyond the code I write on my screen. I’ve always been drawn to the intersection where clean aesthetics and high-end engineering meet, which is a passion rooted in my long-standing love for aviation, mecha and piloting. I’ve spent a lot of time exploring the intricate worlds of Gundam SEED and Macross Frontier, and I’ve always viewed the ZGMF-X20A Strike Freedom as the absolute gold standard for mecha design. That appreciation eventually translated into a hands-on hobby of building Gunpla and other plastic models, where I’ve found that my academic and creative worlds overlap more than I ever expected. I’ve realized that the level of patience and precision needed to meticulously detail a Master Grade kit is almost identical to the mindset I need when I’m refining a neural network or debugging a difficult project. Both tasks require a deep curiosity for the under-the-hood mechanics that make a system work, and I truly enjoy the process of taking dozens of complex components and perfecting them into a functional whole, whether that’s inside a terminal or at my workbench.";
+export const PILOT_BIO = "I’m currently a fourth-year Computer Science student specialising in AI and Data Analytics, but my fascination with complex systems goes way beyond the code I write on my screen. I’ve always been drawn to the intersection where clean aesthetics and high-end engineering meet, which is a passion rooted in my long-standing love for aviation, mecha and piloting. I’ve spent a lot of time exploring the intricate worlds of Gundam SEED and Macross Frontier, and I’ve always viewed the ZGMF-X20A Strike Freedom as the absolute gold standard for mecha design. That appreciation eventually translated into a hands-on hobby of building Gunpla and other plastic models, where I’ve found that my academic and creative worlds overlap more than I ever expected. I’ve realised that the level of patience and precision needed to meticulously detail a Master Grade kit is almost identical to the mindset I need when I’m refining a neural network or debugging a difficult project. Both tasks require a deep curiosity for the under-the-hood mechanics that make a system work, and I truly enjoy the process of taking dozens of complex components and perfecting them into a functional whole, whether that’s inside a terminal or at my workbench.";
 
 export const NAV_TITLE = "NERO GARCIA - PORTFOLIO";
 
 export const NAV_ITEMS = [
-  { id: 'home', label: 'HOME', icon: '◆' },
-  { id: 'about', label: 'PILOT DATA', icon: '◆' },
-  { id: 'projects', label: 'SORTIES', icon: '◆' },
-  { id: 'contact', label: 'COMMS', icon: '◆' },
+  { id: 'home', label: 'HOME' },
+  { id: 'about', label: 'PILOT DATA' },
+  { id: 'projects', label: 'SORTIES' },
+  { id: 'contact', label: 'COMMS' },
 ];
 
 export const SITE_TEXT = {
@@ -234,7 +228,7 @@ export const SITE_TEXT = {
   },
   about: {
     sectionCode: "SEC_02",
-    title: "PILOT DOSSIER // DASHBOARD",
+    title: "PILOT DATA // DOSSIER",
     statsHeader: "PILOT_STATS",
     bioHeader: "ABOUT_ME",
     skillsHeader: "SYSTEM_SKILLS_ACTIVE"
@@ -243,20 +237,18 @@ export const SITE_TEXT = {
     sectionCode: "SEC_03",
     title: "SORTIES // PROJECTS",
     statusLabel: "STATUS:",
-    tagsLabel: "Tags",
-    debriefLabel: "DEBRIEFING_LOG",
     accessLabel: "ACCESS_REPOSITORY",
     lockSuccess: "[TARGET_LOCK_ACQUIRED] // ENHANCING_ARCHIVAL_DATA",
-    lockFail: "[TARGET_LOCK_ACQUIRED] // NO_EXTERNAL_ARCHIVAL_DATA_AVAILABLE",
+    lockFail: "[TARGET_LOCK_FAILED] // NO_EXTERNAL_ARCHIVAL_DATA_AVAILABLE",
     deployLabel: "DEPLOY"
   },
   contact: {
     sectionCode: "SEC_04",
-    title: "COMMUNICATION // DATA NODES",
+    title: "COMMS // DATA NODES",
     footerCopyright: "© Nero Garcia",
     footerEstDate: "EST_DATE: 2026.04.24"
   },
   boot: {
-    initializeLabel: "CLICK OR PRESS ANY KEY TO INITIALIZE"
+    initializeLabel: "CLICK OR PRESS ANY KEY TO INITIALISE"
   }
 };

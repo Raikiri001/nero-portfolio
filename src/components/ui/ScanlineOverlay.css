@@ -1,37 +1,33 @@
-/* Scanline & Chromatic Aberration Overlay */
+/* ============================================================
+   CRT overlay — the site's one scanline layer
+   ============================================================ */
 .scanline-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9998;
+  z-index: var(--z-scanlines);
   pointer-events: none;
   overflow: hidden;
 }
 
-.scanline-lines {
+.scanline-overlay__lines {
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.03) 2px,
-    rgba(0, 0, 0, 0.03) 4px
-  );
+  background: var(--crt-scanlines), var(--crt-fringe);
+  background-size: 100% 2px, 3px 100%;
 }
 
-.scanline-sweep {
+.scanline-overlay__sweep {
   position: absolute;
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(180deg, transparent, rgba(0, 242, 255, 0.04), transparent);
+  background: linear-gradient(180deg, transparent, rgba(var(--rgb-primary), 0.04), transparent);
   animation: scanline-sweep 6s linear infinite;
 }
 
-.chromatic-layer {
+.scanline-overlay__chromatic {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(90deg, rgba(255, 0, 0, 0.01) 0%, transparent 2%, transparent 98%, rgba(0, 0, 255, 0.01) 100%);
+  background: var(--crt-edge-fringe);
   mix-blend-mode: screen;
 }

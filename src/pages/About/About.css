@@ -1,10 +1,10 @@
 /* ============================================================
-   About Section — EDA Dashboard (NERO TACTICAL OS)
+   About Section — Pilot dossier (NERO TACTICAL OS)
    ============================================================ */
 
-.eda-dashboard-section {
+.about-section {
   position: relative;
-  min-height: 100vh;
+  min-height: 100dvh;
   padding: var(--section-pad-top) var(--hud-padding) 40px;
   display: flex;
   flex-direction: column;
@@ -19,27 +19,22 @@
   align-items: start;
 }
 
+/* background, border and padding come from .hud-panel */
 .eda-panel {
-  padding: 30px;
   height: 100%;
 }
 
 .eda-panel__header {
   font-family: var(--font-mono);
   font-weight: bold;
-  color: var(--nerd-primary);
-  border-bottom: 2px solid rgba(0, 144, 217, 0.4);
+  color: var(--nero-primary);
+  border-bottom: 2px solid rgba(var(--rgb-primary), 0.4);
   padding-bottom: 10px;
   margin-bottom: 20px;
   letter-spacing: 0.15em;
 }
 
-/* --- Pilot Stats Panel --- */
-.pilot-stats-panel {
-  background: rgba(0, 144, 217, 0.05);
-  border: 1px solid rgba(0, 144, 217, 0.2);
-}
-
+/* --- Pilot stats --- */
 .pilot-stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -47,21 +42,21 @@
 }
 
 .pilot-stat-box {
+  --bevel: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(0, 144, 217, 0.15);
+  background: rgba(var(--rgb-black), 0.6);
+  border: 1px solid rgba(var(--rgb-primary), 0.15);
   padding: 15px 10px;
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
   transition: all 0.3s ease;
 }
 
 .pilot-stat-box:hover {
-  background: rgba(0, 144, 217, 0.1);
-  border-color: var(--nerd-primary);
-  box-shadow: 0 0 20px rgba(0, 144, 217, 0.3);
+  background: rgba(var(--rgb-primary), 0.1);
+  border-color: var(--nero-primary);
+  box-shadow: 0 0 20px rgba(var(--rgb-primary), 0.3);
 }
 
 .pilot-stat-label {
@@ -80,6 +75,11 @@
   text-shadow: 0 0 10px currentColor;
 }
 
+.pilot-stat-value--primary { color: var(--nero-primary); }
+.pilot-stat-value--red { color: var(--nero-accent-red); }
+.pilot-stat-value--green { color: var(--nero-accent-green); }
+.pilot-stat-value--yellow { color: var(--nero-accent-yellow); }
+
 .pilot-bio-container {
   margin-top: 25px;
 }
@@ -89,19 +89,12 @@
   font-size: 0.95rem;
   line-height: 1.6;
   color: var(--color-text-primary);
-  display: flex;
-  align-items: flex-start;
-  gap: 15px;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(var(--rgb-black), 0.4);
   padding: 20px;
-  border-left: 3px solid var(--nerd-primary);
+  border-left: 3px solid var(--nero-primary);
 }
 
-.pilot-bio .blink-dot {
-  margin-top: 5px;
-}
-
-/* --- SKILLS PANEL --- */
+/* --- Skills --- */
 .skill-ribbon-panel {
   display: flex;
   flex-direction: column;
@@ -122,7 +115,7 @@
 .skill-static-label {
   font-family: var(--font-mono);
   font-size: 0.9rem;
-  color: var(--nerd-accent-red);
+  color: var(--nero-accent-red);
   margin-bottom: 15px;
   letter-spacing: 0.1em;
 }
@@ -134,47 +127,33 @@
 }
 
 .skill-static-item {
+  --bevel: 8px;
   font-family: var(--font-mono);
   font-size: 0.85rem;
   padding: 6px 15px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(0, 144, 217, 0.2);
-  color: var(--nerd-primary);
+  background: rgba(var(--rgb-black), 0.6);
+  border: 1px solid rgba(var(--rgb-primary), 0.2);
+  color: var(--nero-primary);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   transition: all 0.3s ease;
-  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-  cursor: none;
 }
 
 .skill-static-item:hover {
-  background: rgba(0, 144, 217, 0.1);
-  border-color: var(--nerd-primary);
-  box-shadow: 0 0 20px rgba(0, 144, 217, 0.3);
-  color: #fff;
+  background: rgba(var(--rgb-primary), 0.1);
+  border-color: var(--nero-primary);
+  box-shadow: 0 0 20px rgba(var(--rgb-primary), 0.3);
+  color: var(--color-text-primary);
 }
 
-/* Blinking Cursor for Pilot Stats */
-@keyframes cursor-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-.blink-cursor {
-  animation: cursor-blink 1s step-end infinite;
-  display: inline-block;
-  color: var(--nerd-accent-red);
-  margin-left: 2px;
-}
-
-/* ---- Responsive Breakpoints ---- */
-@media (max-width: 900px) {
+/* ---- Responsive ---- */
+@media (max-width: 1024px) {
   .eda-layout {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 480px) {
   .pilot-stats-grid {
     grid-template-columns: 1fr;
   }

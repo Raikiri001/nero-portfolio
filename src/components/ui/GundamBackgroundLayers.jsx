@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence, useMotionValue, animate } from 'motion/react';
 import { GUNDAM_ROSTER } from '../../data/gundamVisuals.jsx';
 import { PROJECTS_ARRAY } from '../../data/siteData';
@@ -7,6 +6,10 @@ import { Robot } from './GundamRobot';
 
 const EXCESS_IDS = GUNDAM_ROSTER.map((_, i) => i).slice(PROJECTS_ARRAY.length);
 const ALL_IDS = GUNDAM_ROSTER.map((_, i) => i);
+
+// A phone gets a handful of background suits, not all 22.
+const SMALL_SCREEN_CAP = 8;
+const isSmallScreen = () => window.matchMedia('(max-width: 768px)').matches;
 
 // Starting point used whenever getTarget can't resolve one yet (e.g. the
 // target DOM node doesn't exist the instant this mounts) — a random point
@@ -55,6 +58,11 @@ function useWander(getTarget) {
     let timeoutId;
 
     const tick = () => {
+      // Background tab: don't queue animations nobody can see.
+      if (document.hidden) {
+        timeoutId = setTimeout(tick, 1000);
+        return;
+      }
       const result = getTargetRef.current(prevRef.current);
       if (!result) {
         timeoutId = setTimeout(tick, 300);
@@ -103,22 +111,26 @@ function BackgroundGundam({ gundamId, seed }) {
       animate={{ opacity: 0.3, transition: { duration: 0.6, delay: (seed % 8) * 0.15 } }}
       exit={{ opacity: 0, transition: { duration: 0.4 } }}
     >
-      <Robot dir={dir} gundamId={gundamId} />
+      {/* flicker OFF: see Robot's doc comment. 22 of these are mounted on
+          every page and never unmount, and the flames are drawn at 30 %
+          opacity and half scale where the flicker cannot be seen anyway. */}
+      <Robot dir={dir} gundamId={gundamId} flicker={false} />
     </motion.div>
   );
 }
 
-// Always-mounted layer, sitting just above the starfield background and
-// below all page content. Holds every Gundam not currently taking a
-// dedicated foreground role — i.e. all 22 on every page except Projects
-// (now a 3D hangar corridor, see game/hangar/HangarCorridor.jsx), where the
-// project-linked units are busy being the docked models and only the
-// reserve/excess designs wander back here.
+// The layer just above the starfield and below all page content. Holds
+// every Gundam not taking a foreground role: all of them on every page
+// except Projects, where the project-linked units are the docked 3D models
+// (game/hangar/HangarCorridor.jsx) and only the remaining units wander here.
+// App.jsx unmounts it during a deploy.
 export function GundamBackLayer({ activeSection }) {
-  const ids = activeSection === 'projects' ? EXCESS_IDS : ALL_IDS;
+  const [small] = useState(isSmallScreen);
+  const pool = activeSection === 'projects' ? EXCESS_IDS : ALL_IDS;
+  const ids = small ? pool.slice(0, SMALL_SCREEN_CAP) : pool;
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none', overflow: 'hidden' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 'var(--z-sprites)', pointerEvents: 'none', overflow: 'hidden' }}>
       <AnimatePresence>
         {ids.map((gundamId, i) => (
           <BackgroundGundam key={gundamId} gundamId={gundamId} seed={i} />

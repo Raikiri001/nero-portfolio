@@ -1,5 +1,8 @@
 import { useEffect, useRef } from 'react';
+import { hudRgba } from '../../data/hudColors';
 import './Combat.css';
+
+const CONTROLS_HINT = 'MOUSE AIM · WASD MOVE · SPACE/C VERTICAL · SHIFT BOOST · LMB FIRE · RMB/F MELEE · Q/E SPECIAL · ESC PAUSE';
 
 // Draws beam tracers + the lock-on reticle every frame by reading hudRef
 // directly (written by CombatScene's useFrame) — its own rAF loop, outside
@@ -28,7 +31,7 @@ function BeamCanvas({ hudRef }) {
       if (!screen || screen.behind) return;
       const { x, y } = screen;
       ctx.save();
-      ctx.strokeStyle = locked ? '#ff003c' : '#0090d9';
+      ctx.strokeStyle = locked ? hudRgba('red') : hudRgba('primary');
       ctx.lineWidth = 1.5;
       ctx.shadowColor = ctx.strokeStyle;
       ctx.shadowBlur = 8;
@@ -43,13 +46,13 @@ function BeamCanvas({ hudRef }) {
 
       ctx.beginPath();
       ctx.arc(x, y, s * 1.6, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * lockProgress);
-      ctx.strokeStyle = locked ? '#ff003c' : 'rgba(0,144,217,0.7)';
+      ctx.strokeStyle = locked ? hudRgba('red') : hudRgba('primary', 0.7);
       ctx.stroke();
 
       if (locked) {
         ctx.font = 'bold 11px "Fira Code", monospace';
         ctx.textAlign = 'center';
-        ctx.fillStyle = '#ff003c';
+        ctx.fillStyle = hudRgba('red');
         ctx.fillText('LOCK', x, y - s * 1.9);
       }
       ctx.restore();
@@ -62,8 +65,8 @@ function BeamCanvas({ hudRef }) {
         ctx.globalAlpha = Math.max(0, b.alpha);
         ctx.strokeStyle = b.color;
         ctx.shadowColor = b.color;
-        ctx.shadowBlur = b.kind === 'slash' ? 4 : 10;
-        ctx.lineWidth = b.kind === 'slash' ? 5 : 2.5;
+        ctx.shadowBlur = b.kind === 'slash' ? 4 : b.kind === 'heavy' ? 24 : 10;
+        ctx.lineWidth = b.kind === 'slash' ? 5 : b.kind === 'heavy' ? 7 : 2.5;
         ctx.beginPath();
         ctx.moveTo(b.from.x, b.from.y);
         ctx.lineTo(b.to.x, b.to.y);
@@ -92,24 +95,65 @@ function BeamCanvas({ hudRef }) {
   return <canvas ref={canvasRef} className="combat-hud__canvas" />;
 }
 
-export function CombatHUD({ hudRef, snapshot, bossName, result, onRetry, onReturn }) {
+// One centred modal: the result, the pause menu, or a blocking notice.
+function CombatModal({ title, tone = 'neutral', actions }) {
+  return (
+    <div className="combat-hud__overlay">
+      <div className="combat-hud__modal hud-panel" role="dialog" aria-label={title}>
+        <div className={`combat-hud__modal-title combat-hud__modal-title--${tone}`}>{title}</div>
+        <div className="combat-hud__modal-actions">
+          {actions.map(({ label, onClick, secondary }) => (
+            <button
+              key={label}
+              type="button"
+              className={`combat-hud__btn ${secondary ? 'combat-hud__btn--secondary' : ''}`}
+              onClick={onClick}
+              data-clickable
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The DOM overlay over the arena. Bars and labels come from the throttled
+ * `snapshot`; beams and the reticle are drawn every frame from `hudRef`.
+ * With `notice` set it renders only that notice (e.g. no mouse available).
+ */
+export function CombatHUD({
+  hudRef, snapshot, bossName, result, paused, notice, onResume, onRetry, onReturn,
+}) {
+  if (notice) {
+    return (
+      <div className="combat-hud">
+        <CombatModal title={notice} actions={[{ label: 'RETURN TO HANGAR', onClick: onReturn }]} />
+      </div>
+    );
+  }
+
   const playerHpPct = snapshot?.playerHpPct ?? 1;
   const bossHpPct = snapshot?.bossHpPct ?? 1;
   const boostPct = snapshot?.boostPct ?? 1;
+  const specialCharge = snapshot?.specialCharge ?? 1;
+  const specialReady = specialCharge >= 1;
 
   return (
     <div className="combat-hud">
       <BeamCanvas hudRef={hudRef} />
 
       <div className="combat-hud__boss-bar hud-panel">
-        <div className="combat-hud__boss-name">{snapshot?.bossName || bossName}</div>
+        <div className="combat-hud__boss-name">{bossName}</div>
         <div className="combat-hud__bar combat-hud__bar--boss">
           <div className="combat-hud__bar-fill" style={{ width: `${Math.max(0, bossHpPct) * 100}%` }} />
         </div>
       </div>
 
       <div className="combat-hud__player-panel hud-panel">
-        <div className="combat-hud__label">PLAYER</div>
+        <div className="combat-hud__label">{snapshot?.unitName || 'PLAYER'}</div>
         <div className="combat-hud__bar combat-hud__bar--player">
           <div className="combat-hud__bar-fill" style={{ width: `${Math.max(0, playerHpPct) * 100}%` }} />
         </div>
@@ -117,24 +161,40 @@ export function CombatHUD({ hudRef, snapshot, bossName, result, onRetry, onRetur
         <div className="combat-hud__bar combat-hud__bar--boost">
           <div className="combat-hud__bar-fill" style={{ width: `${Math.max(0, boostPct) * 100}%` }} />
         </div>
+        {/* Per-unit special: charges over its cooldown, lights when ready. */}
+        {snapshot?.specialLabel && (
+          <>
+            <div className={`combat-hud__label combat-hud__label--boost ${specialReady ? 'combat-hud__label--ready' : ''}`}>
+              [Q] {snapshot.specialLabel}{specialReady ? ' — READY' : ''}
+            </div>
+            <div className="combat-hud__bar combat-hud__bar--special">
+              <div className={`combat-hud__bar-fill ${snapshot.specialActive ? 'combat-hud__bar-fill--active' : ''}`}
+                style={{ width: `${Math.max(0, Math.min(1, specialCharge)) * 100}%` }} />
+            </div>
+          </>
+        )}
       </div>
 
-      <div className="combat-hud__controls-hint">
-        MOUSE AIM · WASD MOVE · SPACE/CTRL VERTICAL · SHIFT BOOST · LMB FIRE · RMB/F MELEE
-      </div>
+      <div className="combat-hud__controls-hint">{CONTROLS_HINT}</div>
 
       {result && (
-        <div className="combat-hud__result-overlay">
-          <div className="combat-hud__result-panel hud-panel">
-            <div className={`combat-hud__result-title combat-hud__result-title--${result}`}>
-              {result === 'won' ? 'SORTIE SUCCESSFUL' : 'MISSION FAILED'}
-            </div>
-            <div className="combat-hud__result-actions">
-              <button className="combat-hud__result-btn" onClick={onRetry} data-clickable>RETRY</button>
-              <button className="combat-hud__result-btn combat-hud__result-btn--secondary" onClick={onReturn} data-clickable>RETURN TO HANGAR</button>
-            </div>
-          </div>
-        </div>
+        <CombatModal
+          title={result === 'won' ? 'SORTIE SUCCESSFUL' : 'MISSION FAILED'}
+          tone={result}
+          actions={[
+            { label: 'RETRY', onClick: onRetry },
+            { label: 'RETURN TO HANGAR', onClick: onReturn, secondary: true },
+          ]}
+        />
+      )}
+      {!result && paused && (
+        <CombatModal
+          title="PAUSED"
+          actions={[
+            { label: 'RESUME', onClick: onResume },
+            { label: 'RETURN TO HANGAR', onClick: onReturn, secondary: true },
+          ]}
+        />
       )}
     </div>
   );

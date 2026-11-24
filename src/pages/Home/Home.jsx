@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'motion/react';
 import { PROJECTS_ARRAY, TERMINAL_MESSAGES, SITE_TEXT } from '../../data/siteData';
 import { ScrambleText } from '../../components/ui/ScrambleText';
@@ -8,91 +7,73 @@ import { MechaBattleCanvas } from '../../components/ui/MechaBattleCanvas';
 import { Robot } from '../../components/ui/GundamRobot';
 import './Home.css';
 
-// ... existing Home component ...
-export function Home({ onNavigate }) {
+/** Fisher–Yates — an unbiased shuffle (sort-by-random is not). */
+function shuffled(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const timestamp = () => new Date().toLocaleTimeString('en-GB', {
+  hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit',
+});
+
+export function Home({ onOpenProject }) {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const parallaxX = useTransform(mouseX, (v) => v * -0.5);
+  const parallaxY = useTransform(mouseY, (v) => v * -0.5);
+  // Raw pointer position, shared by every bounding box so they can wander
+  // away from it — one window listener for the whole page, not one per box.
+  const pointerRef = useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
   const [lockTarget, setLockTarget] = useState(null);
 
-  // Message Pool for non-duplicating sequence
-  const messagePoolRef = useRef([]);
-
-  const getNextMessage = useCallback(() => {
-    if (messagePoolRef.current.length === 0) {
-      // Refill and shuffle the pool
-      messagePoolRef.current = [...TERMINAL_MESSAGES].sort(() => Math.random() - 0.5);
-    }
-    return messagePoolRef.current.pop();
+  // Terminal messages are dealt from a shuffled deck so nothing repeats
+  // until every message has been shown once.
+  const deckRef = useRef([]);
+  const nextMessage = useCallback(() => {
+    if (deckRef.current.length === 0) deckRef.current = shuffled(TERMINAL_MESSAGES);
+    return deckRef.current.pop();
   }, []);
 
-  // Initialize with a random starting message
-  const [scrollingMessages, setScrollingMessages] = useState(() => {
-    const startMsg = [...TERMINAL_MESSAGES].sort(() => Math.random() - 0.5)[0];
-    return [{
-      id: Date.now(),
-      text: startMsg,
-      time: new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
-    }];
-  });
-  const containerRef = useRef(null);
+  const [messages, setMessages] = useState(() => [
+    { id: 0, text: nextMessage(), time: timestamp() },
+  ]);
 
   useEffect(() => {
     const handleMouse = (e) => {
+      pointerRef.current = { x: e.clientX, y: e.clientY };
       mouseX.set((e.clientX / window.innerWidth - 0.5) * 15);
       mouseY.set((e.clientY / window.innerHeight - 0.5) * 15);
     };
-    window.addEventListener('mousemove', handleMouse);
+    window.addEventListener('mousemove', handleMouse, { passive: true });
     return () => window.removeEventListener('mousemove', handleMouse);
   }, [mouseX, mouseY]);
 
-  // Scrolling Terminal Logic - Shuffled Deck Order
   useEffect(() => {
+    let id = 1;
     const interval = setInterval(() => {
-      setScrollingMessages(prev => {
-        const nextMsg = getNextMessage();
-
-        const newMessage = {
-          id: Date.now(),
-          text: nextMsg,
-          time: new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
-        };
-
-        const newArr = [...prev, newMessage];
-        return newArr.slice(-20);
-      });
-    }, 3500); // 3.5s for a better data-stream feel
-
+      setMessages((prev) => [...prev, { id: id++, text: nextMessage(), time: timestamp() }].slice(-20));
+    }, 3500);
     return () => clearInterval(interval);
-  }, [getNextMessage]);
+  }, [nextMessage]);
 
   return (
     <section className="home-section" id="home">
-      {/* Multi-lock overlay */}
       {lockTarget && <MultiLockCanvas target={lockTarget} />}
 
-      <motion.div
-        className="home-parallax"
-        ref={containerRef}
-        style={{
-          x: useTransform(mouseX, value => value * -0.5),
-          y: useTransform(mouseY, value => value * -0.5),
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          position: 'relative'
-        }}
-      >
-        <div className="cv-overlay" style={{ zIndex: 1 }}>
+      <motion.div className="home-parallax" style={{ x: parallaxX, y: parallaxY }}>
+        <div className="cv-overlay">
           {PROJECTS_ARRAY.map((project, index) => (
             <CVBoundingBox
               key={project.id}
               project={project}
               index={index}
-              total={PROJECTS_ARRAY.length}
-              onNavigate={onNavigate}
+              pointerRef={pointerRef}
+              onOpenProject={onOpenProject}
               setLockTarget={setLockTarget}
             />
           ))}
@@ -103,11 +84,10 @@ export function Home({ onNavigate }) {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          style={{ zIndex: 2, pointerEvents: 'none' }}
         >
-          <div className="nero-title" style={{ margin: 0, lineHeight: 1 }}>
+          <h1 className="nero-title">
             <ScrambleText text={SITE_TEXT.home.title} duration={600} />
-          </div>
+          </h1>
         </motion.div>
 
         <motion.div
@@ -115,24 +95,23 @@ export function Home({ onNavigate }) {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          style={{ width: 'min(95%, 1000px)', height: 'clamp(200px, 45vh, 420px)', marginTop: 'clamp(15px, 3vh, 40px)', zIndex: 2 }}
         >
-          <div className="mission-log__header" style={{ borderBottom: '1px solid var(--nerd-accent-red)' }}>
+          <div className="mission-log__header">
             <ScrambleText text={SITE_TEXT.home.terminalHeader} />
           </div>
-          <div className="mission-log__content" style={{ maxHeight: '320px', overflow: 'hidden' }}>
+          <div className="mission-log__content" aria-live="polite">
             <AnimatePresence>
-              {scrollingMessages.map((msgItem) => (
+              {messages.map((msg) => (
                 <motion.div
-                  key={msgItem.id}
+                  key={msg.id}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 10 }}
                   transition={{ duration: 0.3 }}
                   className="mission-log__message"
                 >
-                  <span className="log-timestamp" style={{ color: 'var(--nerd-accent-red)' }}>{msgItem.time}</span>
-                  <span className="log-text">{msgItem.text}</span>
+                  <span className="mission-log__time">{msg.time}</span>
+                  <span className="mission-log__text">{msg.text}</span>
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -143,9 +122,16 @@ export function Home({ onNavigate }) {
   );
 }
 
-// Bounding Box Component for CV Overlay
-function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
-  const [dim, setDim] = useState({ w: 240, h: 140 });
+// Box size shrinks with the viewport so seven boxes still fit on a phone.
+function randomDim() {
+  const s = Math.max(0.65, Math.min(1, window.innerWidth / 1024));
+  return { w: (240 + Math.random() * 60) * s, h: (140 + Math.random() * 40) * s };
+}
+
+// One wandering CV bounding box. Click it and its Gundam fights off a
+// missile barrage, launches, and hands off to that project's hangar bay.
+function CVBoundingBox({ project, index, pointerRef, onOpenProject, setLockTarget }) {
+  const [dim, setDim] = useState(randomDim);
   const [isHovered, setIsHovered] = useState(false);
   const [robotDir, setRobotDir] = useState('idle');
   const boxRef = useRef(null);
@@ -159,25 +145,32 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
   const [mode, setMode] = useState('defend');
   const [battleTarget, setBattleTarget] = useState(null);
   // Whether MechaBattleCanvas is mounted. Deliberately NOT the same as
-  // `phase === 'battling'` — in evade mode the Gundam's launch (`phase`
-  // flips to 'launching') fires early, well before the missile pack's own
-  // scatter-and-explode tail is done playing. Gating the canvas's mount on
-  // `phase` used to unmount it (cancelling its rAF loop) the instant the
-  // boost fired, cutting that tail off mid-scatter instead of letting it
-  // finish. This stays true until the canvas's own onComplete says it's
-  // genuinely done.
+  // `phase === 'battling'`: in evade mode the launch fires before the
+  // missile pack's own scatter-and-explode tail has finished, and gating the
+  // canvas on `phase` would cut that tail off mid-scatter. This stays true
+  // until the canvas's own onComplete says it is done.
   const [battleActive, setBattleActive] = useState(false);
   const [powering, setPowering] = useState(false);
 
-  // Start just off-screen past a random edge (offset from the box's
-  // center-anchored static position) so every box visibly flies inward on
-  // load instead of all seven fanning out from the exact same center point.
+  // Every one-shot timer this box starts, so unmounting mid-sequence (the
+  // launch navigates away from Home) never fires into a dead component.
+  const timersRef = useRef(new Set());
+  const later = useCallback((fn, ms) => {
+    const t = setTimeout(() => { timersRef.current.delete(t); fn(); }, ms);
+    timersRef.current.add(t);
+  }, []);
+  useEffect(() => {
+    const timers = timersRef.current;
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  // Start just off-screen past a random edge so every box visibly flies
+  // inward on load instead of all fanning out from the centre.
   const [initialPos] = useState(() => {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const edge = Math.floor(Math.random() * 4);
     const pad = 150 + Math.random() * 150;
-    switch (edge) {
+    switch (Math.floor(Math.random() * 4)) {
       case 0: return { x: (Math.random() - 0.5) * vw, y: -vh / 2 - pad };
       case 1: return { x: (Math.random() - 0.5) * vw, y: vh / 2 + pad };
       case 2: return { x: -vw / 2 - pad, y: (Math.random() - 0.5) * vh };
@@ -185,93 +178,59 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
     }
   });
 
-  // Motion Values for real-time tracking
   const motionX = useMotionValue(initialPos.x);
   const motionY = useMotionValue(initialPos.y);
-
-  const mouseRef = useRef({ x: typeof window !== 'undefined' ? window.innerWidth / 2 : 0, y: typeof window !== 'undefined' ? window.innerHeight / 2 : 0 });
   const prevPosRef = useRef(initialPos);
 
+  // Idle wander: pick a point away from the pointer every few seconds.
   useEffect(() => {
-    const handleGlobalMouse = (e) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY };
-    };
-    window.addEventListener('mousemove', handleGlobalMouse);
-    return () => window.removeEventListener('mousemove', handleGlobalMouse);
-  }, []);
-
-  useEffect(() => {
-    const scramble = () => {
+    const wander = () => {
       if (phaseRef.current !== 'idle') return;
 
-      let targetX = 0, targetY = 0;
-      let attempts = 0;
-
-      const mX = mouseRef.current.x - window.innerWidth / 2;
-      const mY = mouseRef.current.y - window.innerHeight / 2;
-
-      do {
+      const mX = pointerRef.current.x - window.innerWidth / 2;
+      const mY = pointerRef.current.y - window.innerHeight / 2;
+      let targetX = 0;
+      let targetY = 0;
+      for (let attempts = 0; attempts <= 15; attempts++) {
         targetX = (Math.random() - 0.5) * (window.innerWidth - 300);
         targetY = (Math.random() - 0.5) * (window.innerHeight - 200);
+        if (Math.hypot(targetX - mX, targetY - mY) > 350) break;
+      }
 
-        const distToMouse = Math.hypot(targetX - mX, targetY - mY);
-        if (distToMouse > 350 || attempts > 15) {
-          break;
-        }
-        attempts++;
-      } while (attempts <= 15);
-
-      setDim({
-        w: 240 + Math.random() * 60,
-        h: 140 + Math.random() * 40,
-      });
+      setDim(randomDim());
 
       const dx = targetX - prevPosRef.current.x;
       const dy = targetY - prevPosRef.current.y;
-
-      let dir = [];
+      const dir = [];
       if (dy < -50) dir.push('up');
       if (dy > 50) dir.push('down');
       if (dx < -50) dir.push('left');
       if (dx > 50) dir.push('right');
-
-      if (dir.length === 0) dir.push('idle');
-      setRobotDir(dir.join('-'));
+      setRobotDir(dir.length ? dir.join('-') : 'idle');
 
       prevPosRef.current = { x: targetX, y: targetY };
-
-      // Animate the motion values directly for smooth real-time interpolation
-      animate(motionX, targetX, { duration: 4.5 + Math.random(), ease: "easeInOut" });
-      animate(motionY, targetY, { duration: 4.5 + Math.random(), ease: "easeInOut" });
+      animate(motionX, targetX, { duration: 4.5 + Math.random(), ease: 'easeInOut' });
+      animate(motionY, targetY, { duration: 4.5 + Math.random(), ease: 'easeInOut' });
     };
 
-    scramble();
-    const interval = setInterval(scramble, 5000 + Math.random() * 2000);
+    wander();
+    const interval = setInterval(wander, 5000 + Math.random() * 2000);
     return () => clearInterval(interval);
-  }, [index, total, motionX, motionY]);
+  }, [pointerRef, motionX, motionY]);
 
-  // Evade mode: instead of standing its ground, banks away and keeps
-  // gliding along a continuous curving heading — each leg only turns by a
-  // limited angle from the last, so it reads as one flowing flight path
-  // being outrun, rather than teleporting between random points. Stops the
-  // moment the chase ends and the launch sequence takes over (see
-  // handleBoost) — no separate "boost" dash beforehand, which used to look
-  // like an unmotivated teleport right before it flew up.
+  // Evade mode: banks away along a continuous curving heading — each leg
+  // turns by a limited angle from the last, so it reads as one flowing
+  // flight path being outrun rather than teleporting between points.
   useEffect(() => {
-    if (phase !== 'battling' || mode !== 'evade') return;
+    if (phase !== 'battling' || mode !== 'evade') return undefined;
 
     let timeoutId;
     let heading = Math.random() * Math.PI * 2;
     const boundX = (window.innerWidth - 220) / 2;
     const boundY = (window.innerHeight - 180) / 2;
-    // On a narrow/short viewport (mobile) these bounds are small relative to
-    // the fixed 340-620px dash distance below, so almost every dash clipped
-    // a wall and got its heading reflected — several sharp bounces per
-    // chase instead of one flowing path. That reflected heading feeds
-    // straight into the missile pack's aim point (getLiveTarget), so it
-    // read as the missiles themselves jittering. Scaling the dash distance
-    // down with the available space keeps it a full, uninterrupted glide on
-    // any screen size instead of a corner-bound ping-pong.
+    // On a small viewport a fixed dash distance clips a wall almost every
+    // leg, and the reflected heading feeds straight into the missiles' aim
+    // point — it reads as the missiles jittering. Scale the dash to fit.
     const spaceScale = Math.max(0.35, Math.min(1, Math.min(boundX, boundY) / 300));
 
     const dash = () => {
@@ -297,8 +256,8 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
       prevPosRef.current = { x: targetX, y: targetY };
 
       const duration = 1.15 + Math.random() * 0.55;
-      animate(motionX, targetX, { duration, ease: "easeInOut" });
-      animate(motionY, targetY, { duration, ease: "easeInOut" });
+      animate(motionX, targetX, { duration, ease: 'easeInOut' });
+      animate(motionY, targetY, { duration, ease: 'easeInOut' });
       timeoutId = setTimeout(dash, duration * 1000);
     };
 
@@ -313,15 +272,16 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
     return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
   }, []);
 
+  const freeze = () => {
+    animate(motionX, motionX.get(), { duration: 0 });
+    animate(motionY, motionY.get(), { duration: 0 });
+  };
+
   const handleClick = (e) => {
     e.preventDefault();
     if (phase !== 'idle') return;
 
-    // Freeze exactly where it is right now — cancel whatever wander
-    // animation was already mid-flight rather than letting it keep sliding.
-    animate(motionX, motionX.get(), { duration: 0 });
-    animate(motionY, motionY.get(), { duration: 0 });
-
+    freeze();
     const rect = e.currentTarget.getBoundingClientRect();
     const center = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
     prevPosRef.current = center;
@@ -332,8 +292,8 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
     setRobotDir('idle');
     setPhase('bracing');
 
-    // Brief "standing to attention" beat before the barrage appears.
-    setTimeout(() => {
+    // A brief "standing to attention" beat before the barrage appears.
+    later(() => {
       setPhase('battling');
       setBattleActive(true);
     }, 380);
@@ -341,48 +301,26 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
 
   const handleCounter = useCallback(() => {
     setPowering(true);
-    setTimeout(() => setPowering(false), 450);
-  }, []);
+    later(() => setPowering(false), 450);
+  }, [later]);
 
-  // Missile barrage has resolved enough to launch — in defend mode this is
-  // the counter's aftermath; in evade mode it's the chasing pack losing the
-  // lock (fired as `onBoost` from MechaBattleCanvas, well before that
-  // canvas's own scatter-and-explode tail is done — see `battleActive`
-  // above and handleBattleCanvasComplete below for why the canvas itself
-  // keeps playing independently of this). Freeze in place (cancels any
-  // in-flight wander/chase dash so the launch starts from one stable point
-  // instead of continuing to drift sideways), angle up and fly off, ping
-  // the site title as it passes, then hand off to Projects. The `phase`
-  // guard stops this from firing twice. The Robot itself rejoins the
-  // ambient background layer (GundamBackgroundLayers), which keeps flying
-  // underneath regardless of page, and pops back up next to its card once
-  // Projects is open.
+  // The barrage has resolved enough to launch: freeze in place, angle up and
+  // fly off, ping the nav title as it passes, then open this project's bay.
+  // The `phaseRef` guard stops it firing twice.
   const handleBoost = () => {
     if (phaseRef.current === 'launching') return;
 
-    animate(motionX, motionX.get(), { duration: 0 });
-    animate(motionY, motionY.get(), { duration: 0 });
-
+    freeze();
     setLockTarget(null);
     setPhase('launching');
 
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('gundam-title-ping'));
-    }, 550);
-
-    setTimeout(() => {
-      if (onNavigate) {
-        window.sessionStorage.setItem('openProject', project.id);
-        onNavigate('projects');
-      }
-    }, mode === 'evade' ? 1150 : 780);
+    later(() => window.dispatchEvent(new CustomEvent('gundam-title-ping')), 550);
+    later(() => onOpenProject?.(project.id), mode === 'evade' ? 1150 : 780);
   };
 
-  // The canvas's own animation has genuinely finished (defend mode's
-  // counter resolution, or evade mode's missile scatter-and-explode tail
-  // playing all the way out) — safe to unmount it now. Defend mode has no
-  // separate boost signal, so this doubles as its launch trigger; evade
-  // mode already launched earlier via onBoost, so here it's purely cleanup.
+  // The canvas's own animation has genuinely finished — safe to unmount it.
+  // Defend mode has no separate boost signal, so this is its launch
+  // trigger; evade mode already launched via onBoost.
   const handleBattleCanvasComplete = () => {
     setBattleActive(false);
     if (mode !== 'evade') handleBoost();
@@ -394,34 +332,20 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
       onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`cv-bounding-box project-scanner ${isHovered ? 'locked-on' : ''}`}
-      animate={{
-        width: dim.w,
-        height: dim.h,
-        borderColor: isHovered ? 'var(--nerd-accent-red)' : 'var(--nerd-primary)',
-        backgroundColor: isHovered ? 'rgba(255, 0, 60, 0.05)' : 'transparent'
-      }}
-      style={{
-        position: 'absolute',
-        // Bind position to motion values
-        x: motionX,
-        y: motionY,
-        cursor: 'pointer',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '5px',
-        color: 'var(--color-text-primary)',
-      }}
+      onFocus={() => setIsHovered(true)}
+      onBlur={() => setIsHovered(false)}
+      className={`cv-bounding-box ${isHovered ? 'cv-bounding-box--hot' : ''}`}
+      aria-label={`${project.title} — ${SITE_TEXT.home.interceptLabel}`}
+      animate={{ width: dim.w, height: dim.h }}
+      style={{ x: motionX, y: motionY }}
       data-clickable
     >
       <span className="cv-box-internal-tgt">{SITE_TEXT.home.targetPrefix}{project.id.replace('proj_', '')}</span>
 
-      <div className="cv-box-corner top-left"></div>
-      <div className="cv-box-corner top-right"></div>
-      <div className="cv-box-corner bottom-left"></div>
-      <div className="cv-box-corner bottom-right"></div>
+      <span className="cv-box-corner cv-box-corner--tl" />
+      <span className="cv-box-corner cv-box-corner--tr" />
+      <span className="cv-box-corner cv-box-corner--bl" />
+      <span className="cv-box-corner cv-box-corner--br" />
 
       {battleActive && battleTarget && (
         <MechaBattleCanvas
@@ -435,27 +359,19 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
         />
       )}
 
-      {/* Brief power-surge flash right as the counter-attack fires, so it
-          reads unmistakably as the mech's own doing, not a random effect. */}
+      {/* Power-surge flash as the counter-attack fires, so it reads as the
+          mech's own doing rather than a random effect. */}
       {powering && (
-        <motion.div
+        <motion.span
+          className="cv-power-flash"
           initial={{ opacity: 0, scale: 0.6 }}
           animate={{ opacity: [0, 0.9, 0], scale: [0.6, 1.6, 2.1] }}
-          transition={{ duration: 0.45, ease: "easeOut" }}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(120,200,255,0.4) 40%, transparent 70%)',
-            pointerEvents: 'none',
-            zIndex: 0
-          }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
         />
       )}
 
-      <motion.div
-        key="robot"
-        style={{ position: 'absolute', inset: 0 }}
+      <motion.span
+        className="cv-robot"
         animate={
           phase === 'launching'
             ? { rotate: [0, -30, -18], y: [0, -30, -900], opacity: [1, 1, 0], scale: [1, 1.15, 1.3] }
@@ -463,26 +379,26 @@ function CVBoundingBox({ project, index, total, onNavigate, setLockTarget }) {
         }
         transition={
           phase === 'launching'
-            ? { duration: 0.75, times: [0, 0.3, 1], ease: "easeIn" }
+            ? { duration: 0.75, times: [0, 0.3, 1], ease: 'easeIn' }
             : { duration: 0.3 }
         }
       >
         <Robot dir={robotDir} gundamId={index} />
-      </motion.div>
+      </motion.span>
 
       <AnimatePresence>
         {isHovered && (
-          <motion.div
+          <motion.span
             className="cv-expanded-details"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            style={{ textAlign: 'center', marginTop: '10px', pointerEvents: 'none', zIndex: 10, position: 'relative', overflow: 'hidden' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            aria-hidden="true"
           >
-            <div className="cv-proj-title" style={{ fontSize: '0.9rem', color: '#fff', textShadow: '0 0 5px red' }}>{project.title}</div>
-            <div className="cv-proj-action" style={{ color: 'var(--nerd-accent-red)', fontSize: '0.8rem', marginTop: '5px' }}>{SITE_TEXT.home.interceptLabel}</div>
-          </motion.div>
+            <span className="cv-proj-title">{project.title}</span>
+            <span className="cv-proj-action">{SITE_TEXT.home.interceptLabel}</span>
+          </motion.span>
         )}
       </AnimatePresence>
     </motion.button>

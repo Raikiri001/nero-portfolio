@@ -3,8 +3,13 @@
   flex-wrap: wrap;
 }
 
+.scramble-word {
+  display: inline-flex;
+  white-space: nowrap;
+}
+
 .scramble-char {
   display: inline-block;
-  min-width: 0.6em; /* Prevent jitter for variable width fonts */
+  min-width: 0.6em; /* stops variable-width glyphs jittering while they churn */
   text-align: center;
 }

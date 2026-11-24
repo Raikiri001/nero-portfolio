@@ -1,220 +1,316 @@
-import { useState, useCallback, useEffect } from 'react';
-// eslint-disable-next-line no-unused-vars
-import { AnimatePresence, motion } from 'motion/react';
+import { useState, useCallback, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
+import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import { BootSequence } from './components/boot/BootSequence';
 import { CustomCursor } from './components/ui/CustomCursor';
 import { ScanlineOverlay } from './components/ui/ScanlineOverlay';
 import { Navigation } from './components/ui/Navigation';
-import { TransitionOverlay } from './components/ui/TransitionOverlay';
 import { ScrollIndicator } from './components/ui/ScrollIndicator';
 import { GundamBackLayer } from './components/ui/GundamBackgroundLayers';
 import { Home } from './pages/Home/Home';
-import { Projects } from './pages/Projects/Projects';
 import { About } from './pages/About/About';
 import { Contact } from './pages/Contact/Contact';
-import { LaunchSequence } from './game/LaunchSequence';
-import { Combat } from './game/Combat';
+import { pickRandomBoss } from './data/bossRoster';
 import './App.css';
 
+// Everything that pulls in three.js / React Three Fiber is loaded on demand,
+// so Home, About and Contact never download the 3D stack. The loaders are
+// named so they can be warmed early.
+//
+// The game itself (launch + fight) runs INSIDE the hangar canvas, so it
+// ships in the Projects chunk; only its DOM overlay is separate.
+const loadProjects = () => import('./pages/Projects/Projects');
+const loadDeployOverlay = () => import('./game/DeployOverlay');
+const Projects = lazy(() => loadProjects().then((m) => ({ default: m.Projects })));
+const DeployOverlay = lazy(() => loadDeployOverlay().then((m) => ({ default: m.DeployOverlay })));
+
+function emptyHud() {
+  return { bossScreen: null, beams: [], lockProgress: 0, locked: false };
+}
+
 const SECTIONS = ['home', 'about', 'projects', 'contact'];
+
+// Wheel travel (px) that switches section. Accumulated, and reset every
+// WHEEL_RESET_MS, so a deliberate flick switches and a stray nudge doesn't.
+const WHEEL_THRESHOLD = 400;
+const WHEEL_RESET_MS = 200;
+// Upper bound on the section-switch lock, in case AnimatePresence never
+// reports its exit (e.g. reduced motion skips the animation entirely).
+const TRANSITION_LOCK_MS = 1700;
+
+// Push-back transition between sections
+const SECTION_VARIANTS = {
+  initial: { scale: 1.1, opacity: 0, filter: 'brightness(2) blur(4px)' },
+  enter: { scale: 1, opacity: 1, filter: 'brightness(1) blur(0px)', transition: { duration: 0.8, ease: 'easeOut' } },
+  exit: { scale: 0.85, opacity: 0, filter: 'brightness(0.3) blur(8px)', transition: { duration: 0.8, ease: 'easeInOut' } },
+};
+
+// The boot layer only fades — scaling it would shrink the backdrop with it
+const BOOT_VARIANTS = {
+  enter: { opacity: 1, filter: 'brightness(1) blur(0px)', transition: { duration: 0.8, ease: 'easeOut' } },
+  exit: { opacity: 0, filter: 'brightness(0.3) blur(8px)', transition: { duration: 0.8, ease: 'easeInOut' } },
+};
+
+/** deltaY in pixels, whatever unit the browser reported it in. */
+function wheelPixels(e) {
+  if (e.deltaMode === 1) return e.deltaY * 16; // lines (Firefox)
+  if (e.deltaMode === 2) return e.deltaY * window.innerHeight; // pages
+  return e.deltaY;
+}
+
+function SectionLoading() {
+  return <div className="section-loading">LOADING_HANGAR…</div>;
+}
 
 function App() {
   const [bootComplete, setBootComplete] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [isTransitioning, setIsTransitioning] = useState(false);
-  // null | { phase: 'launching' | 'combat', gundamId }
+  // The project whose bay Projects should open on, or null for the first.
+  const [openProjectId, setOpenProjectId] = useState(null);
+  // The deploy session — DEPLOY → sortie (launch shot) → combat → return.
+  // null, or { gundamId, phase: 'sortie' | 'combat', bossDef, runKey,
+  // entry, paused, result }. The same session drives the 3D (through
+  // Projects → HangarCorridor) and the DOM (DeployOverlay).
   const [deploySession, setDeploySession] = useState(null);
+  const [sortieStage, setSortieStage] = useState(null);
+  const [snapshot, setSnapshot] = useState(null);
+  const hudRef = useRef(emptyHud());
+  const lockTimerRef = useRef(null);
 
-  const handleBootComplete = useCallback(() => {
-    setBootComplete(true);
-  }, []);
+  // Warm the hangar chunk while the boot sequence plays, so the first visit
+  // to Projects doesn't wait on the network.
+  useEffect(() => { loadProjects(); }, []);
 
-  const handleDeploy = useCallback((gundamId) => {
-    setDeploySession({ phase: 'launching', gundamId });
-  }, []);
+  // Once someone is in the hangar, they may DEPLOY: warm the overlay too.
+  useEffect(() => {
+    if (activeSection === 'projects') loadDeployOverlay();
+  }, [activeSection]);
 
-  const handleLaunchComplete = useCallback(() => {
-    setDeploySession((s) => (s ? { ...s, phase: 'combat' } : s));
+  const unlock = useCallback(() => {
+    clearTimeout(lockTimerRef.current);
+    setIsTransitioning(false);
   }, []);
-
-  const handleCombatReturn = useCallback(() => {
-    setDeploySession(null);
-  }, []);
+  useEffect(() => () => clearTimeout(lockTimerRef.current), []);
 
   const changeSection = useCallback((direction, targetSection = null) => {
     if (isTransitioning) return;
-    
-    let newSection = targetSection;
-    
-    if (!newSection) {
-      const currentIndex = SECTIONS.indexOf(activeSection);
-      if (direction === 'next' && currentIndex < SECTIONS.length - 1) {
-        newSection = SECTIONS[currentIndex + 1];
-      } else if (direction === 'prev' && currentIndex > 0) {
-        newSection = SECTIONS[currentIndex - 1];
-      } else {
-        return; // out of bounds
-      }
-    } else if (newSection === activeSection) {
-      return; // already on this section
+
+    let next = targetSection;
+    if (!next) {
+      const i = SECTIONS.indexOf(activeSection);
+      if (direction === 'next' && i < SECTIONS.length - 1) next = SECTIONS[i + 1];
+      else if (direction === 'prev' && i > 0) next = SECTIONS[i - 1];
+      else return;
+    } else if (next === activeSection) {
+      return;
     }
 
     setIsTransitioning(true);
-    setActiveSection(newSection);
+    setActiveSection(next);
+    clearTimeout(lockTimerRef.current);
+    lockTimerRef.current = setTimeout(unlock, TRANSITION_LOCK_MS);
+  }, [activeSection, isTransitioning, unlock]);
 
-    // Give time for push-back / fall-in animation
-    setTimeout(() => {
-      setIsTransitioning(false);
-    }, 1200); 
-  }, [activeSection, isTransitioning]);
+  const handleNavigate = useCallback((sectionId) => {
+    setOpenProjectId(null);
+    changeSection(null, sectionId);
+  }, [changeSection]);
 
-  // Wheel listener for vertical scroll switching
+  // Home's bounding-box launch: open the hangar on that project's bay.
+  const handleOpenProject = useCallback((projectId) => {
+    setOpenProjectId(projectId);
+    changeSection(null, 'projects');
+  }, [changeSection]);
+
+  // ---- the deploy session ------------------------------------------
+  const handleDeploy = useCallback((gundamId) => {
+    hudRef.current = emptyHud();
+    setSnapshot(null);
+    setSortieStage(null);
+    setDeploySession({
+      gundamId, phase: 'sortie', bossDef: pickRandomBoss(), runKey: 0,
+      entry: null, paused: false, result: null, skip: false,
+    });
+  }, []);
+
+  // SPACE / CLICK during the launch shot: the director plays the rest of
+  // the timeline fast rather than cutting, so a skip is still one shot.
+  const handleSkip = useCallback(() => {
+    setDeploySession((s) => (s && s.phase === 'sortie' ? { ...s, skip: true } : s));
+  }, []);
+
+  // The suit has left the catapult: the fight starts from there.
+  const handleLaunched = useCallback((entry) => {
+    setDeploySession((s) => (s ? { ...s, phase: 'combat', entry } : s));
+  }, []);
+
+  const handleCombatExit = useCallback((result) => {
+    setDeploySession((s) => (s ? { ...s, result } : s));
+  }, []);
+
+  const handleTogglePause = useCallback(() => {
+    setDeploySession((s) => (s && !s.result ? { ...s, paused: !s.paused } : s));
+  }, []);
+
+  // A new opponent, same launch point — no second launch, no cut.
+  const handleRetry = useCallback(() => {
+    hudRef.current = emptyHud();
+    setSnapshot(null);
+    setDeploySession((s) => (s ? {
+      ...s, bossDef: pickRandomBoss(s.bossDef.id), runKey: s.runKey + 1, paused: false, result: null,
+    } : s));
+  }, []);
+
+  // Back to the hangar. Projects never unmounted, so it is still on the bay
+  // that deployed; the corridor re-docks the suit and re-frames the camera.
+  const handleCombatReturn = useCallback(() => {
+    setDeploySession(null);
+    setSortieStage(null);
+  }, []);
+
+  // What the hangar canvas needs. Memoised on the fields it reads, so HUD
+  // snapshots (~12/s, separate state) never re-render the 3D.
+  const sortie = useMemo(() => deploySession && {
+    gundamId: deploySession.gundamId,
+    phase: deploySession.phase,
+    bossDef: deploySession.bossDef,
+    runKey: deploySession.runKey,
+    entry: deploySession.entry,
+    frozen: deploySession.paused || !!deploySession.result,
+    skip: !!deploySession.skip,
+    hudRef,
+    onStage: setSortieStage,
+    onLaunched: handleLaunched,
+    onSnapshot: setSnapshot,
+    onExit: handleCombatExit,
+  }, [deploySession, handleLaunched, handleCombatExit]);
+
+  const handleBootComplete = useCallback(() => setBootComplete(true), []);
+
+  // Wheel → section switching. Only when the content under the pointer
+  // can't scroll further in that direction, and never during a deploy.
   useEffect(() => {
-    if (!bootComplete || isTransitioning) return;
-    
-    // Using an accumulator to prevent overly sensitive touchpad swipes from triggering multiple times
-    let wheelAccumulator = 0;
-    
+    if (!bootComplete || isTransitioning || deploySession) return undefined;
+
+    let accumulated = 0;
+
     const handleWheel = (e) => {
-      // Don't trigger if user is scrolling inside a scrollable container (like the hangar's info panel)
       if (e.target.closest('.hangar-info')) return;
-      
-      // Allow natural scrolling if the section content overflows
-      const scrollContainer = e.target.closest('.eda-dashboard-section, .projects-section, .home-section, .contact-section');
-      if (scrollContainer) {
-        const isScrollingUp = e.deltaY < 0;
-        const isScrollingDown = e.deltaY > 0;
-        const atTop = scrollContainer.scrollTop <= 0;
-        const atBottom = scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 1;
-        
-        // If it can scroll in the requested direction, don't change sections
-        if (isScrollingDown && !atBottom) return;
-        if (isScrollingUp && !atTop) return;
+
+      // The hangar is its own scroller; everything else scrolls inside the
+      // section wrapper (.page-scroll).
+      const scroller = e.target.closest('.projects-section, .page-scroll');
+      if (scroller) {
+        const atTop = scroller.scrollTop <= 0;
+        const atBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1;
+        if (e.deltaY > 0 && !atBottom) return;
+        if (e.deltaY < 0 && !atTop) return;
       }
-      
-      wheelAccumulator += e.deltaY;
-      
-      // Increased threshold to 800 for more deliberate scrolling
-      if (wheelAccumulator > 800) {
+
+      accumulated += wheelPixels(e);
+      if (accumulated > WHEEL_THRESHOLD) {
         changeSection('next');
-        wheelAccumulator = 0;
-      } else if (wheelAccumulator < -800) {
+        accumulated = 0;
+      } else if (accumulated < -WHEEL_THRESHOLD) {
         changeSection('prev');
-        wheelAccumulator = 0;
+        accumulated = 0;
       }
     };
 
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    
-    // Clear accumulator over time
-    const interval = setInterval(() => { wheelAccumulator = 0; }, 200);
-    
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    const interval = setInterval(() => { accumulated = 0; }, WHEEL_RESET_MS);
     return () => {
       window.removeEventListener('wheel', handleWheel);
       clearInterval(interval);
     };
-  }, [bootComplete, isTransitioning, changeSection]);
+  }, [bootComplete, isTransitioning, deploySession, changeSection]);
 
-
-
-  const handleNavigate = useCallback((sectionId) => {
-    changeSection(null, sectionId);
-  }, [changeSection]);
-
-  // Framer Motion variants for push-back animation
-  const containerVariants = {
-    initial: { scale: 1.1, opacity: 0, filter: 'brightness(2) blur(4px)' },
-    enter: { scale: 1, opacity: 1, filter: 'brightness(1) blur(0px)', transition: { duration: 0.8, ease: "easeOut" } },
-    exit: { scale: 0.85, opacity: 0, filter: 'brightness(0.3) blur(8px)', transition: { duration: 0.8, ease: "easeInOut" } }
-  };
-
-  // Specific variants for boot sequence to prevent background shrinking
-  const bootVariants = {
-    enter: { 
-      opacity: 1, 
-      filter: 'brightness(1) blur(0px)',
-      transition: { duration: 0.8, ease: "easeOut" } 
-    },
-    exit: { 
-      opacity: 0, 
-      filter: 'brightness(0.3) blur(8px)',
-      transition: { duration: 0.8, ease: "easeInOut" } 
-    }
-  };
+  const sectionIndex = SECTIONS.indexOf(activeSection);
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <CustomCursor />
 
-      {/* Background Base */}
       <div className="hex-grid-bg" />
 
       <AnimatePresence mode="wait">
         {!bootComplete ? (
           <motion.div
             key="boot"
-            variants={bootVariants}
+            className="boot-layer"
+            variants={BOOT_VARIANTS}
             initial="enter"
             animate="enter"
             exit="exit"
-            style={{ position: 'absolute', inset: 0, zIndex: 10000, transformOrigin: 'center center', width: '100%', height: '100vh' }}
           >
             <BootSequence onComplete={handleBootComplete} />
           </motion.div>
         ) : (
           <div key="main" className="main-app">
-
-            {/* HUD Elements — nav drops out during a deploy session so it
-                doesn't overlap the combat HUD's own controls/reticle. */}
+            {/* The nav drops out during a deploy so it can't overlap the
+                launch shot or the combat HUD. */}
             {!deploySession && <Navigation activeSection={activeSection} onNavigate={handleNavigate} />}
             <ScanlineOverlay />
 
-            {/* Persistent, never unmounts across page navigation: every
-                Gundam flies continuously in the background on every page.
-                While Projects is active, the project-linked units drop
-                out of this layer — they're the docked 3D models in the
-                hangar corridor instead (see game/hangar/HangarCorridor.jsx). */}
-            <GundamBackLayer activeSection={activeSection} />
+            {/* Persistent across sections: every roster Gundam flies in the
+                background. On Projects, the project-linked units drop out of
+                this layer — they are the docked 3D models instead. Gone
+                during a deploy: the hangar canvas is transparent, and 2D
+                sprites drifting through space would sit behind the fight. */}
+            {!deploySession && <GundamBackLayer activeSection={activeSection} />}
 
-            {/* Sections Container for Push-Back Transition */}
-            <div className="page-container" style={{ position: 'relative', zIndex: 2 }}>
-              <AnimatePresence mode="wait">
+            {/* The section stays mounted through a deploy: the hangar canvas
+                IS the stage for the launch and the fight. */}
+            <main className="page-container">
+              <AnimatePresence mode="wait" onExitComplete={unlock}>
                 <motion.div
                   key={activeSection}
-                  variants={containerVariants}
+                  className="page-scroll"
+                  variants={SECTION_VARIANTS}
                   initial="initial"
                   animate="enter"
                   exit="exit"
-                  style={{ position: 'absolute', inset: 0, transformOrigin: 'center center', width: '100%', height: '100vh', overflowY: 'auto', overflowX: 'hidden' }}
                 >
-                  {/* Home and Projects now take extra props to handle deep-linking. We will add them later. */}
-                  {activeSection === 'home' && <Home onNavigate={handleNavigate} />}
+                  {activeSection === 'home' && <Home onOpenProject={handleOpenProject} />}
                   {activeSection === 'about' && <About />}
-                  {activeSection === 'projects' && <Projects onDeploy={handleDeploy} />}
+                  {activeSection === 'projects' && (
+                    <Suspense fallback={<SectionLoading />}>
+                      <Projects onDeploy={handleDeploy} openProjectId={openProjectId} sortie={sortie} />
+                    </Suspense>
+                  )}
                   {activeSection === 'contact' && <Contact />}
 
-                  {/* Scroll Indicators inside the push-back container so they transition out together */}
-                  <ScrollIndicator direction="up" show={SECTIONS.indexOf(activeSection) > 0} />
-                  <ScrollIndicator direction="down" show={SECTIONS.indexOf(activeSection) < SECTIONS.length - 1} />
+                  <ScrollIndicator direction="up" show={!deploySession && sectionIndex > 0} />
+                  <ScrollIndicator direction="down" show={!deploySession && sectionIndex < SECTIONS.length - 1} />
                 </motion.div>
               </AnimatePresence>
-            </div>
+            </main>
 
-            {/* Deploy flow: hangar's DEPLOY button -> catapult launch
-                cinematic -> 3D combat duel -> Retry/Return back here.
-                Rendered as full-screen overlays above everything else,
-                outside the section push-back cycle. */}
-            {deploySession?.phase === 'launching' && (
-              <LaunchSequence gundamId={deploySession.gundamId} onComplete={handleLaunchComplete} />
+            {/* Deploy flow, DOM half: the launch callouts, then the combat
+                HUD. Text over the live canvas — never a backdrop. */}
+            {deploySession && (
+              <Suspense fallback={null}>
+                <DeployOverlay
+                  gundamId={deploySession.gundamId}
+                  phase={deploySession.phase}
+                  stage={sortieStage}
+                  hudRef={hudRef}
+                  snapshot={snapshot}
+                  bossName={deploySession.bossDef.name}
+                  result={deploySession.result}
+                  paused={deploySession.paused}
+                  onTogglePause={handleTogglePause}
+                  onRetry={handleRetry}
+                  onReturn={handleCombatReturn}
+                  onSkip={handleSkip}
+                  skipping={!!deploySession.skip}
+                />
+              </Suspense>
             )}
-            {deploySession?.phase === 'combat' && (
-              <Combat gundamId={deploySession.gundamId} onReturn={handleCombatReturn} />
-            )}
-
           </div>
         )}
       </AnimatePresence>
-    </>
+    </MotionConfig>
   );
 }
 

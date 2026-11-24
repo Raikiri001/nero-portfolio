@@ -1,106 +1,88 @@
-import { useState, useEffect, useCallback } from 'react';
-// eslint-disable-next-line no-unused-vars
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SYSTEM_BOOT_SEQUENCE, SITE_TEXT } from '../../data/siteData';
 import './BootSequence.css';
 
+const CHAR_MS = 15;      // typing speed
+const LINE_PAUSE_MS = 150;
+const PROMPT_DELAY_MS = 500;
+
+// Types SYSTEM_BOOT_SEQUENCE out line by line, then waits for any key or a
+// click before handing over to the site.
 export function BootSequence({ onComplete }) {
-  const [stage, setStage] = useState('terminal'); // terminal → awaiting_input → done
-  const [terminalLines, setTerminalLines] = useState([]);
-  const [activeLineIdx, setActiveLineIdx] = useState(0);
-  const [activeCharIdx, setActiveCharIdx] = useState(0);
-
-  // Input stage completion
-  const handleComplete = useCallback(() => {
-    onComplete();
-  }, [onComplete]);
+  const [stage, setStage] = useState('terminal'); // terminal → awaiting_input
+  const [lines, setLines] = useState([]);
+  const [lineIdx, setLineIdx] = useState(0);
+  const [charIdx, setCharIdx] = useState(0);
+  const awaiting = stage === 'awaiting_input';
 
   useEffect(() => {
-    if (stage === 'awaiting_input') {
-      const handleKeyDown = () => handleComplete();
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [stage, handleComplete]);
+    if (!awaiting) return undefined;
+    window.addEventListener('keydown', onComplete);
+    return () => window.removeEventListener('keydown', onComplete);
+  }, [awaiting, onComplete]);
 
-  // Terminal Typing Logic
   useEffect(() => {
-    if (stage === 'terminal') {
-      if (activeLineIdx >= SYSTEM_BOOT_SEQUENCE.length) {
-        // Finished typing all lines
-        setTimeout(() => setStage('awaiting_input'), 500);
-        return;
-      }
+    if (stage !== 'terminal') return undefined;
 
-      const currentTargetLine = SYSTEM_BOOT_SEQUENCE[activeLineIdx];
-
-      if (activeCharIdx < currentTargetLine.length) {
-        const timeout = setTimeout(() => {
-          setTerminalLines(prev => {
-            const newLines = [...prev];
-            if (!newLines[activeLineIdx]) newLines[activeLineIdx] = '';
-            newLines[activeLineIdx] = currentTargetLine.substring(0, activeCharIdx + 1);
-            return newLines;
-          });
-          setActiveCharIdx(prev => prev + 1);
-        }, 15); // typing speed
-        return () => clearTimeout(timeout);
-      } else {
-        // Line complete, delay before next line
-        const timeout = setTimeout(() => {
-          setActiveLineIdx(prev => prev + 1);
-          setActiveCharIdx(0);
-        }, 150);
-        return () => clearTimeout(timeout);
-      }
+    if (lineIdx >= SYSTEM_BOOT_SEQUENCE.length) {
+      const t = setTimeout(() => setStage('awaiting_input'), PROMPT_DELAY_MS);
+      return () => clearTimeout(t);
     }
-  }, [stage, activeLineIdx, activeCharIdx]);
 
-  // ASCII Helmet logic removed
+    const target = SYSTEM_BOOT_SEQUENCE[lineIdx];
+    if (charIdx < target.length) {
+      const t = setTimeout(() => {
+        setLines((prev) => {
+          const next = [...prev];
+          next[lineIdx] = target.substring(0, charIdx + 1);
+          return next;
+        });
+        setCharIdx((c) => c + 1);
+      }, CHAR_MS);
+      return () => clearTimeout(t);
+    }
 
-  // Burst logic removed
+    const t = setTimeout(() => {
+      setLineIdx((i) => i + 1);
+      setCharIdx(0);
+    }, LINE_PAUSE_MS);
+    return () => clearTimeout(t);
+  }, [stage, lineIdx, charIdx]);
 
   return (
     <div
       className="boot-sequence"
-      onClick={stage === 'awaiting_input' ? handleComplete : undefined}
-      style={{ cursor: stage === 'awaiting_input' ? 'pointer' : 'default' }}
+      onClick={awaiting ? onComplete : undefined}
+      role={awaiting ? 'button' : undefined}
+      tabIndex={awaiting ? 0 : undefined}
+      aria-label={awaiting ? SITE_TEXT.boot.initializeLabel : undefined}
     >
-      {/* Gate Screen */}
-      {/* Gate Screen Removed */}
-
-      {/* Terminal Typing Sequence */}
       <AnimatePresence>
-        {(stage === 'terminal' || stage === 'awaiting_input') && (
-          <motion.div
-            className="boot-stage boot-neural"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, scale: 0.8, filter: 'blur(10px)' }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-          >
-            <div className="neural-text">
-              {terminalLines.map((line, idx) => (
-                <div key={idx} className="neural-text__content">
-                  {line}
-                  {idx === activeLineIdx && <span className="neural-cursor">█</span>}
-                  {idx < activeLineIdx && <span className="neural-text__ok"> [OK]</span>}
-                </div>
-              ))}
+        <motion.div
+          className="boot-sequence__stage"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, scale: 0.8, filter: 'blur(10px)' }}
+          transition={{ duration: 0.8, ease: 'easeInOut' }}
+        >
+          <div className="boot-sequence__text" aria-live="polite">
+            {lines.map((line, idx) => (
+              <div key={idx} className="boot-sequence__line">
+                {line}
+                {idx === lineIdx && <span className="boot-sequence__cursor">█</span>}
+                {idx < lineIdx && <span className="boot-sequence__ok"> [OK]</span>}
+              </div>
+            ))}
 
-              {stage === 'awaiting_input' && (
-                <div className="neural-text__content neural-text__content--blink">
-                   {SITE_TEXT.boot.initializeLabel}
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
+            {awaiting && (
+              <div className="boot-sequence__line boot-sequence__line--prompt">
+                {SITE_TEXT.boot.initializeLabel}
+              </div>
+            )}
+          </div>
+        </motion.div>
       </AnimatePresence>
-
-      {/* ASCII Helmet Removed */}
-
-      {/* System Ready Flash Removed */}
     </div>
   );
 }
