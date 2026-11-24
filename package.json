@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "homepage": "https://www.leinerogarcia.com",
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
